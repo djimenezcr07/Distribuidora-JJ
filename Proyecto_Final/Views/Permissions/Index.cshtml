@@ -1,0 +1,18 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.RoleListItemViewModel>
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Permisos por rol";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var buscar = ViewBag.Buscar as string;
+    var canAssign = admin || await PermissionService.HasCodePermissionAsync(role, "PERMISOS_ASIGNAR");
+}
+<section class="djj-security"><partial name="_SecurityNavigation" />
+<header class="djj-page-header"><div class="djj-page-header__copy"><h1>Permisos por rol</h1><p>Seleccioná un rol para revisar el catálogo de capacidades y sus asignaciones.</p></div></header><form asp-action="Index" method="get" class="djj-filter-bar"><div class="djj-field"><label for="buscar">Buscar rol</label><input id="buscar" name="buscar" value="@buscar" class="djj-input" maxlength="100" placeholder="Nombre o descripción" /></div><button class="djj-button djj-button--primary" type="submit">Buscar</button><a asp-action="Index" class="djj-button djj-button--secondary">Limpiar</a></form>
+
+<div class="djj-table-scroll" role="region" aria-label="Permisos por rol" tabindex="0"><table class="djj-table djj-security-table"><caption class="djj-sr-only">Roles disponibles para consultar o administrar capacidades</caption><thead><tr><th scope="col">ID</th><th scope="col">Rol</th><th scope="col">Descripción</th><th scope="col">Usuarios</th><th scope="col">Estado</th><th scope="col">Permisos</th></tr></thead><tbody>
+@if (!Model.Any()) { <tr><td colspan="6">No se encontraron roles para revisar permisos.</td></tr> }
+@foreach (var item in Model) { <tr><td>#@item.PerfilId</td><td><strong>@item.Nombre</strong>@if (item.EsRolBase) { <small class="djj-table__note">Rol base</small> }</td><td>@(string.IsNullOrWhiteSpace(item.Descripcion) ? "Sin descripción" : item.Descripcion)</td><td>@item.TotalUsuarios</td><td><span class="djj-badge djj-badge--@(item.Activo ? "success" : "neutral")">@(item.Activo ? "Activo" : "Inactivo")</span></td><td><a asp-action="Edit" asp-route-id="@item.PerfilId" class="djj-button djj-button--secondary">@(canAssign && !string.Equals(item.Nombre, "Administrador", StringComparison.OrdinalIgnoreCase) ? "Administrar" : "Consultar")</a></td></tr> }
+</tbody></table></div></section>

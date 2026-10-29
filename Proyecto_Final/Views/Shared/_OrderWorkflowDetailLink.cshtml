@@ -1,0 +1,12 @@
+@model int
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    var role = Context.Session.GetString("UserRole");
+    var canViewOrders = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase)
+        || await PermissionService.HasModulePermissionAsync(role, "Pedidos");
+}
+@if (canViewOrders)
+{
+    <a asp-controller="OrdersAdmin" asp-action="Detail" asp-route-id="@Model" class="djj-button djj-button--ghost djj-button--sm">Detalle completo</a>
+}

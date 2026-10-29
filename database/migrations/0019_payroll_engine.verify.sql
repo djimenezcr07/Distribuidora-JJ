@@ -1,0 +1,8 @@
+SET NOCOUNT ON;
+IF NOT EXISTS(SELECT 1 FROM dbo.SchemaMigrationHistory WHERE MigrationId=N'0019_payroll_engine' AND Status=N'Applied' AND LEN(FileSha256)=64) THROW 55270,N'0019 no figura aplicada.',1;
+IF OBJECT_ID(N'dbo.PlanillaReglas',N'U') IS NULL OR OBJECT_ID(N'dbo.PlanillaPeriodos',N'U') IS NULL OR OBJECT_ID(N'dbo.PlanillaCalculos',N'U') IS NULL OR OBJECT_ID(N'dbo.PlanillaDetalle',N'U') IS NULL OR OBJECT_ID(N'dbo.PlanillaAuditoria',N'U') IS NULL THROW 55271,N'Faltan tablas de planilla.',1;
+IF EXISTS(SELECT required.Codigo FROM(VALUES(N'PLANILLA_VER'),(N'PLANILLA_CONFIGURAR'),(N'PLANILLA_GESTIONAR'),(N'PLANILLA_CALCULAR'),(N'PLANILLA_APROBAR'),(N'PLANILLA_PAGAR'),(N'PLANILLA_REVERTIR'))required(Codigo) WHERE NOT EXISTS(SELECT 1 FROM dbo.Permisos p WHERE p.Codigo=required.Codigo AND p.Activo=1)) THROW 55272,N'Faltan permisos de planilla.',1;
+IF EXISTS(SELECT 1 FROM dbo.PlanillaReglas WHERE Fuente=N'' OR Valor<0) OR EXISTS(SELECT 1 FROM dbo.PlanillaPeriodos WHERE FuenteConfiguracion=N'' OR FactorSalario<=0 OR FactorSalario>1) THROW 55273,N'Existe configuración de planilla sin fuente o fuera de rango.',1;
+IF EXISTS(SELECT 1 FROM dbo.PlanillaCalculos WHERE ISJSON(ReglasSnapshotJson)<>1 OR TotalNeto<>TotalBruto-TotalDeducciones) THROW 55274,N'Existe un cálculo inconsistente.',1;
+IF OBJECT_ID(N'dbo.sp_Payroll_GuardarCalculo',N'P') IS NULL OR OBJECT_ID(N'dbo.sp_Payroll_CambiarEstado',N'P') IS NULL OR OBJECT_ID(N'dbo.sp_Payroll_ObtenerEntradaCalculo',N'P') IS NULL THROW 55275,N'Faltan procedimientos de planilla.',1;
+SELECT MigrationId,FileSha256,Status,AppliedAtUtc FROM dbo.SchemaMigrationHistory WHERE MigrationId=N'0019_payroll_engine';

@@ -1,0 +1,29 @@
+@model Proyecto_Final.Models.Store.ContactViewModel
+@{ Layout = "_StorefrontLayout"; ViewData["Title"] = "Contacto"; }
+@section Styles { <link rel="stylesheet" href="~/css/stage2/public-surfaces.css" asp-append-version="true" /> }
+<div class="djj-container djj-public-page">
+    <header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Atención al cliente</span><h1>Contacto</h1><p>Consultá sobre pedidos, productos, disponibilidad y facturación.</p></div></header>
+    <section class="djj-contact-details" aria-label="Información de contacto">
+        <article class="djj-card"><h2>Ubicación</h2><p>San José, Costa Rica</p><p>Distribuidora y licorera con atención en tienda y gestión de pedidos.</p></article>
+        <article class="djj-card"><h2>Teléfono</h2><p>+506 2222-2222</p><p>Lunes a sábado de 8:00 a. m. a 8:00 p. m.</p></article>
+        <article class="djj-card"><h2>Correo</h2><p>info@@labodega.com</p><p>Consultas de pedidos, productos, disponibilidad y facturación.</p></article>
+    </section>
+    <div class="djj-contact-grid">
+        <section class="djj-card" aria-labelledby="contact-form-title"><h2 id="contact-form-title">Envianos un mensaje</h2>
+            @if (TempData["ContactSuccess"] is string success && !string.IsNullOrWhiteSpace(success)) { <div class="djj-alert djj-alert--success" role="status"><p>@success</p></div> }
+            <form asp-controller="Home" asp-action="Contact" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="djj-validation-summary" role="alert" tabindex="-1"></div>
+                <div class="djj-form-grid">
+                    <div class="djj-field"><label asp-for="Nombre">Nombre</label><input asp-for="Nombre" class="djj-input" autocomplete="name" maxlength="100" aria-describedby="contact-name-error" /><span id="contact-name-error" asp-validation-for="Nombre" class="djj-field__error"></span></div>
+                    <div class="djj-field"><label asp-for="Correo">Correo</label><input asp-for="Correo" type="email" class="djj-input" autocomplete="email" aria-describedby="contact-email-error" /><span id="contact-email-error" asp-validation-for="Correo" class="djj-field__error"></span></div>
+                    <div class="djj-field djj-form-grid__wide"><label asp-for="Asunto">Asunto</label><input asp-for="Asunto" class="djj-input" maxlength="120" aria-describedby="contact-subject-error" /><span id="contact-subject-error" asp-validation-for="Asunto" class="djj-field__error"></span></div>
+                    <div class="djj-field djj-form-grid__wide"><label asp-for="Mensaje">Mensaje</label><textarea asp-for="Mensaje" class="djj-textarea" rows="6" maxlength="1000" aria-describedby="contact-message-hint contact-message-error"></textarea><small id="contact-message-hint" class="djj-field__hint">Hasta 1000 caracteres.</small><span id="contact-message-error" asp-validation-for="Mensaje" class="djj-field__error"></span></div>
+                </div>
+                <div class="djj-surface-actions"><button type="submit" class="djj-button djj-button--primary">Enviar mensaje</button></div>
+            </form>
+        </section>
+        <aside class="djj-card" aria-labelledby="contact-help"><h2 id="contact-help">Información rápida</h2><ul class="djj-contact-list"><li><strong>Pedidos:</strong> seguimiento y disponibilidad.</li><li><strong>Inventario:</strong> consulta de productos activos.</li><li><strong>Facturación:</strong> soporte administrativo.</li><li><strong>Entrega:</strong> coordinación según cobertura.</li></ul></aside>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

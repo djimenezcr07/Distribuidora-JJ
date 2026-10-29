@@ -1,0 +1,74 @@
+.admin-shell .card,
+.admin-shell .table-responsive,
+.admin-shell .admin-filter,
+.admin-shell .admin-panel {
+    border: 1px solid rgba(212,175,55,.18);
+    box-shadow: 0 10px 30px rgba(17,17,17,.08);
+}
+.admin-shell .admin-title {
+    color: #1a1a1a;
+    font-weight: 700;
+}
+.admin-shell .admin-subtitle {
+    color: #6c757d;
+}
+.admin-shell .metric-card {
+    border-radius: 14px;
+    overflow: hidden;
+}
+.admin-shell .metric-card .metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+.admin-shell .metric-card .metric-label {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .8rem;
+    color: #6c757d;
+}
+.admin-shell .admin-panel,
+.admin-shell .admin-filter,
+.admin-shell .table-responsive,
+.admin-shell .card {
+    border-radius: 14px;
+    background: #fff;
+}
+.admin-shell .table thead th {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+    font-size: .9rem;
+}
+.admin-shell .badge-admin {
+    padding: .45rem .65rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+.admin-shell .badge-normal { background: rgba(40,167,69,.15); color: #218838; }
+.admin-shell .badge-bajo { background: rgba(255,193,7,.18); color: #856404; }
+.admin-shell .badge-agotado { background: rgba(220,53,69,.15); color: #b02a37; }
+.admin-shell .badge-pendiente { background: rgba(255,193,7,.18); color: #856404; }
+.admin-shell .badge-proceso { background: rgba(0,123,255,.15); color: #0b5ed7; }
+.admin-shell .badge-entregado { background: rgba(40,167,69,.15); color: #218838; }
+.admin-shell .badge-cancelado { background: rgba(220,53,69,.15); color: #b02a37; }
+.admin-shell .quick-link {
+    display: block;
+    border-radius: 14px;
+    background: #111;
+    color: #fff;
+    padding: 1rem 1.1rem;
+    text-decoration: none;
+    transition: .2s ease;
+}
+.admin-shell .quick-link:hover {
+    transform: translateY(-2px);
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(17,17,17,.16);
+}
+.admin-shell .quick-link small { color: rgba(255,255,255,.72); }
+.admin-shell .form-control,
+.admin-shell .custom-select,
+.admin-shell textarea {
+    border-radius: 10px;
+}

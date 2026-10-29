@@ -1,0 +1,33 @@
+@model Proyecto_Final.Models.Presentation.AnalyticsChartViewModel
+@using Proyecto_Final.Models.Presentation
+@{ var maximum = Model.Maximum; }
+<figure class="djj-card djj-analytics-chart">
+    <figcaption><h2>@Model.Title</h2><p>@Model.Context · Colones (₡). Valores completos en la tabla de detalle.</p></figcaption>
+    @if (Model.Rows.Count == 0)
+    {
+        <div class="djj-empty-state"><p>No hay datos para graficar en este período.</p></div>
+    }
+    else
+    {
+        <div class="djj-chart-legend"><span class="djj-chart-key">@Model.ValueLabel</span>@if (Model.TargetLabel is not null) { <span class="djj-chart-key djj-chart-key--target">@Model.TargetLabel</span> }</div>
+        <p class="djj-chart-scale">Escala común: ₡0 — ₡@maximum.ToString("N2")</p>
+        @if (maximum <= 0) { <p class="djj-chart-scale">Todos los valores del período son cero.</p> }
+        <div class="djj-chart-rows" tabindex="0" role="region" aria-label="@Model.Title: valores y barras comparativas">
+            @foreach (var row in Model.Rows)
+            {
+                <div class="djj-chart-row">
+                    <strong>@row.Label</strong>
+                    <div class="djj-chart-series">
+                        <div class="djj-chart-reading"><span>@Model.ValueLabel</span><span class="djj-number">₡@row.Value.ToString("N2")</span></div>
+                        <div class="djj-chart-track" aria-hidden="true"><span style="--djj-chart-width:@(AnalyticsChartViewModel.Width(row.Value, maximum))%"></span></div>
+                        @if (row.Target.HasValue)
+                        {
+                            <div class="djj-chart-reading"><span>@Model.TargetLabel</span><span class="djj-number">₡@row.Target.Value.ToString("N2")</span></div>
+                            <div class="djj-chart-track djj-chart-track--target" aria-hidden="true"><span style="--djj-chart-width:@(AnalyticsChartViewModel.Width(row.Target.Value, maximum))%"></span></div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</figure>

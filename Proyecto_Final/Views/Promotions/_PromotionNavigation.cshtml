@@ -1,0 +1,5 @@
+@{ var action = ViewContext.RouteData.Values["action"]?.ToString(); }
+<nav class="djj-domain-nav" aria-label="Secciones de promociones">
+    <a asp-action="Index" aria-current="@(action != "Segments" ? "page" : null)">Promociones</a>
+    <a asp-action="Segments" aria-current="@(action == "Segments" ? "page" : null)">Segmentos de cliente</a>
+</nav>

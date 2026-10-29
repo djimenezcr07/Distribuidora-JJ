@@ -1,0 +1,165 @@
+@model Proyecto_Final.Models.Admin.MaintenanceIndexViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Mantenimiento de flota";
+    var vehiculos = ViewBag.Vehiculos as List<Proyecto_Final.Models.Admin.VehicleOptionViewModel> ?? new();
+}
+
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-page-header">
+                <h1>Órdenes de mantenimiento</h1>
+                <p>Registra el mantenimiento preventivo y correctivo de cada vehículo para llevar control de los gastos del taller.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="djj-logistics-split djj-logistics-split--form-first">
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <h2>Nueva orden</h2>
+                <form asp-action="CreateMaintenance" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="djj-logistics-danger"></div>
+                    <div class="djj-field">
+                        <label asp-for="Nueva.VehiculoId">Vehículo</label>
+                        <select asp-for="Nueva.VehiculoId" class="djj-input">
+                            <option value="">-- Seleccione --</option>
+                            @foreach (var v in vehiculos)
+                            {
+                                <option value="@v.VehiculoId">@v.Placa — @v.Descripcion</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Nueva.VehiculoId" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="Nueva.Tipo">Tipo</label>
+                        <select asp-for="Nueva.Tipo" class="djj-input">
+                            <option value="Preventivo">Preventivo</option>
+                            <option value="Correctivo">Correctivo</option>
+                        </select>
+                        <span asp-validation-for="Nueva.Tipo" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="Nueva.Descripcion">Descripción</label>
+                        <textarea asp-for="Nueva.Descripcion" class="djj-input" rows="2" placeholder="Ej: cambio de aceite y filtros"></textarea>
+                        <span asp-validation-for="Nueva.Descripcion" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="Nueva.Taller">Taller</label>
+                        <input asp-for="Nueva.Taller" class="djj-input" />
+                        <span asp-validation-for="Nueva.Taller" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-form-grid">
+                        <div class="djj-field">
+                            <label asp-for="Nueva.Costo">Costo (₡)</label>
+                            <input asp-for="Nueva.Costo" class="djj-input" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="Nueva.Costo" class="djj-logistics-danger"></span>
+                        </div>
+                        <div class="djj-field">
+                            <label asp-for="Nueva.Estado">Estado</label>
+                            <select asp-for="Nueva.Estado" class="djj-input">
+                                <option value="Programada">Programada</option>
+                                <option value="EnProceso">En proceso</option>
+                                <option value="Completada">Completada</option>
+                            </select>
+                        <span asp-validation-for="Nueva.Estado" class="djj-logistics-danger"></span>
+                        </div>
+                    </div>
+                    <div class="djj-form-grid">
+                        <div class="djj-field">
+                            <label asp-for="Nueva.FechaProgramada">Fecha programada</label>
+                            <input asp-for="Nueva.FechaProgramada" class="djj-input" type="date" />
+                        <span asp-validation-for="Nueva.FechaProgramada" class="djj-logistics-danger"></span>
+                        </div>
+                        <div class="djj-field">
+                            <label asp-for="Nueva.KilometrajeProximo">Próximo (km)</label>
+                            <input asp-for="Nueva.KilometrajeProximo" class="djj-input" type="number" min="0" placeholder="Aviso por desgaste" />
+                        <span asp-validation-for="Nueva.KilometrajeProximo" class="djj-logistics-danger"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="djj-button djj-button--primary djj-full-width">Registrar orden</button>
+                </form>
+            </div>
+        </div>
+
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <form asp-action="Maintenance" method="get" class="djj-logistics-filter">
+                    <label for="maintenance-state">Estado del historial</label><select id="maintenance-state" name="estado" class="djj-input">
+                        <option value="">Todos los estados</option>
+                        <option value="Programada" selected="@(Model.Estado == "Programada")">Programada</option>
+                        <option value="EnProceso" selected="@(Model.Estado == "EnProceso")">En proceso</option>
+                        <option value="Completada" selected="@(Model.Estado == "Completada")">Completada</option>
+                    </select>
+                    <button type="submit" class="djj-button djj-button--primary">Filtrar</button>
+                    <a asp-action="Maintenance" class="djj-button djj-button--outline">Limpiar</a>
+                </form>
+            </div>
+
+            <div class="djj-card">
+                <div class="djj-logistics-pad djj-logistics-divider djj-cluster djj-logistics-between">
+                    <h2>Historial de mantenimiento</h2>
+                    <span class="djj-text-secondary">Total: @Model.Ordenes.Count</span>
+                </div>
+                <div class="djj-table-wrap" tabindex="0" aria-label="Tabla desplazable">
+                    <table class="djj-table"><caption class="djj-sr-only">Fleet/Maintenance · registros operativos</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Vehículo</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Programación</th><th scope="col" class="djj-align-right">Costo</th>
+                                <th scope="col" class="djj-logistics-center">Estado</th>
+                                <th scope="col" class="djj-logistics-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Ordenes.Any())
+                            {
+                                <tr><td colspan="7" class="djj-logistics-center djj-text-secondary">No hay órdenes registradas.</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var o in Model.Ordenes)
+                                {
+                                    var badge = LogisticsStatusPresentation.MaintenanceTone(o.Estado);
+                                    var tipoBadge = "neutral";
+                                    <tr>
+                                        <td class="djj-logistics-strong">@o.VehiculoPlaca</td>
+                                        <td><span class="djj-badge djj-badge--@tipoBadge">@o.Tipo</span></td>
+                                        <td>@o.Descripcion<br /><small class="djj-text-secondary">@o.Taller</small></td>
+                                        <td><span class="djj-table__nowrap">@(o.FechaProgramada?.ToString("dd/MM/yyyy") ?? "Sin fecha")</span><small class="djj-table__note">Próximo km: @(o.KilometrajeProximo?.ToString("N0") ?? "Sin definir")</small><small class="djj-table__note">Registro: @o.FechaRegistro.ToString("dd/MM/yyyy") · @o.RegistradoPorNombre</small></td><td class="djj-align-right djj-table__nowrap">₡@o.Costo.ToString("N2")</td>
+                                        <td class="djj-logistics-center"><span class="djj-badge djj-badge--@badge">@o.Estado</span></td>
+                                        <td class="djj-logistics-center">
+                                            @if (o.Estado != "Completada")
+                                            {
+                                                <form asp-action="CompleteMaintenance" method="post" class="djj-inline-action"
+                                                      data-djj-confirm="¿Marcar la orden como completada?">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="ordenId" value="@o.OrdenMantenimientoId" />
+                                                    <button type="submit" class="djj-button djj-button--outline">Completar</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="djj-text-secondary">@o.FechaRealizada?.ToString("dd/MM/yyyy")</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

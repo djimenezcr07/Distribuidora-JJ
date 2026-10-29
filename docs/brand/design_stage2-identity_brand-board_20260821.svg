@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960" role="img" aria-labelledby="title desc">
+  <title id="title">Foundation board de identidad de Distribuidora JJ</title>
+  <desc id="desc">Presentación del monograma JJ, versiones sobre fondo claro y oscuro, paleta y tamaños recomendados.</desc>
+  <rect width="1440" height="960" fill="#FAFAFA"/>
+  <rect width="1440" height="16" fill="#8B0E16"/>
+  <text x="80" y="92" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Distribuidora JJ</text>
+  <text x="80" y="128" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="600" letter-spacing="2">IDENTIDAD FINAL · CONCEPTO A — MONOGRAMA JJ</text>
+
+  <rect x="80" y="176" width="820" height="270" rx="20" fill="#FFFFFF" stroke="#E5E1E2"/>
+  <rect x="120" y="228" width="168" height="168" rx="34" fill="#8B0E16"/>
+  <path d="M159 272H192V327C192 353 177 369 155 369C144 369 135 364 129 356" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M219 272H252V327C252 353 237 369 215 369C204 369 195 364 189 356" fill="none" stroke="#D4AF37" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="338" y="304" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="43" font-weight="700">DISTRIBUIDORA JJ</text>
+  <rect x="340" y="325" width="60" height="5" rx="2.5" fill="#D4AF37"/>
+  <text x="338" y="369" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" letter-spacing="2.6">LICORERA - DISTRIBUIDORA</text>
+
+  <rect x="932" y="176" width="428" height="270" rx="20" fill="#1F1F1F"/>
+  <rect x="976" y="229" width="112" height="112" rx="24" fill="#8B0E16"/>
+  <path d="M1002 259H1024V296C1024 314 1014 324 999 324C992 324 986 321 982 316" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1041 259H1063V296C1063 314 1053 324 1038 324C1031 324 1025 321 1021 316" fill="none" stroke="#D4AF37" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="1114" y="278" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">DISTRIBUIDORA</text>
+  <text x="1114" y="307" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">JJ</text>
+  <text x="976" y="386" fill="#D0CACC" font-family="Arial, Helvetica, sans-serif" font-size="15">Versión invertida · fondos oscuros</text>
+
+  <text x="80" y="520" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Paleta de marca</text>
+  <g font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="600">
+    <rect x="80" y="552" width="220" height="120" rx="16" fill="#8B0E16"/><text x="100" y="632" fill="#FFFFFF">ROJO PRINCIPAL · #8B0E16</text>
+    <rect x="320" y="552" width="220" height="120" rx="16" fill="#1F1F1F"/><text x="340" y="632" fill="#FFFFFF">CARBÓN · #1F1F1F</text>
+    <rect x="560" y="552" width="220" height="120" rx="16" fill="#D4AF37"/><text x="580" y="632" fill="#1F1F1F">DORADO · #D4AF37</text>
+    <rect x="800" y="552" width="220" height="120" rx="16" fill="#FFFFFF" stroke="#D0CACC"/><text x="820" y="632" fill="#1F1F1F">BLANCO · #FFFFFF</text>
+    <rect x="1040" y="552" width="220" height="120" rx="16" fill="#FAFAFA" stroke="#D0CACC"/><text x="1060" y="632" fill="#1F1F1F">SUPERFICIE · #FAFAFA</text>
+  </g>
+
+  <text x="80" y="744" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700">Escala y variantes</text>
+  <rect x="80" y="778" width="72" height="72" rx="15" fill="#8B0E16"/>
+  <path d="M97 798H111V822C111 833 105 840 95 840C91 840 87 838 84 835" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M123 798H137V822C137 833 131 840 121 840C117 840 113 838 110 835" fill="none" stroke="#D4AF37" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="80" y="878" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="14">Isotipo · 32 px mínimo en interfaz</text>
+
+  <rect x="430" y="794" width="48" height="48" rx="10" fill="#8B0E16"/>
+  <path d="M441 807H450V823C450 831 446 835 439 835" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <path d="M458 807H467V823C467 831 463 835 456 835" fill="none" stroke="#D4AF37" stroke-width="4" stroke-linecap="round"/>
+  <text x="430" y="878" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="14">App / sidebar</text>
+
+  <text x="680" y="816" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">DISTRIBUIDORA JJ</text>
+  <text x="680" y="845" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="600" letter-spacing="1.8">LICORERA - DISTRIBUIDORA</text>
+  <text x="680" y="878" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="14">Horizontal · 180 px mínimo con subtítulo</text>
+
+  <text x="80" y="930" fill="#8B0E16" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700">STAGE 2.1A.1 · IDENTIDAD DEFINIDA · UI NO IMPLEMENTADA</text>
+</svg>

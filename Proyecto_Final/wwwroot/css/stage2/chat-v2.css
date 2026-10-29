@@ -1,0 +1,9 @@
+.djj-chat-v2 { display: grid; gap: var(--djj-space-4); min-width: 0; }
+.djj-chat-v2-tools, .djj-chat-v2-compose { display: grid; gap: var(--djj-space-3); align-items: end; }
+.djj-chat-v2 .djj-field { min-width: 0; }
+.djj-chat-v2-messages { min-height: 12rem; max-height: 32rem; overflow-y: auto; display: grid; gap: var(--djj-space-3); align-content: start; }
+.djj-chat-v2-message { margin: 0; padding: var(--djj-space-3); border-radius: var(--djj-radius-md); background: var(--djj-color-surface-subtle); white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (min-width: 48rem) {
+    .djj-chat-v2-tools { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; }
+    .djj-chat-v2-compose { grid-template-columns: minmax(0, 1fr) auto; }
+}

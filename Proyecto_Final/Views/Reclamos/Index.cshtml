@@ -1,0 +1,25 @@
+@model Proyecto_Final.Models.Admin.ReclamoFilterViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Reclamos de clientes";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "RECLAMOS_GESTIONAR");
+}
+<div class="djj-customer-service">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Reclamos de clientes</h1><p>Registro y seguimiento de inconformidades.</p></div>@if (canManage) { <a asp-action="Create" class="djj-button djj-button--primary">Nuevo reclamo</a> }</header>
+<partial name="_CustomerServiceNavigation" />
+<section class="djj-card djj-filter-card"><h2>Buscar casos</h2><form asp-action="Index" method="get" class="djj-filter-bar">
+<div class="djj-field"><label for="service-state">Estado</label><select id="service-state" name="estado" class="djj-select"><option value="">Todos</option><option value="Abierto" selected="@(Model.Estado == "Abierto")">Abierto</option><option value="EnProceso" selected="@(Model.Estado == "EnProceso")">EnProceso</option><option value="Cerrado" selected="@(Model.Estado == "Cerrado")">Cerrado</option></select></div>
+<div class="djj-field"><label for="service-search">Buscar</label><input id="service-search" type="search" name="buscar" value="@Model.Buscar" class="djj-input" placeholder="Cliente, correo, asunto o contenido" /></div>
+<div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--neutral">Buscar</button><a asp-action="Index" class="djj-button djj-button--ghost">Limpiar</a></div></form></section>
+<section class="djj-card djj-data-section"><header><h2>Reclamos registrados</h2><p>@Model.Reclamos.Count registro(s).</p></header><div class="djj-table-wrap" tabindex="0" role="region" aria-label="Reclamos registrados: tabla desplazable"><table class="djj-table djj-table--compact djj-service-table"><caption class="djj-sr-only">Reclamos registrados</caption><thead><tr><th scope="col">Reclamo / asunto</th><th scope="col">Cliente / contacto</th><th scope="col">Categoría / prioridad</th><th scope="col">Factura</th><th scope="col">Registro / cierre</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody>
+@if (!Model.Reclamos.Any()) { <tr><td colspan="7"><div class="djj-empty-state"><h3>Sin reclamos para estos filtros</h3><p>Probá otra búsqueda o limpiá los filtros.</p></div></td></tr> }
+@foreach (var item in Model.Reclamos)
+{
+<tr><td><strong class="djj-table__primary">#@item.ReclamoId · @item.Asunto</strong></td><td>@item.ClienteNombre<small class="djj-table__note">@item.ClienteCorreo</small></td><td>@item.Categoria<small class="djj-table__note"><span class="djj-badge djj-badge--@CustomerServicePresentation.PriorityTone(item.Prioridad)">@item.Prioridad</span></small></td><td>@(item.NumeroFactura ?? "Sin factura asociada")</td><td>@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")<small class="djj-table__note">Cierre: @(item.FechaCierre?.ToString("dd/MM/yyyy HH:mm") ?? "Sin cierre")</small></td><td><span class="djj-badge djj-badge--@CustomerServicePresentation.ComplaintTone(item.Estado)">@item.Estado</span></td><td><a asp-action="Details" asp-route-id="@item.ReclamoId" class="djj-button djj-button--ghost djj-button--sm" aria-label="Ver reclamo @item.ReclamoId">Ver</a></td></tr>
+}
+</tbody></table></div></section>
+</div>

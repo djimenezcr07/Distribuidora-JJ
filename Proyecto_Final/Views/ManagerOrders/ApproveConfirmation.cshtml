@@ -1,0 +1,6 @@
+@model Proyecto_Final.Models.Admin.ManagerApproveResultViewModel
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Pedido liberado"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Pedidos · Resultado de aprobación</span><h1>Pedido aprobado y facturado</h1><p>El pedido fue liberado, el inventario descontado y la factura generada automáticamente.</p></div></header>
+<section class="djj-card djj-form-card" aria-labelledby="approved-order-title"><h2 id="approved-order-title">Resultado de la operación</h2><dl class="djj-detail-grid"><div><dt>Pedido</dt><dd><strong>#@Model.PedidoId</strong></dd></div><div><dt>Estado</dt><dd><span class="djj-badge djj-badge--@OrderStatusPresentation.Tone(Model.Estado)">@Model.Estado</span></dd></div>@if (!string.IsNullOrWhiteSpace(Model.NumeroFactura)) { <div class="djj-form-grid__full"><dt>Factura generada</dt><dd>@Model.NumeroFactura</dd></div> }</dl></section>
+<nav class="djj-order-navigation" aria-label="Siguientes acciones de revisión"><a asp-action="Index" class="djj-button djj-button--primary">Volver a pedidos retenidos</a><partial name="_OrderWorkflowDetailLink" model="Model.PedidoId" /></nav>

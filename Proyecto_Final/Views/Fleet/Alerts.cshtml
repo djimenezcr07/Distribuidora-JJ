@@ -1,0 +1,118 @@
+@model Proyecto_Final.Models.Admin.FleetAlertsViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Alertas de flota";
+    var vehiculos = ViewBag.Vehiculos as List<Proyecto_Final.Models.Admin.VehicleOptionViewModel> ?? new();
+}
+
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-page-header">
+                <h1>Alertas de flota</h1>
+                <p>Vencimientos legales y mantenimientos preventivos próximos o vencidos, para evitar averías mayores o multas.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="djj-logistics-split">
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <form asp-action="Alerts" method="get" class="djj-logistics-filter">
+                    <label for="diasAviso">Avisar con</label>
+                    <input type="number" id="diasAviso" name="diasAviso" value="@Model.DiasAviso" min="1" max="180" class="djj-input" />
+                    <span>días de anticipación</span>
+                    <button type="submit" class="djj-button djj-button--primary">Actualizar</button>
+                </form>
+            </div>
+
+            <div class="djj-card">
+                <div class="djj-logistics-pad djj-logistics-divider djj-cluster djj-logistics-between">
+                    <h2>Alertas activas</h2>
+                    <span class="djj-text-secondary">Total: @Model.Alertas.Count</span>
+                </div>
+                <div class="djj-table-wrap" tabindex="0" aria-label="Tabla desplazable">
+                    <table class="djj-table"><caption class="djj-sr-only">Fleet/Alerts · registros operativos</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Categoría</th>
+                                <th scope="col">Vehículo</th>
+                                <th scope="col">Detalle</th>
+                                <th scope="col">Fecha</th><th scope="col" class="djj-logistics-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Alertas.Any())
+                            {
+                                <tr><td colspan="5" class="djj-logistics-center djj-text-secondary">Sin alertas pendientes.</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var a in Model.Alertas)
+                                {
+                                    var badge = LogisticsStatusPresentation.AlertTone(a.Severidad);
+                                    var texto = a.Severidad == "Vencido"
+                                        ? "Vencido"
+                                        : a.Severidad == "PorVencer" ? (a.DiasRestantes.HasValue ? $"En {a.DiasRestantes} día(s)" : "Por vencer") : a.Severidad;
+
+                                    <tr>
+                                        <td>@a.Categoria</td>
+                                        <td class="djj-logistics-strong">@a.VehiculoPlaca</td>
+                                        <td>@a.Detalle</td>
+                                        <td class="djj-table__nowrap">@(a.Fecha?.ToString("dd/MM/yyyy") ?? "Sin fecha")</td><td class="djj-logistics-center"><span class="djj-badge djj-badge--@badge">@texto</span></td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <h2>Registrar documento legal</h2>
+                <p class="djj-text-secondary small">Marchamo, RTV, seguro u otro documento con fecha de vencimiento.</p>
+                <form asp-action="CreateDocument" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="djj-field">
+                        <label asp-for="NuevoDocumento.VehiculoId">Vehículo</label>
+                        <select asp-for="NuevoDocumento.VehiculoId" class="djj-input">
+                            <option value="">-- Seleccione --</option>
+                            @foreach (var v in vehiculos)
+                            {
+                                <option value="@v.VehiculoId">@v.Placa — @v.Descripcion</option>
+                            }
+                        </select>
+                        <span asp-validation-for="NuevoDocumento.VehiculoId" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="NuevoDocumento.Tipo">Tipo</label>
+                        <select asp-for="NuevoDocumento.Tipo" class="djj-input">
+                            <option value="Marchamo">Marchamo</option>
+                            <option value="RTV">RTV (Riteve)</option>
+                            <option value="Seguro">Seguro</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                        <span asp-validation-for="NuevoDocumento.Tipo" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="NuevoDocumento.FechaVencimiento">Fecha de vencimiento</label>
+                        <input asp-for="NuevoDocumento.FechaVencimiento" class="djj-input" type="date" />
+                        <span asp-validation-for="NuevoDocumento.FechaVencimiento" class="djj-logistics-danger"></span>
+                    </div>
+                    <div class="djj-field">
+                        <label asp-for="NuevoDocumento.Observaciones">Observaciones</label>
+                        <input asp-for="NuevoDocumento.Observaciones" class="djj-input" />
+                        <span asp-validation-for="NuevoDocumento.Observaciones" class="djj-logistics-danger"></span>
+                    </div>
+                    <button type="submit" class="djj-button djj-button--primary djj-full-width">Registrar documento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

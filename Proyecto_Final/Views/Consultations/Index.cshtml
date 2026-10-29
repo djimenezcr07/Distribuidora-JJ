@@ -1,0 +1,25 @@
+@model Proyecto_Final.Models.Admin.ConsultationFilterViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Consultas";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "CONSULTAS_ATENDER");
+}
+<div class="djj-customer-service">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Consultas recibidas</h1><p>Búsqueda y seguimiento de mensajes del formulario de contacto.</p></div></header>
+<partial name="_CustomerServiceNavigation" />
+<section class="djj-card djj-filter-card"><h2>Buscar casos</h2><form asp-action="Index" method="get" class="djj-filter-bar">
+<div class="djj-field"><label for="service-state">Estado</label><select id="service-state" name="estado" class="djj-select"><option value="">Todos</option><option value="Pendiente" selected="@(Model.Estado == "Pendiente")">Pendiente</option><option value="Atendida" selected="@(Model.Estado == "Atendida")">Atendida</option><option value="Cerrada" selected="@(Model.Estado == "Cerrada")">Cerrada</option></select></div>
+<div class="djj-field"><label for="service-search">Buscar</label><input id="service-search" type="search" name="buscar" value="@Model.Buscar" class="djj-input" placeholder="Cliente, correo, asunto o contenido" /></div>
+<div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--neutral">Buscar</button><a asp-action="Index" class="djj-button djj-button--ghost">Limpiar</a></div></form></section>
+<section class="djj-card djj-data-section"><header><h2>Consultas registradas</h2><p>@Model.Consultas.Count registro(s).</p></header><div class="djj-table-wrap" tabindex="0" role="region" aria-label="Consultas registradas: tabla desplazable"><table class="djj-table djj-table--compact djj-service-table"><caption class="djj-sr-only">Consultas registradas</caption><thead><tr><th scope="col">Consulta / asunto</th><th scope="col">Cliente / contacto</th><th scope="col">Registro</th><th scope="col">Estado</th><th scope="col">Última atención</th><th scope="col">Acciones</th></tr></thead><tbody>
+@if (!Model.Consultas.Any()) { <tr><td colspan="6"><div class="djj-empty-state"><h3>Sin consultas para estos filtros</h3><p>Probá otra búsqueda o limpiá los filtros.</p></div></td></tr> }
+@foreach (var item in Model.Consultas)
+{
+<tr><td><strong class="djj-table__primary">#@item.ConsultaId · @item.Asunto</strong></td><td>@item.Nombre<small class="djj-table__note">@item.Correo</small></td><td>@item.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td><td><span class="djj-badge djj-badge--@CustomerServicePresentation.ConsultationTone(item.Estado)">@item.Estado</span></td><td>@(item.AtendidoPorNombre ?? "Sin atención registrada")<small class="djj-table__note">@(item.FechaAtencion?.ToString("dd/MM/yyyy HH:mm"))</small></td><td><a asp-action="Details" asp-route-id="@item.ConsultaId" class="djj-button djj-button--ghost djj-button--sm" aria-label="Ver consulta @item.ConsultaId">Ver</a></td></tr>
+}
+</tbody></table></div></section>
+</div>

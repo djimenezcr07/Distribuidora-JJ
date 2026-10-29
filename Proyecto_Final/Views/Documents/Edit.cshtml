@@ -1,0 +1,15 @@
+@model Proyecto_Final.Models.Admin.DocumentFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Editar metadatos"; }
+<div class="djj-documents">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Gestión documental</span><h1>Editar metadatos</h1><p>Estos cambios conservan el archivo y su historial de versiones.</p></div></header>
+<partial name="_DocumentsNavigation" />
+<section class="djj-card djj-form-card" aria-labelledby="document-edit-title">
+    <h2 id="document-edit-title">Datos del documento</h2>
+    <form asp-action="Edit" method="post" data-djj-document-form>
+        @Html.AntiForgeryToken()
+        <partial name="_Form" model="Model" />
+        <div class="djj-form-actions"><button type="submit" class="djj-button djj-button--primary">Guardar cambios</button></div>
+    </form>
+</section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/stage2/documents.js" asp-append-version="true"></script> }

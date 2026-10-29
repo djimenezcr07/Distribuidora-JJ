@@ -1,0 +1,49 @@
+@model Proyecto_Final.Models.Admin.OrderDetailViewModel
+@inject Proyecto_Final.Services.IRolePermissionService RolePermissions
+@{ var permissions=await RolePermissions.GetPermissionCodesAsync(Context.Session.GetString("UserRole")); Layout="_WorkspaceLayout"; ViewData["Title"]=$"Pedido #{Model.PedidoId}"; string Tone(string value)=>value=="Entregado"?"success":value=="Cancelado"?"danger":value=="Pendiente"?"warning":"info"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Ventas y pedidos · Detalle</span><h1>Pedido #@Model.PedidoId</h1><p>@Model.Cliente · @Model.FechaPedido.ToString("dd/MM/yyyy HH:mm")</p></div><div class="djj-page-header__actions"><span class="djj-badge djj-badge--@Tone(Model.Estado)">@Model.Estado</span><a class="djj-button djj-button--ghost" asp-action="Index">Volver</a></div></header>
+<div class="djj-detail-layout"><section class="djj-card"><div class="djj-card__header"><div><h2>Resumen</h2><p>Información comercial y de entrega.</p></div></div><dl class="djj-detail-grid"><div><dt>Cliente</dt><dd>@Model.Cliente</dd></div><div><dt>Correo</dt><dd>@Model.Correo</dd></div><div><dt>Entrega</dt><dd>@(string.IsNullOrWhiteSpace(Model.TipoEntrega)?"No definida":Model.TipoEntrega)</dd></div><div><dt>Dirección</dt><dd>@(string.IsNullOrWhiteSpace(Model.DireccionEntrega)?"No registrada":Model.DireccionEntrega)</dd></div><div><dt>Método de pago</dt><dd>@(string.IsNullOrWhiteSpace(Model.MetodoPago)?"No registrado":Model.MetodoPago)</dd></div><div><dt>Estado de pago</dt><dd>@(string.IsNullOrWhiteSpace(Model.EstadoPago)?"No registrado":Model.EstadoPago)</dd></div><div><dt>Total</dt><dd><strong>₡@Model.Total.ToString("N2")</strong></dd></div><div><dt>Observaciones</dt><dd>@(string.IsNullOrWhiteSpace(Model.Observaciones)?"Sin observaciones":Model.Observaciones)</dd></div></dl></section>
+<aside class="djj-card djj-workspace-form">
+    <h2>Acciones del pedido</h2>
+    @if (permissions.Contains("PEDIDOS_CAMBIAR_ESTADO") && Model.EstadosDisponibles.Count > 0)
+    {
+        <form asp-action="UpdateStatus" method="post" class="djj-workspace-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="pedidoId" value="@Model.PedidoId" />
+            <div class="djj-field">
+                <label for="nuevoEstado">Nuevo estado</label>
+                <select id="nuevoEstado" name="nuevoEstado" class="djj-select" aria-describedby="order-state-help">
+                    @foreach (var item in Model.EstadosDisponibles) { <option value="@item">@item</option> }
+                </select>
+                <p id="order-state-help" class="djj-page-header__meta">La entrega se confirma únicamente desde logística.</p>
+            </div>
+            <button class="djj-button djj-button--primary" type="submit">Guardar estado</button>
+        </form>
+    }
+    else
+    {
+        <p class="djj-page-header__meta">No hay cambios manuales disponibles para este pedido y tus permisos.</p>
+    }
+    @if (Model.Estado == "Retenido")
+    {
+        <p class="djj-page-header__meta">La aprobación supervisora requiere una relación comercial acreditada. Este flujo permanece bloqueado.</p>
+    }
+    @if (Model.HasInvoice && Model.FacturaId.HasValue)
+    {
+        <a class="djj-button djj-button--outline" asp-controller="Billing" asp-action="Detail" asp-route-id="@Model.FacturaId.Value">Ver factura</a>
+    }
+    else if (Model.CanGenerateInvoice && permissions.Contains("FACTURACION_GENERAR"))
+    {
+        <p class="djj-page-header__meta">Total facturable: ₡@Model.InvoiceTotal.ToString("N2"), con impuesto del 13 % sobre el neto registrado.</p>
+        <form asp-controller="Billing" asp-action="GenerateFromOrder" method="post" data-djj-confirm="Generar la factura para el pedido #@Model.PedidoId. El pedido quedará Facturado; la entrega requiere confirmación logística.">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="pedidoId" value="@Model.PedidoId" />
+            <button class="djj-button djj-button--success" type="submit">Generar factura</button>
+        </form>
+    }
+    else
+    {
+        <p class="djj-page-header__meta">La facturación requiere permiso efectivo, inventario acreditado y un pedido dentro del umbral autorizado.</p>
+    }
+</aside></div>
+<section class="djj-card djj-data-section" aria-labelledby="lines-title"><header><div><h2 id="lines-title">Productos</h2><p>Líneas registradas en el pedido.</p></div></header>@if(Model.Detalles==null||!Model.Detalles.Any()){<div class="djj-empty-state"><h3>Sin líneas</h3><p>Este pedido no tiene productos registrados.</p></div>}else{<div class="djj-table-wrap"><table class="djj-table djj-table--compact"><thead><tr><th>Producto</th><th class="djj-align-right">Cantidad</th><th class="djj-align-right">Precio</th><th class="djj-align-right">Subtotal</th><th class="djj-align-right">Stock</th></tr></thead><tbody>@foreach(var item in Model.Detalles){var tone=item.StockActual<=0?"danger":item.StockActual<=5?"warning":"success";<tr><td><strong>@item.Producto</strong><small class="djj-table__note">Detalle #@item.PedidoDetalleId</small></td><td class="djj-align-right">@item.Cantidad</td><td class="djj-align-right">₡@item.PrecioUnitario.ToString("N2")</td><td class="djj-align-right">₡@item.Subtotal.ToString("N2")</td><td class="djj-align-right"><span class="djj-badge djj-badge--@tone">@item.StockActual</span></td></tr>}</tbody></table></div>}</section>

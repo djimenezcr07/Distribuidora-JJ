@@ -1,0 +1,26 @@
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var codes = await PermissionService.GetPermissionCodesAsync(role);
+    bool Can(string code) => code is "RUTAS_GESTIONAR" or "ENTREGAS_TABLERO_VER" or "ENTREGAS_EVIDENCIA_VER" ? codes.Contains(code) : admin || codes.Contains(code);
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    bool Current(string c, string a) => controller == c && action == a;
+}
+<nav class="djj-logistics-nav" aria-label="Operaciones logísticas">
+    @if (Can("FLOTA_MANTENIMIENTO"))
+    {
+        <a asp-controller="Fleet" asp-action="Alerts" aria-current="@(Current("Fleet", "Alerts") ? "page" : null)">Alertas de flota</a>
+        <a asp-controller="Fleet" asp-action="Maintenance" aria-current="@(Current("Fleet", "Maintenance") ? "page" : null)">Mantenimiento</a>
+    }
+    @if (Can("RUTAS_GESTIONAR"))
+    {
+        <a asp-controller="RoutesAdmin" asp-action="Index" aria-current="@(controller == "RoutesAdmin" ? "page" : null)">Rutas</a>
+    }
+    @if (Can("ENTREGAS_TABLERO_VER"))
+    {
+        <a asp-controller="DeliveryBoard" asp-action="Index" aria-current="@(controller == "DeliveryBoard" ? "page" : null)">Tablero de entregas</a>
+    }
+</nav>

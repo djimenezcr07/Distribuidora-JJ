@@ -1,0 +1,9 @@
+@model ErrorViewModel
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_StatusLayout"; ViewData["Title"] = "No pudimos completar la solicitud"; var requestId = PublicSurfacePresentation.SafeRequestId(Model?.RequestId); }
+<section class="djj-card djj-state-card" aria-labelledby="error-title">
+    <h1 id="error-title">No pudimos completar la solicitud</h1>
+    <p>Intentalo nuevamente en unos minutos.</p>
+    @if (requestId is not null) { <p>Identificador de seguimiento: <code class="djj-trace-id">@requestId</code></p> }
+    <div class="djj-surface-actions"><a asp-controller="Home" asp-action="Index" class="djj-button djj-button--primary">Ir al inicio</a></div>
+</section>

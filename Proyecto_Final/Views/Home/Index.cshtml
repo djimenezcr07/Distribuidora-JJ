@@ -1,0 +1,88 @@
+@model Proyecto_Final.Models.Store.HomeFeaturedViewModel
+@{
+    Layout = "_StorefrontLayout";
+    ViewData["Title"] = "Inicio";
+    var productos = Model?.ProductosDestacados ?? new List<Proyecto_Final.Models.Store.StoreProductViewModel>();
+    var destacado = productos.FirstOrDefault();
+    var categorias = productos.Where(item => !string.IsNullOrWhiteSpace(item.Categoria)).Select(item => item.Categoria.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Take(8).ToList();
+}
+
+<section class="djj-home-hero">
+    <div class="djj-container djj-home-hero__inner">
+        <div class="djj-home-hero__copy">
+            <span class="djj-home-hero__eyebrow"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-store"></use></svg>@Company.Value.BrandName</span>
+            <h1>Una selección clara para tu hogar, negocio y celebraciones.</h1>
+            <p>Explorá el catálogo activo con precios en colones y disponibilidad visible antes de elegir.</p>
+            <div class="djj-home-hero__actions">
+                <a class="djj-button djj-button--primary djj-button--lg" asp-controller="Home" asp-action="Shop"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-store"></use></svg>Explorar tienda</a>
+                @if (categorias.Count > 0)
+                {
+                    <a class="djj-button djj-button--outline djj-button--lg" asp-controller="Home" asp-action="Shop" asp-route-categoria="@categorias[0]">Ver @categorias[0]</a>
+                }
+            </div>
+        </div>
+
+        @if (destacado is not null)
+        {
+            var imagenDestacada = string.IsNullOrWhiteSpace(destacado.ImagenUrl) ? Url.Content("~/img/product-placeholder.svg") : Url.Content(destacado.ImagenUrl);
+            <a class="djj-home-hero__feature" asp-controller="Home" asp-action="Detail" asp-route-id="@destacado.ProductoId">
+                <div class="djj-home-hero__feature-media"><img data-djj-product-image src="@imagenDestacada" alt="@destacado.Nombre" width="640" height="480" /></div>
+                <div class="djj-home-hero__feature-body"><span>Producto destacado</span><h2>@destacado.Nombre</h2><p>₡@destacado.Precio.ToString("N0") · @destacado.EstadoStock</p></div>
+            </a>
+        }
+        else
+        {
+            <div class="djj-home-hero__feature"><div class="djj-home-hero__feature-body"><span>@Company.Value.BrandSubtitle</span><h2>Catálogo administrado desde una sola operación.</h2><p>Los productos destacados aparecerán aquí cuando estén configurados.</p></div></div>
+        }
+    </div>
+</section>
+
+<div class="djj-container">
+    <section class="djj-home-section" aria-labelledby="djj-trust-title">
+        <div class="djj-home-section__header"><div><h2 id="djj-trust-title">Comprá con información útil</h2><p>La experiencia conecta el catálogo público con los datos gestionados por la operación.</p></div></div>
+        <div class="djj-trust-grid">
+            <article class="djj-trust-card"><span class="djj-trust-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-package"></use></svg></span><div><h3>Disponibilidad visible</h3><p>Consultá el estado de inventario mostrado para cada producto.</p></div></article>
+            <article class="djj-trust-card"><span class="djj-trust-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-tag"></use></svg></span><div><h3>Precios claros</h3><p>Compará productos con valores expresados en colones.</p></div></article>
+            <article class="djj-trust-card"><span class="djj-trust-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-user"></use></svg></span><div><h3>Historial conectado</h3><p>Ingresá a tu cuenta para consultar pedidos y documentos disponibles.</p></div></article>
+        </div>
+    </section>
+
+    @if (categorias.Count > 0)
+    {
+        <section class="djj-home-section" aria-labelledby="djj-categories-title">
+            <div class="djj-home-section__header"><div><h2 id="djj-categories-title">Explorá por categoría</h2><p>Categorías tomadas de los productos destacados activos.</p></div><a class="djj-button djj-button--outline djj-button--inline-mobile" asp-controller="Home" asp-action="Shop">Ver todo</a></div>
+            <div class="djj-category-list">
+                @foreach (var categoria in categorias)
+                {
+                    <a class="djj-category-link" asp-controller="Home" asp-action="Shop" asp-route-categoria="@categoria">@categoria<svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-arrow-right"></use></svg></a>
+                }
+            </div>
+        </section>
+    }
+
+    <section class="djj-home-section" aria-labelledby="djj-featured-title">
+        <div class="djj-home-section__header"><div><h2 id="djj-featured-title">Productos destacados</h2><p>Una selección del catálogo activo para descubrir más rápido.</p></div><a class="djj-button djj-button--primary djj-button--inline-mobile" asp-controller="Home" asp-action="Shop">Ir al catálogo</a></div>
+        @if (productos.Count > 0)
+        {
+            <div class="djj-product-grid">
+                @foreach (var item in productos.Take(4))
+                {
+                    var imagen = string.IsNullOrWhiteSpace(item.ImagenUrl) ? Url.Content("~/img/product-placeholder.svg") : Url.Content(item.ImagenUrl);
+                    var stockClass = item.Stock <= 0 ? "danger" : item.Stock <= 5 ? "warning" : "success";
+                    <article class="djj-product-card">
+                        <a class="djj-product-card__media" asp-controller="Home" asp-action="Detail" asp-route-id="@item.ProductoId"><img data-djj-product-image src="@imagen" alt="@item.Nombre" loading="lazy" width="360" height="360" /></a>
+                        <div class="djj-product-card__body">
+                            <span class="djj-product-card__category">@item.Categoria</span><h3>@item.Nombre</h3>
+                            <p class="djj-product-card__description">@(string.IsNullOrWhiteSpace(item.Descripcion) ? "Producto disponible en el catálogo activo." : item.Descripcion)</p>
+                            <div class="djj-product-card__footer"><div><strong class="djj-product-card__price">₡@item.Precio.ToString("N0")</strong><span class="djj-status-badge djj-status-badge--@stockClass">@item.EstadoStock</span></div><a class="djj-button djj-button--primary djj-button--sm" asp-controller="Home" asp-action="Detail" asp-route-id="@item.ProductoId">Ver detalle</a></div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="djj-card djj-state"><span class="djj-state__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-package"></use></svg></span><h3>No hay productos destacados</h3><p>Podés explorar el catálogo completo mientras se configura esta selección.</p><a class="djj-button djj-button--primary djj-button--inline-mobile" asp-controller="Home" asp-action="Shop">Explorar catálogo</a></div>
+        }
+    </section>
+</div>

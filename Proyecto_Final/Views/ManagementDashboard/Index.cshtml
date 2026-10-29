@@ -1,0 +1,134 @@
+@model Proyecto_Final.Models.Admin.ManagementDashboardViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Tablero gerencial";
+    string Activo(string r) => Model.Rango == r ? "djj-button--primary" : "djj-button--secondary";
+    var period = $"{Model.Desde:dd/MM/yyyy} — {Model.Hasta:dd/MM/yyyy}";
+    var chart = new AnalyticsChartViewModel { Title = "Ventas facturadas por día", Context = period + " · Días con facturas generadas", Rows = Model.Serie.Select(s => new AnalyticsChartRow(s.Dia.ToString("dd/MM/yyyy"), s.Total)).ToList() };
+}
+<div class="djj-analytics">
+<header class="djj-page-header">
+<div>
+<h1>Tablero gerencial</h1>
+<p>Ventas del período y situación operativa actual.</p>
+<span class="djj-page-header__meta">@period</span>
+</div>
+</header>
+<section class="djj-card djj-analytics-filter" aria-label="Período del tablero">
+<div class="djj-filter-bar__actions" role="group" aria-label="Períodos rápidos" data-djj-screen-only>
+@foreach (var range in new[] { ("hoy", "Hoy"), ("semana", "Semana"), ("mes", "Mes") })
+{ <a asp-action="Index" asp-route-rango="@range.Item1" class="djj-button @Activo(range.Item1)" aria-current="@(Model.Rango == range.Item1 ? "page" : null)">@range.Item2</a> }
+</div>
+<form asp-action="Index" method="get" class="djj-filter-bar djj-filter-bar--analytics" data-djj-screen-only>
+<div class="djj-field">
+<label for="dashboard-desde">Desde</label>
+<input id="dashboard-desde" type="date" name="desde" value="@Model.Desde.ToString("yyyy-MM-dd")" class="djj-input" />
+</div>
+<div class="djj-field">
+<label for="dashboard-hasta">Hasta</label>
+<input id="dashboard-hasta" type="date" name="hasta" value="@Model.Hasta.ToString("yyyy-MM-dd")" class="djj-input" />
+</div>
+<div>
+<button type="submit" class="djj-button djj-button--primary">Aplicar período</button>
+</div>
+</form>
+</section>
+@if (!Model.HayDatos) { <div class="djj-alert djj-alert--info">No hay transacciones en este período. Los indicadores operativos muestran la situación actual.</div> }
+<section class="djj-analytics-kpis" aria-label="Resultados del período">
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Ventas facturadas</p>
+<p class="djj-kpi-card__value">₡@Model.VentasPeriodo.ToString("N2")</p>
+<small>Facturas generadas · @period</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Facturas</p>
+<p class="djj-kpi-card__value">@Model.FacturasPeriodo</p>
+<small>Ticket promedio: <span class="djj-number">₡@Model.TicketPromedio.ToString("N2")</span>
+</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Pedidos registrados</p>
+<p class="djj-kpi-card__value">@Model.PedidosPeriodo</p>
+<small>Pedidos creados en el período</small>
+</article>
+</section>
+<div class="djj-analytics-panels">
+<partial name="_AnalyticsChart" model="chart" />
+<section class="djj-card djj-data-section" aria-labelledby="attention-title">
+<header>
+<div>
+<h2 id="attention-title">Atención operativa</h2>
+<p>Estado actual; estos valores no se limitan al período de ventas.</p>
+</div>
+</header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Indicadores operativos actuales">
+<table class="djj-table">
+<caption>Inventario, reparto y cuentas por cobrar</caption>
+<thead>
+<tr>
+<th scope="col">Indicador</th>
+<th scope="col" class="djj-align-right">Valor actual</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th scope="row">Stock bajo</th>
+<td class="djj-number">
+<span class="djj-badge @(Model.StockBajo > 0 ? "djj-badge--warning" : "djj-badge--neutral")">@Model.StockBajo productos</span>
+</td>
+</tr>
+<tr>
+<th scope="row">Productos agotados</th>
+<td class="djj-number">
+<span class="djj-badge @(Model.ProductosAgotados > 0 ? "djj-badge--danger" : "djj-badge--neutral")">@Model.ProductosAgotados</span>
+</td>
+</tr>
+<tr>
+<th scope="row">Pedidos en ruta</th>
+<td class="djj-number">@Model.PedidosEnRuta</td>
+</tr>
+<tr>
+<th scope="row">Cobros pendientes</th>
+<td class="djj-number">₡@Model.CobrosPendientes.ToString("N2")</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<section class="djj-card djj-data-section" aria-labelledby="daily-title">
+<header>
+<div>
+<h2 id="daily-title">Detalle diario</h2>
+<p>@period · Equivalente tabular de la gráfica.</p>
+</div>
+</header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Ventas y facturas por día">
+<table class="djj-table djj-table--compact">
+<caption>Días con facturación registrada; no se interpolan días sin datos.</caption>
+<thead>
+<tr>
+<th scope="col">Día</th>
+<th scope="col" class="djj-align-right">Ventas</th>
+<th scope="col" class="djj-align-right">Facturas</th>
+</tr>
+</thead>
+<tbody>
+@if (!Model.Serie.Any()) { <tr>
+<td colspan="3">
+<div class="djj-empty-state">
+<p>No hay ventas facturadas en el período.</p>
+</div>
+</td>
+</tr> }
+@foreach (var point in Model.Serie) { <tr>
+<th scope="row">@point.Dia.ToString("dd/MM/yyyy")</th>
+<td class="djj-number">₡@point.Total.ToString("N2")</td>
+<td class="djj-number">@point.Facturas</td>
+</tr> }
+</tbody>
+</table>
+</div>
+</section>
+</div>

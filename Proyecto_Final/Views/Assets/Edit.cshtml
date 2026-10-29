@@ -1,0 +1,13 @@
+@model Proyecto_Final.Models.Admin.AssetFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Editar activo"; }
+<div class="djj-assets djj-stack">
+    <partial name="_AssetsNavigation" />
+    <header class="djj-page-header"><div><h1>Editar activo</h1><p>Identificá y describí el equipo de la empresa.</p></div><a asp-action="Index" class="djj-button djj-button--outline">Volver</a></header>
+    <form asp-action="Edit" method="post" class="djj-card djj-padded djj-assets-form">
+        @Html.AntiForgeryToken()<input type="hidden" asp-for="ActivoId" />
+        <div asp-validation-summary="All" class="djj-assets-error" role="alert"></div>
+        <partial name="_AssetFields" model="Model" />
+        <div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--primary">Guardar cambios</button><a asp-action="Index" class="djj-button djj-button--outline">Cancelar</a></div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

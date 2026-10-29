@@ -1,0 +1,116 @@
+@model Proyecto_Final.Models.Admin.DetailedSalesReportViewModel
+@using Proyecto_Final.Models.Admin
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    var printMode = ViewData["PrintMode"] as bool? == true;
+    ViewData["Title"] = "Reporte de ventas";
+    var period = $"{Model.Filtro.Desde:dd/MM/yyyy} — {Model.Filtro.Hasta:dd/MM/yyyy}";
+    var chart = new AnalyticsChartViewModel { Title = "Ventas por agrupación", Context = period + " · Agrupación: " + Model.Filtro.Agrupacion, Rows = Model.Filas.Select(row => new AnalyticsChartRow(row.Etiqueta, row.TotalVentas)).ToList() };
+}
+<div class="djj-analytics">
+<header class="djj-page-header">
+<div>
+<h1>Reporte de ventas</h1>
+<p>Ventas, facturación y desglose comercial.</p>
+<span class="djj-page-header__meta">@period</span>
+</div>
+@if (printMode) { <button type="button" class="djj-button djj-button--secondary" data-djj-screen-only onclick="window.print()">Imprimir</button> }
+</header>
+@if (!printMode) {
+<form method="get" class="djj-card djj-analytics-filter djj-filter-bar djj-filter-bar--analytics" data-djj-screen-only aria-label="Filtros del reporte">
+<div class="djj-field">
+<label for="salesreports-desde">Desde</label>
+<input id="salesreports-desde" name="Desde" type="date" value="@Model.Filtro.Desde.ToString("yyyy-MM-dd")" class="djj-input" />
+</div>
+<div class="djj-field">
+<label for="salesreports-hasta">Hasta</label>
+<input id="salesreports-hasta" name="Hasta" type="date" value="@Model.Filtro.Hasta.ToString("yyyy-MM-dd")" class="djj-input" />
+</div>
+<div class="djj-field">
+<label for="salesreports-agrupacion">Agrupación</label>
+<select id="salesreports-agrupacion" name="Agrupacion" class="djj-select">
+<option value="diario" selected="@(Model.Filtro.Agrupacion==SalesReportGrouping.Daily)">Diaria</option>
+<option value="mensual" selected="@(Model.Filtro.Agrupacion==SalesReportGrouping.Monthly)">Mensual</option>
+<option value="categoria" selected="@(Model.Filtro.Agrupacion==SalesReportGrouping.Category)">Categoría</option>
+</select>
+</div>
+<div class="djj-field">
+<label for="salesreports-categoria">Categoría de factura</label>
+<select id="salesreports-categoria" name="Categoria" class="djj-select">
+<option value="">Todas</option>@foreach(var category in Model.Categorias){<option value="@category" selected="@(category==Model.Filtro.Categoria)">@category</option>}</select>
+</div>
+<div class="djj-filter-bar__actions">
+<button class="djj-button djj-button--primary">Consultar</button> <a asp-action="Print" asp-route-Desde="@Model.Filtro.Desde.ToString("yyyy-MM-dd")" asp-route-Hasta="@Model.Filtro.Hasta.ToString("yyyy-MM-dd")" asp-route-Agrupacion="@Model.Filtro.Agrupacion" asp-route-Categoria="@Model.Filtro.Categoria" target="_blank" rel="noopener" class="djj-button djj-button--secondary">Imprimir</a> <a asp-action="ExportCsv" asp-route-Desde="@Model.Filtro.Desde.ToString("yyyy-MM-dd")" asp-route-Hasta="@Model.Filtro.Hasta.ToString("yyyy-MM-dd")" asp-route-Agrupacion="@Model.Filtro.Agrupacion" asp-route-Categoria="@Model.Filtro.Categoria" class="djj-button djj-button--secondary">Exportar CSV</a>
+</div>
+<div asp-validation-summary="All" class="djj-validation-summary" role="alert">
+</div>
+</form>
+}
+<p class="djj-analytics-period">@Model.Filtro.Agrupacion · Categoría: @(Model.Filtro.Categoria ?? "Todas")</p>
+<section class="djj-analytics-kpis" aria-label="Totales del reporte">
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Ventas facturadas</p>
+<p class="djj-kpi-card__value">₡@Model.TotalVentas.ToString("N2")</p>
+<small>Ingresos del período</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Facturas</p>
+<p class="djj-kpi-card__value">@Model.Facturas</p>
+<small>Facturas incluidas en el reporte</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Pedidos</p>
+<p class="djj-kpi-card__value">@Model.Pedidos</p>
+<small>Pedidos del período</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Ticket promedio</p>
+<p class="djj-kpi-card__value">₡@Model.TicketPromedio.ToString("N2")</p>
+<small>Promedio por factura</small>
+</article>
+</section>
+@if (ViewData.ModelState.IsValid) { <partial name="_AnalyticsChart" model="chart" /> }
+<section class="djj-card djj-data-section" aria-labelledby="report-detail">
+<header>
+<div>
+<h2 id="report-detail">Desglose de ventas</h2>
+<p>@period · @Model.Filas.Count fila(s)</p>
+</div>
+</header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Detalle del reporte">
+<table class="djj-table djj-table--compact">
+<caption>Las ventas por categoría corresponden a subtotales de detalle; el total facturado conserva el total de factura. Los conteos por categoría pueden compartir facturas y pedidos.</caption>
+<thead>
+<tr>
+<th scope="col">Grupo</th>
+<th scope="col">Categoría</th>
+<th scope="col">Ventas</th>
+<th scope="col">Facturas</th>
+<th scope="col">Pedidos</th>
+<th scope="col">Ticket promedio</th>
+<th scope="col">Unidades</th>
+</tr>
+</thead>
+<tbody>
+@if (!Model.HayDatos) { <tr>
+<td colspan="7">
+<div class="djj-empty-state">
+<p>@(ViewData.ModelState.IsValid ? "No hay datos para los filtros seleccionados." : "Revisá los filtros para consultar el reporte.")</p>
+</div>
+</td>
+</tr> }
+@foreach (var row in Model.Filas) { <tr>
+<th scope="row">@row.Etiqueta</th>
+<td>@(row.Categoria ?? "—")</td>
+<td class="djj-number">₡@row.TotalVentas.ToString("N2")</td>
+<td class="djj-number">@row.Facturas</td>
+<td class="djj-number">@row.Pedidos</td>
+<td class="djj-number">₡@row.TicketPromedio.ToString("N2")</td>
+<td class="djj-number">@row.Unidades</td>
+</tr> }
+</tbody>
+</table>
+</div>
+</section>
+</div>

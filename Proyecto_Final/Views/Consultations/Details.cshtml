@@ -1,0 +1,27 @@
+@model Proyecto_Final.Models.Admin.ConsultationDetailViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Detalle de consulta";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "CONSULTAS_ATENDER");
+}
+<div class="djj-customer-service">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Consulta #@Model.ConsultaId</h1><p>Detalle y seguimiento administrativo.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a consultas</a></header>
+<partial name="_CustomerServiceNavigation" />
+<section class="djj-card djj-form-card"><h2>@Model.Asunto</h2><span class="djj-badge djj-badge--@CustomerServicePresentation.ConsultationTone(Model.Estado)">@Model.Estado</span><dl class="djj-service-metadata"><dt>Cliente</dt><dd>@Model.Nombre</dd><dt>Correo</dt><dd>@Model.Correo</dd><dt>Recibida</dt><dd>@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd><dt>Última atención</dt><dd>@(Model.AtendidoPorNombre ?? "Sin atención registrada") · @(Model.FechaAtencion?.ToString("dd/MM/yyyy HH:mm") ?? "Sin fecha")</dd></dl>
+<h3>Mensaje del cliente</h3><p class="djj-service-text">@Model.Mensaje</p>
+<h3>Respuesta u observación interna registrada</h3><p class="djj-service-text">@(string.IsNullOrWhiteSpace(Model.RespuestaInterna) ? "Sin observación registrada." : Model.RespuestaInterna)</p><p class="djj-table__note">Información administrativa; no se envía ni se muestra al cliente desde este formulario.</p></section>
+@if (canManage)
+{
+<section class="djj-card djj-form-card"><h2>Actualizar seguimiento</h2><form asp-action="UpdateStatus" method="post" data-djj-service-form data-djj-confirm="¿Guardar el estado y la observación interna de esta consulta?">
+@Html.AntiForgeryToken()<input type="hidden" name="ConsultaId" value="@Model.ConsultaId" />
+<div class="djj-field"><label for="consultation-state">Estado</label><select id="consultation-state" name="Estado" class="djj-select" required>
+@if (!new[] { "Pendiente", "Atendida", "Cerrada" } .Contains(Model.Estado)) { <option value="" selected disabled>Seleccioná un estado permitido</option> }
+@foreach (var state in new[] { "Pendiente", "Atendida", "Cerrada" }) { <option selected="@(Model.Estado == state)">@state</option> }
+</select></div><div class="djj-field"><label for="consultation-response">Respuesta u observación interna</label><textarea id="consultation-response" name="RespuestaInterna" class="djj-textarea" rows="7" maxlength="1000" aria-describedby="consultation-response-help">@Model.RespuestaInterna</textarea><small id="consultation-response-help">Máximo 1000 caracteres. Esta información no se muestra al cliente.</small></div>
+<div class="djj-form-actions"><button type="submit" class="djj-button djj-button--primary">Guardar seguimiento</button></div></form></section>
+}
+</div>

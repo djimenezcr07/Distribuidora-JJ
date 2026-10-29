@@ -1,0 +1,33 @@
+@model Proyecto_Final.Models.Admin.ComboFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Nuevo combo"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Inventario · Combos</span><h1>Nuevo combo</h1><p>Definí el precio del paquete y la cantidad de cada producto incluido.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a combos</a></header>
+<partial name="_ComboNavigation" />
+<form asp-action="Create" method="post" class="djj-workspace-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="djj-validation-summary" data-djj-validation-summary tabindex="-1" role="alert"></div>
+    <div class="djj-commerce-grid">
+        <section class="djj-card" aria-labelledby="combo-identity"><h2 id="combo-identity">Identidad del combo</h2>
+            <div class="djj-field"><label asp-for="Nombre"></label><input asp-for="Nombre" class="djj-input" /><span asp-validation-for="Nombre" class="djj-field-error"></span></div>
+            <div class="djj-field"><label asp-for="Descripcion"></label><textarea asp-for="Descripcion" class="djj-textarea" rows="3"></textarea><span asp-validation-for="Descripcion" class="djj-field-error"></span></div>
+        </section>
+        <section class="djj-card" aria-labelledby="combo-price"><h2 id="combo-price">Precio y configuración</h2>
+            <div class="djj-field"><label asp-for="Precio"></label><input asp-for="Precio" type="number" step="0.01" min="0.01" class="djj-input" aria-describedby="combo-price-help" /><span asp-validation-for="Precio" class="djj-field-error"></span><small id="combo-price-help" class="djj-field__hint">Precio de venta del paquete en colones.</small></div>
+            <p class="djj-field__hint">La disponibilidad depende del stock y del estado de cada componente. El paquete no reserva inventario al crearse.</p>
+        </section>
+    </div>
+    <section class="djj-card djj-data-section" aria-labelledby="combo-products"><header><div><h2 id="combo-products">Productos incluidos</h2><p>Seleccioná al menos un producto e indicá sus unidades por combo.</p><span asp-validation-for="Productos" class="djj-field-error" role="alert"></span></div></header>
+        @if (Model.Productos.Count == 0) { <div class="djj-empty-state"><h3>Sin productos disponibles</h3><p>Se necesita al menos un producto activo para crear un combo.</p></div> }
+        else {
+            <div class="djj-table-wrap" tabindex="0" role="region" aria-labelledby="combo-products"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">Selección de productos y cantidades por combo</caption>
+                <thead><tr><th scope="col">Incluir</th><th scope="col">Producto</th><th scope="col" class="djj-align-right">Stock actual</th><th scope="col">Cantidad por combo</th></tr></thead><tbody>
+                    @for (int i = 0; i < Model.Productos.Count; i++) {
+                        <tr><td><input type="hidden" asp-for="Productos[i].ProductoId" /><input type="hidden" asp-for="Productos[i].Nombre" /><input type="hidden" asp-for="Productos[i].StockActual" /><label class="djj-check"><input type="checkbox" asp-for="Productos[i].Seleccionado" class="djj-checkbox" /><span class="djj-sr-only">Incluir @Model.Productos[i].Nombre</span></label></td>
+                        <td><strong class="djj-table__primary">@Model.Productos[i].Nombre</strong></td><td class="djj-align-right">@Model.Productos[i].StockActual</td>
+                        <td><label asp-for="Productos[i].Cantidad" class="djj-sr-only">Unidades de @Model.Productos[i].Nombre por combo</label><input asp-for="Productos[i].Cantidad" type="number" min="1" class="djj-input djj-line-input" /><span asp-validation-for="Productos[i].Cantidad" class="djj-field-error"></span></td></tr>
+                    }
+                </tbody></table></div>
+        }
+    </section>
+    <section class="djj-card" aria-labelledby="combo-review"><h2 id="combo-review">Revisión y creación</h2><p>Revisá el precio, los productos seleccionados y las cantidades antes de crear el paquete.</p><div class="djj-form-actions"><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Crear combo</button></div></section>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,135 @@
+@model Proyecto_Final.Models.Admin.RouteCreateViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Nueva ruta de entrega";
+}
+
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-page-header djj-cluster djj-logistics-between">
+                <div>
+                    <h1>Nueva ruta de entrega</h1>
+                    <p>Agrupa pedidos por zona y asigna un chofer y un vehículo disponibles.</p>
+                </div>
+                <a asp-action="Index" class="djj-button djj-button--outline">Volver</a>
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.HayRecursos)
+    {
+        <div class="djj-logistics-grid">
+            <div>
+                <div class="djj-alert djj-alert--warning">
+
+                    No hay <strong>chofer</strong> o <strong>vehículo</strong> disponible para asignar la ruta.
+                    Registre o active recursos antes de crear una ruta.
+                </div>
+            </div>
+        </div>
+    }
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="djj-logistics-danger"></div>
+
+        <div class="djj-logistics-split djj-logistics-split--form-first">
+            <div>
+                <div class="djj-card djj-logistics-pad">
+                    <h2>Datos de la ruta</h2>
+
+                    <div class="djj-field">
+                        <label asp-for="Zona" class="djj-logistics-strong">Zona</label>
+                        <input asp-for="Zona" class="djj-input" placeholder="Ej: GAM Heredia, Alajuela Centro" />
+                        <span asp-validation-for="Zona" class="djj-logistics-danger"></span>
+                    </div>
+
+                    <div class="djj-field">
+                        <label asp-for="ChoferUsuarioId" class="djj-logistics-strong">Chofer</label>
+                        <select asp-for="ChoferUsuarioId" class="djj-input">
+                            <option value="0">-- Seleccione un chofer --</option>
+                            @foreach (var ch in Model.Choferes)
+                            {
+                                <option value="@ch.UsuarioId">@ch.NombreCompleto (@ch.RutasAbiertas ruta(s) abierta(s))</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ChoferUsuarioId" class="djj-logistics-danger"></span>
+                    </div>
+
+                    <div class="djj-field">
+                        <label asp-for="VehiculoId" class="djj-logistics-strong">Vehículo</label>
+                        <select asp-for="VehiculoId" class="djj-input">
+                            <option value="0">-- Seleccione un vehículo --</option>
+                            @foreach (var v in Model.Vehiculos)
+                            {
+                                <option value="@v.VehiculoId">@v.Placa - @v.Descripcion (@v.RutasAbiertas abierta(s))</option>
+                            }
+                        </select>
+                        <span asp-validation-for="VehiculoId" class="djj-logistics-danger"></span>
+                    </div>
+
+                    <div class="djj-field">
+                        <label asp-for="Observaciones" class="djj-logistics-strong">Observaciones</label>
+                        <textarea asp-for="Observaciones" class="djj-input" rows="2" placeholder="Opcional"></textarea>
+                        <span asp-validation-for="Observaciones" class="djj-logistics-danger"></span>
+                    </div>
+
+                    <p class="djj-text-secondary">Revisá zona, chofer, unidad y pedidos antes de crear. La fecha y el horario se registran por el flujo existente.</p><button type="submit" class="djj-button djj-button--primary djj-full-width" disabled="@(!Model.HayRecursos)">
+                        Crear ruta
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <div class="djj-card">
+                    <div class="djj-logistics-pad djj-logistics-divider djj-cluster djj-logistics-between">
+                        <h2>Pedidos por asignar</h2>
+                        <span class="djj-text-secondary">Seleccione los pedidos de la zona</span>
+                    </div>
+                    <div class="djj-table-wrap" tabindex="0" aria-label="Tabla desplazable">
+                        <table class="djj-table"><caption class="djj-sr-only">RoutesAdmin/Create · registros operativos</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Seleccionar</th>
+                                    <th scope="col"># Pedido</th>
+                                    <th scope="col">Cliente</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (!Model.PedidosDisponibles.Any())
+                                {
+                                    <tr><td colspan="5" class="djj-logistics-center djj-text-secondary">No hay pedidos pendientes de asignar.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var p in Model.PedidosDisponibles)
+                                    {
+                                        <tr>
+                                            <td class="djj-logistics-center">
+                                                <input class="djj-logistics-check" type="checkbox"
+                                                       name="PedidosSeleccionados" value="@p.PedidoId" checked="@Model.PedidosSeleccionados.Contains(p.PedidoId)" aria-label="Seleccionar pedido @p.PedidoId de @p.Cliente" />
+                                            </td>
+                                            <td class="djj-logistics-strong">#@p.PedidoId</td>
+                                            <td>@p.Cliente</td>
+                                            <td><small>@p.DireccionEntrega</small></td>
+                                            <td class="djj-align-right djj-table__nowrap">₡@p.Total.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

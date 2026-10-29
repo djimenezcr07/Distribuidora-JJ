@@ -1,0 +1,11 @@
+@model Proyecto_Final.Models.Admin.EmployeeFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Nuevo empleado"; }
+
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Personal · Alta</span><h1>Crear empleado</h1><p>Registrá la cuenta interna y su relación laboral inicial.</p></div><div class="djj-page-header__actions"><a asp-action="Index" class="djj-button djj-button--ghost">Volver</a></div></header>
+<form asp-action="Create" method="post" class="djj-workspace-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="djj-alert djj-alert--danger" role="alert" tabindex="-1" data-djj-validation-summary></div>
+    <section class="djj-card"><partial name="_EmployeeForm" model="Model" /></section>
+    <div class="djj-form-actions"><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Guardar empleado</button></div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

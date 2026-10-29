@@ -1,0 +1,126 @@
+@using System.Globalization
+@using Proyecto_Final.Models.Admin
+@model PurchaseOrderFormViewModel
+@{
+    var fromSuggestions = ViewData["FromSuggestions"] as bool? == true;
+    var catalog = ViewBag.ProductCatalog as IReadOnlyList<PurchaseOrderLineSelectionViewModel> ?? [];
+    ViewData["Title"] = fromSuggestions ? "Sugerencias de compra" : "Nueva orden de compra";
+    Layout = "_WorkspaceLayout";
+}
+
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Compras · Nueva orden</span>
+        <h1>@ViewData["Title"]</h1>
+        <p>@(fromSuggestions ? "Revise las líneas sugeridas y defina precios; ninguna compra se crea automáticamente." : "Busque productos y agregue únicamente las líneas que formarán la orden.")</p>
+    </div></header>
+        <form asp-action="Create" method="post" id="purchase-order-form" class="djj-workspace-form">
+            @Html.AntiForgeryToken()
+            <input asp-for="TokenOperacion" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="djj-validation-summary" role="alert" tabindex="-1"></div>
+            <section class="djj-card djj-form-grid">
+                <div class="djj-field"><label asp-for="ProveedorId">Proveedor activo</label><select asp-for="ProveedorId" class="djj-select"><option value="">Seleccioná un proveedor</option>@foreach (var supplier in Model.Proveedores) { <option value="@supplier.ProveedorId">@supplier.Nombre</option> }</select><span asp-validation-for="ProveedorId" class="djj-field__error"></span></div>
+                <div class="djj-field"><label asp-for="Notas"></label><input asp-for="Notas" class="djj-input" /></div>
+            </section>
+
+            <section class="djj-card djj-workspace-form">
+                <div class="djj-card__header"><div><h2>Agregar productos</h2><p>Solo se envían las líneas incorporadas.</p></div></div>
+                <div class="djj-form-grid">
+                    <div class="djj-field"><label for="product-search">Buscar en catálogo</label><input id="product-search" type="search" class="djj-input" placeholder="Filtrar por nombre" autocomplete="off" /></div>
+                    <div class="djj-field"><label for="product-catalog">Producto</label><select id="product-catalog" class="djj-select">
+                            <option value="">Seleccione un producto</option>
+                            @foreach (var product in catalog)
+                            {
+                                <option value="@product.ProductoId" data-stock="@product.StockActual" data-average="@product.PromedioVentaMensual.ToString(CultureInfo.InvariantCulture)" data-last="@(product.UltimoPrecioPagado?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)">@product.Nombre</option>
+                            }
+                        </select>
+                    </div><button type="button" id="add-product" class="djj-button djj-button--outline">Agregar producto</button>
+                </div>
+                <small class="djj-field__hint">Máximo @PurchasingPolicy.MaximumLinesPerOrder líneas por orden.</small>
+                <div id="line-message" class="djj-field__error" role="alert"></div>
+            </section>
+
+            <div class="djj-table-shell">
+                <table class="djj-table djj-table--compact">
+                    <thead><tr><th>Producto</th><th>Stock</th><th>Promedio mensual</th><th>Cantidad</th><th>Precio compra</th><th>Último precio</th><th>Subtotal</th><th></th></tr></thead>
+                    <tbody id="purchase-lines">
+                    @for (var index = 0; index < Model.Productos.Count; index++)
+                    {
+                        var product = Model.Productos[index];
+                        <tr class="purchase-line" data-product-id="@product.ProductoId">
+                            <td><input data-field="ProductoId" name="Productos[@index].ProductoId" value="@product.ProductoId" type="hidden" /><input data-field="Seleccionado" name="Productos[@index].Seleccionado" value="true" type="hidden" />@product.Nombre @if (product.DatosInsuficientes) { <small class="djj-table__note">Datos históricos insuficientes</small> }</td>
+                            <td>@product.StockActual</td>
+                            <td>@product.PromedioVentaMensual.ToString("N1")</td>
+                            <td><input data-field="Cantidad" name="Productos[@index].Cantidad" value="@product.Cantidad" type="number" min="1" class="djj-input djj-line-input quantity" /></td>
+                            <td><input data-field="PrecioUnitario" name="Productos[@index].PrecioUnitario" value="@product.PrecioUnitario.ToString(CultureInfo.InvariantCulture)" type="number" min="0.01" step="0.01" class="djj-input djj-line-input price" data-last="@(product.UltimoPrecioPagado?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)" /><small class="price-warning djj-field__error"></small></td>
+                            <td>@(product.UltimoPrecioPagado.HasValue ? $"₡{product.UltimoPrecioPagado:N2}" : "—")</td><td class="line-total">₡0.00</td>
+                            <td><button type="button" class="djj-button djj-button--ghost djj-button--sm remove-line" aria-label="Quitar @product.Nombre">Quitar</button></td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot><tr><th colspan="6" class="djj-align-right">Total</th><th id="order-total">₡0.00</th><th></th></tr></tfoot>
+                </table>
+            </div>
+            <div class="djj-form-actions"><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Crear orden</button></div>
+        </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const maximumLines = @PurchasingPolicy.MaximumLinesPerOrder;
+            const lines = document.getElementById('purchase-lines');
+            const catalog = document.getElementById('product-catalog');
+            const search = document.getElementById('product-search');
+            const message = document.getElementById('line-message');
+            const money = value => `₡${value.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            const makeInput = (field, value, type, className) => { const input = document.createElement('input'); input.dataset.field = field; input.value = value; input.type = type; if (className) input.className = className; return input; };
+            const appendTextCell = (row, value) => { const cell = row.insertCell(); cell.textContent = value; return cell; };
+
+            function reindex() {
+                const selected = new Set();
+                lines.querySelectorAll('.purchase-line').forEach((row, index) => {
+                    selected.add(row.dataset.productId);
+                    row.querySelectorAll('[data-field]').forEach(input => input.name = `Productos[${index}].${input.dataset.field}`);
+                });
+                Array.from(catalog.options).forEach(option => { if (option.value) option.disabled = selected.has(option.value); });
+            }
+
+            function recalculate() {
+                let total = 0;
+                lines.querySelectorAll('.purchase-line').forEach(row => {
+                    const quantity = Number(row.querySelector('.quantity').value) || 0;
+                    const priceInput = row.querySelector('.price');
+                    const price = Number(priceInput.value) || 0;
+                    const subtotal = quantity * price;
+                    row.querySelector('.line-total').textContent = money(subtotal); total += subtotal;
+                    const previous = Number(priceInput.dataset.last);
+                    const variation = previous > 0 ? ((price - previous) / previous) * 100 : 0;
+                    row.querySelector('.price-warning').textContent = previous > 0 && Math.abs(variation) > 15 ? `${variation.toFixed(1)}% vs. último precio` : '';
+                });
+                document.getElementById('order-total').textContent = money(total);
+            }
+
+            function addSelectedProduct() {
+                message.textContent = '';
+                const option = catalog.selectedOptions[0];
+                if (!option || !option.value) { message.textContent = 'Seleccione un producto para agregar.'; return; }
+                if (lines.children.length >= maximumLines) { message.textContent = `La orden admite como máximo ${maximumLines} líneas.`; return; }
+                const row = lines.insertRow(); row.className = 'purchase-line'; row.dataset.productId = option.value;
+                const nameCell = row.insertCell(); nameCell.append(makeInput('ProductoId', option.value, 'hidden'), makeInput('Seleccionado', 'true', 'hidden'), document.createTextNode(option.textContent));
+                appendTextCell(row, option.dataset.stock || '0');
+                appendTextCell(row, Number(option.dataset.average || 0).toLocaleString('es-CR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
+                const quantityCell = row.insertCell(); const quantity = makeInput('Cantidad', '1', 'number', 'djj-input djj-line-input quantity'); quantity.min = '1'; quantityCell.append(quantity);
+                const priceCell = row.insertCell(); const price = makeInput('PrecioUnitario', '1', 'number', 'djj-input djj-line-input price'); price.min = '0.01'; price.step = '0.01'; price.dataset.last = option.dataset.last || ''; const warning = document.createElement('small'); warning.className = 'price-warning djj-field__error'; priceCell.append(price, warning);
+                appendTextCell(row, option.dataset.last ? money(Number(option.dataset.last)) : '—'); appendTextCell(row, money(1)).className = 'line-total';
+                const actionCell = row.insertCell(); const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'djj-button djj-button--ghost djj-button--sm remove-line'; remove.setAttribute('aria-label', `Quitar ${option.textContent}`); remove.textContent = 'Quitar'; actionCell.append(remove);
+                catalog.value = ''; reindex(); recalculate();
+            }
+
+            document.getElementById('add-product').addEventListener('click', addSelectedProduct);
+            lines.addEventListener('input', recalculate);
+            lines.addEventListener('click', event => { const button = event.target.closest('.remove-line'); if (!button) return; button.closest('.purchase-line').remove(); reindex(); recalculate(); });
+            search.addEventListener('input', () => { const query = search.value.trim().toLocaleLowerCase('es'); Array.from(catalog.options).forEach(option => { if (option.value) option.hidden = query.length > 0 && !option.textContent.toLocaleLowerCase('es').includes(query); }); });
+            document.getElementById('purchase-order-form').addEventListener('submit', event => { if (lines.children.length === 0) { event.preventDefault(); message.textContent = 'Agregue al menos un producto a la orden.'; } });
+            reindex(); recalculate();
+        })();
+    </script>
+}

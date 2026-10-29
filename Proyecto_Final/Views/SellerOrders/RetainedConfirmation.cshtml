@@ -1,0 +1,10 @@
+@model Proyecto_Final.Models.Admin.OrderDetailViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Seguimiento de revisión"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Ventas · Autorización</span><h1>Seguimiento del pedido #@Model.PedidoId</h1><p>El estado que aparece abajo corresponde a la consulta actual del pedido.</p></div></header>
+@if (Model.Estado == "Retenido")
+{
+    <div class="djj-alert djj-alert--warning" role="status"><strong>Pedido retenido, pendiente de revisión por el Gerente.</strong><p>La retención es una condición de negocio. El inventario no se descuenta ni se genera la factura mientras el pedido permanece retenido.</p><p>Podés consultar el resultado de la revisión en Mis pedidos.</p></div>
+}
+else { <div class="djj-alert" role="status">Este pedido ya no está retenido. Consultá su estado actual y cualquier motivo de rechazo disponible.</div> }
+<div class="djj-order-sections"><partial name="_OrderWorkflowSummary" model="Model" /><partial name="_OrderWorkflowLines" model="Model" /></div>
+<nav class="djj-order-navigation" aria-label="Siguientes acciones del pedido"><a asp-action="MyOrders" class="djj-button djj-button--primary">Mis pedidos</a><a asp-action="Index" class="djj-button djj-button--ghost">Nuevo pedido</a></nav>

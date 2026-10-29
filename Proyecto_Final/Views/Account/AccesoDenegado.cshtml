@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Features
+@{
+    Layout = "_StatusLayout";
+    ViewData["Title"] = "Acceso denegado";
+    var authenticated = Context.Features.Get<ISessionFeature>()?.Session?.GetInt32("UserId") is > 0;
+}
+<section class="djj-card djj-state-card" aria-labelledby="access-denied-title">
+    <span class="djj-state-card__code" aria-hidden="true">403</span>
+    <h1 id="access-denied-title">Acceso denegado</h1>
+    <p>No es posible mostrar esta sección con tu acceso actual.</p>
+    @if (authenticated) { <p>Si necesitás completar esta tarea, solicitá el permiso correspondiente a la persona administradora.</p> } else { <p>Podés iniciar sesión con una cuenta que tenga acceso a esta sección.</p> }
+    <div class="djj-surface-actions"><a asp-controller="Home" asp-action="Index" class="djj-button djj-button--primary">Ir al inicio</a>@if (!authenticated) { <a asp-controller="Account" asp-action="Login" class="djj-button djj-button--ghost">Iniciar sesión</a> }</div>
+</section>

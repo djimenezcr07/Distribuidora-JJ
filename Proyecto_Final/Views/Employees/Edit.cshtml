@@ -1,0 +1,12 @@
+@model Proyecto_Final.Models.Admin.EmployeeFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Editar empleado"; }
+
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Personal · Expediente #@Model.EmpleadoId</span><h1>Editar empleado</h1><p>Actualizá identidad, contacto y relación laboral conservando la versión vigente del expediente.</p></div><div class="djj-page-header__actions"><a asp-action="Details" asp-route-id="@Model.EmpleadoId" class="djj-button djj-button--ghost">Volver al expediente</a></div></header>
+<form asp-action="Edit" method="post" class="djj-workspace-form">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="EmpleadoId" /><input type="hidden" asp-for="RowVersionBase64" /><input type="hidden" asp-for="UsuarioId" />
+    <div asp-validation-summary="ModelOnly" class="djj-alert djj-alert--danger" role="alert" tabindex="-1" data-djj-validation-summary></div>
+    <section class="djj-card"><partial name="_EmployeeForm" model="Model" /></section>
+    <div class="djj-form-actions"><a asp-action="Details" asp-route-id="@Model.EmpleadoId" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Guardar cambios</button></div>
+</form>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

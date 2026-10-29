@@ -1,0 +1,14 @@
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Asistente del negocio";
+}
+<section class="djj-security djj-assistant" data-djj-assistant data-ask-url="@Url.Action("Ask", "Assistant")">
+<header class="djj-page-header"><div class="djj-page-header__copy"><h1>Asistente del negocio</h1><p>Asistente conversacional basado en reglas e interpretación de intenciones.</p></div></header>
+<p class="djj-field__hint">Consultá métricas disponibles para tu rol o recibí ayuda sobre los módulos del sistema.</p>
+<div class="djj-card djj-assistant-panel"><h2>Conversación</h2>@Html.AntiForgeryToken()
+<div id="assistantWindow" class="djj-assistant-conversation" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversación con el asistente"></div>
+<p id="assistantStatus" role="status" aria-live="polite"></p>
+<form id="assistantForm" class="djj-assistant-composer"><div class="djj-field"><label for="assistantInput">Pregunta para el asistente</label><input type="text" id="assistantInput" class="djj-input" autocomplete="off" maxlength="500" aria-describedby="assistant-help" placeholder="Escribí una consulta sobre el negocio o un módulo" /></div><button type="submit" id="assistantSubmit" class="djj-button djj-button--primary">Enviar</button></form>
+<p id="assistant-help" class="djj-field__hint">Máximo 500 caracteres. Las respuestas dependen de los permisos de tu rol; las consultas siguen el registro de uso existente.</p></div>
+</section>
+@section Scripts { <script src="~/js/stage2/assistant.js" asp-append-version="true" defer></script> }

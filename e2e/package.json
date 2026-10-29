@@ -1,0 +1,10 @@
+{
+  "name": "trilogia-stage1-e2e",
+  "private": true,
+  "scripts": {
+    "test": "node stage1-smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

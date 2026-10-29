@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- CI supplies the immutable source revision; local builds intentionally expose no revision. -->
+    <BuildCommitSha Condition="'$(BuildCommitSha)' == ''">unknown</BuildCommitSha>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildCommitSha" Value="$(BuildCommitSha)" />
+  </ItemGroup>
+</Project>

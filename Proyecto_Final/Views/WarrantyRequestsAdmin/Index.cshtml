@@ -1,0 +1,32 @@
+@model List<Proyecto_Final.Models.Admin.WarrantyRequestViewModel>
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Solicitudes de garantía";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = (await PermissionService.GetPermissionCodesAsync(role)).Contains("GARANTIAS_GESTIONAR");
+}
+<div class="djj-customer-service">
+@{ var canClients = admin || await PermissionService.HasCodePermissionAsync(role, "CLIENTES_VER"); }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Solicitudes de garantía</h1><p>Revisión y resolución de solicitudes de productos comprados.</p></div></header>
+<partial name="_CustomerServiceNavigation" />
+<section class="djj-card djj-data-section"><header><h2>Garantías registradas</h2><p>@Model.Count registro(s).</p></header><div class="djj-table-wrap" tabindex="0" role="region" aria-label="Garantías registradas: tabla desplazable"><table class="djj-table djj-table--compact djj-service-table"><caption class="djj-sr-only">Garantías registradas</caption><thead><tr><th scope="col">Solicitud / fecha</th><th scope="col">Pedido / producto</th><th scope="col">Cliente</th><th scope="col">Motivo / descripción</th><th scope="col">Estado / resolución</th><th scope="col">Gestión</th></tr></thead><tbody>
+@if (!Model.Any()) { <tr><td colspan="6"><div class="djj-empty-state"><h3>Sin solicitudes de garantía</h3><p>Las solicitudes registradas aparecerán aquí.</p></div></td></tr> }
+@foreach (var item in Model)
+{
+<tr><td><strong>#@item.GarantiaId</strong><small class="djj-table__note">@item.FechaSolicitud.ToString("dd/MM/yyyy HH:mm") UTC</small></td><td>Pedido #@item.PedidoId<small class="djj-table__note">@item.Producto</small></td><td>@item.Cliente @if (canClients) { <a asp-controller="Clients" asp-action="Details" asp-route-id="@item.UsuarioId" class="djj-table__note">Ver cliente</a> }</td><td><strong>@item.Motivo</strong><p class="djj-service-text">@item.Descripcion</p></td><td><span class="djj-badge djj-badge--@CustomerServicePresentation.WarrantyTone(item.Estado)">@item.Estado</span><p class="djj-service-text">@(string.IsNullOrWhiteSpace(item.Resolucion) ? "Sin resolución registrada." : item.Resolucion)</p><small class="djj-table__note">Resolución: @(item.FechaResolucion?.ToString("dd/MM/yyyy HH:mm") ?? "Sin fecha") @(item.FechaResolucion.HasValue ? "UTC" : "")</small></td><td>
+@if (CustomerServicePresentation.WarrantyClosed(item.Estado)) { <span class="djj-table__note">Solicitud cerrada.</span> }
+else if (canManage)
+{
+<form asp-action="UpdateStatus" method="post" class="djj-service-warranty-form" data-djj-service-form data-djj-confirm="¿Actualizar esta garantía? Aprobar o rechazar deja una resolución terminal.">
+@Html.AntiForgeryToken()<input type="hidden" name="garantiaId" value="@item.GarantiaId" />
+<div class="djj-field"><label for="warranty-state-@item.GarantiaId">Estado de garantía #@item.GarantiaId</label><select id="warranty-state-@item.GarantiaId" name="estado" class="djj-select" required>@foreach (var state in new[] { "En revisión", "Aprobada", "Rechazada" }) { <option selected="@(item.Estado == state)">@state</option> }</select></div>
+<div class="djj-field"><label for="warranty-resolution-@item.GarantiaId">Resolución de garantía #@item.GarantiaId</label><textarea id="warranty-resolution-@item.GarantiaId" name="resolucion" class="djj-textarea" maxlength="1000" rows="3" aria-describedby="warranty-help-@item.GarantiaId"></textarea><small id="warranty-help-@item.GarantiaId">Obligatoria al aprobar o rechazar.</small></div><button type="submit" class="djj-button djj-button--neutral djj-button--sm">Actualizar garantía</button></form>
+}
+</td></tr>
+}
+</tbody></table></div></section>
+</div>
+@section Scripts { <script src="~/js/stage2/customer-service.js" asp-append-version="true"></script> }

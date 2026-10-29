@@ -1,0 +1,39 @@
+@model Proyecto_Final.Models.Store.CartViewModel
+@{ Layout = "_StorefrontLayout"; ViewData["Title"] = "Carrito"; }
+<main class="djj-container djj-store-page">
+    <nav class="djj-store-page__breadcrumb" aria-label="Migas de pan"><ol class="djj-breadcrumb"><li><a asp-controller="Home" asp-action="Index">Inicio</a></li><li aria-hidden="true"><svg class="djj-icon djj-icon--sm"><use href="#djj-icon-caret-right"></use></svg></li><li aria-current="page">Carrito</li></ol></nav>
+    <header class="djj-store-heading"><div class="djj-store-heading__copy"><span class="djj-page-header__eyebrow">Carrito de compras</span><h1>Revisá tu pedido</h1><p>Verificá cantidades, disponibilidad y total antes de continuar.</p></div></header>
+    @if (Model.Items.Count == 0)
+    {
+        <section class="djj-card djj-state"><span class="djj-state__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-cart"></use></svg></span><h2>Tu carrito está vacío</h2><p>Explorá el catálogo y agregá los productos que necesitás.</p><a class="djj-button djj-button--primary djj-button--inline-mobile" asp-controller="Home" asp-action="Shop"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-store"></use></svg>Ir al catálogo</a></section>
+    }
+    else
+    {
+        <div class="djj-cart-layout">
+            <section class="djj-cart-list" aria-label="Productos del carrito">
+            @foreach (var item in Model.Items)
+            {
+                var image = string.IsNullOrWhiteSpace(item.ImagenUrl) ? Url.Content("~/img/product-placeholder.svg") : Url.Content(item.ImagenUrl);
+                <article class="djj-card djj-cart-item">
+                    <img data-djj-product-image class="djj-cart-item__image" src="@image" alt="@item.Nombre" width="128" height="128" loading="lazy" />
+                    <div class="djj-cart-item__copy"><span>@item.Categoria</span><h2>@item.Nombre</h2><p>Disponibles: @item.StockDisponible</p><strong>₡@item.Precio.ToString("N0") c/u</strong></div>
+                    <div class="djj-cart-item__quantity">
+                        <span class="djj-field__label">Cantidad</span>
+                        <div class="djj-cart-stepper">
+                            <form asp-action="Update" method="post">@Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@item.ProductoId" /><input type="hidden" name="comboId" value="@item.ComboId" /><input type="hidden" name="itemType" value="@item.ItemType" /><input type="hidden" name="cantidad" value="@(item.Cantidad - 1)" /><button class="djj-icon-button" type="submit" disabled="@(item.Cantidad <= 1)" aria-label="Disminuir cantidad de @item.Nombre">−</button></form>
+                            <form asp-action="Update" method="post" class="djj-cart-stepper__edit">@Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@item.ProductoId" /><input type="hidden" name="comboId" value="@item.ComboId" /><input type="hidden" name="itemType" value="@item.ItemType" /><label class="djj-sr-only" for="qty-@item.ItemType-@(item.ComboId ?? item.ProductoId)">Cantidad de @item.Nombre</label><input class="djj-input" id="qty-@item.ItemType-@(item.ComboId ?? item.ProductoId)" type="number" name="cantidad" value="@item.Cantidad" min="1" max="@item.StockDisponible" inputmode="numeric" /><button class="djj-button djj-button--outline djj-button--sm" type="submit">Actualizar</button></form>
+                            <form asp-action="Update" method="post">@Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@item.ProductoId" /><input type="hidden" name="comboId" value="@item.ComboId" /><input type="hidden" name="itemType" value="@item.ItemType" /><input type="hidden" name="cantidad" value="@(item.Cantidad + 1)" /><button class="djj-icon-button" type="submit" disabled="@(item.Cantidad >= item.StockDisponible)" aria-label="Aumentar cantidad de @item.Nombre">+</button></form>
+                        </div>
+                    </div>
+                    <div class="djj-cart-item__subtotal"><span>Subtotal</span>@if(item.MontoDescuento > 0){<del>₡@item.Subtotal.ToString("N0")</del><strong>₡@item.SubtotalConDescuento.ToString("N0")</strong><small>@item.PromocionNombre</small>}else{<strong>₡@item.Subtotal.ToString("N0")</strong>}<form asp-action="Remove" method="post" data-djj-confirm="¿Quitar @item.Nombre del carrito?">@Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@item.ProductoId" /><input type="hidden" name="comboId" value="@item.ComboId" /><input type="hidden" name="itemType" value="@item.ItemType" /><button class="djj-button djj-button--danger djj-button--sm" type="submit">Quitar</button></form></div>
+                </article>
+            }
+            @foreach (var gift in Model.Regalias)
+            {
+                <article class="djj-card djj-cart-item djj-cart-item--gift"><span class="djj-state__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-package"></use></svg></span><div class="djj-cart-item__copy"><span class="djj-status-badge djj-status-badge--success">Regalía</span><h2>@gift.Nombre</h2><p>@gift.PromocionNombre · @gift.Cantidad unidad(es)</p></div><strong class="djj-cart-item__free">Incluido</strong></article>
+            }
+            </section>
+            <aside class="djj-card djj-cart-summary" aria-labelledby="cart-summary-title"><h2 id="cart-summary-title">Resumen</h2><dl><div><dt>Productos</dt><dd>@Model.TotalItems</dd></div><div><dt>Subtotal</dt><dd>₡@Model.Subtotal.ToString("N0")</dd></div>@if(Model.DescuentoTotal > 0){<div class="djj-cart-summary__discount"><dt>Descuentos</dt><dd>−₡@Model.DescuentoTotal.ToString("N0")</dd></div>}<div class="djj-cart-summary__total"><dt>Total</dt><dd>₡@Model.Total.ToString("N0")</dd></div></dl><p><svg class="djj-icon djj-icon--sm" aria-hidden="true"><use href="#djj-icon-info"></use></svg>El stock y los precios se validan al finalizar.</p><a class="djj-button djj-button--primary" asp-action="Checkout">Finalizar compra</a><a class="djj-button djj-button--ghost" asp-controller="Home" asp-action="Shop">Seguir comprando</a></aside>
+        </div>
+    }
+</main>

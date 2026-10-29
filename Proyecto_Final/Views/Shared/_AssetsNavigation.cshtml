@@ -1,0 +1,21 @@
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var codes = admin ? new HashSet<string>() : await PermissionService.GetPermissionCodesAsync(role);
+    bool Can(string code) => admin || codes.Contains(code);
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<nav class="djj-domain-nav" aria-label="Activos y comodatos">
+    @if (Can("ACTIVOS_GESTIONAR"))
+    {
+        <a asp-controller="Assets" asp-action="Index" aria-current="@(controller == "Assets" ? "page" : null)">Activos</a>
+        <a asp-controller="Comodatos" asp-action="Index" aria-current="@(controller == "Comodatos" && action != "Profitability" ? "page" : null)">Comodatos</a>
+    }
+    @if (Can("COMODATOS_CONSULTAR"))
+    {
+        <a asp-controller="Comodatos" asp-action="Profitability" aria-current="@(controller == "Comodatos" && action == "Profitability" ? "page" : null)">Rentabilidad</a>
+    }
+</nav>

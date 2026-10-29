@@ -1,0 +1,30 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "meta": {
+    "name": "Distribuidora JJ — Identidad Stage 2",
+    "status": "approved-identity-not-integrated",
+    "version": "1.0.0"
+  },
+  "brand": {
+    "name": { "$type": "string", "$value": "Distribuidora JJ" },
+    "subtitle": { "$type": "string", "$value": "Licorera - Distribuidora" }
+  },
+  "color": {
+    "red": {
+      "primary": { "$type": "color", "$value": "#8B0E16" },
+      "active": { "$type": "color", "$value": "#6F0A11" },
+      "bright": { "$type": "color", "$value": "#C41E26" }
+    },
+    "gold": {
+      "accent": { "$type": "color", "$value": "#D4AF37" },
+      "light": { "$type": "color", "$value": "#F2D77A" },
+      "dark": { "$type": "color", "$value": "#B78F24" }
+    },
+    "neutral": {
+      "charcoal": { "$type": "color", "$value": "#1F1F1F" },
+      "secondaryText": { "$type": "color", "$value": "#625B5C" },
+      "surface": { "$type": "color", "$value": "#FAFAFA" },
+      "white": { "$type": "color", "$value": "#FFFFFF" }
+    }
+  }
+}

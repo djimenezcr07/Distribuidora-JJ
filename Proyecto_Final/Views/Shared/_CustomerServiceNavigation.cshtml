@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var codes = admin ? new HashSet<string>() : await PermissionService.GetPermissionCodesAsync(role);
+    bool Can(string code) => admin || codes.Contains(code);
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<nav class="djj-domain-nav" aria-label="Servicio al cliente">
+@if (Can("CONSULTAS_VER")) { <a asp-controller="Consultations" asp-action="Index" aria-current="@(controller == "Consultations" ? "page" : null)">Consultas</a> }
+@if (Can("RECLAMOS_GESTIONAR")) { <a asp-controller="Reclamos" asp-action="Index" aria-current="@(controller == "Reclamos" ? "page" : null)">Reclamos</a> }
+@if (Can("GARANTIAS_GESTIONAR")) { <a asp-controller="WarrantyRequestsAdmin" asp-action="Index" aria-current="@(controller == "WarrantyRequestsAdmin" ? "page" : null)">Garantías</a> }
+</nav>

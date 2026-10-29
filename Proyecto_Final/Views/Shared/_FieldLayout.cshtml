@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Http
+@{
+    ViewData["Stage2Layout"] = true;
+    var brandName = Company.Value.BrandName;
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Operación en campo";
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var userName = Context.Session.GetString("UserFullName") ?? "Usuario";
+    bool IsCurrent(params string[] controllers) => controllers.Any(value => string.Equals(controller, value, StringComparison.OrdinalIgnoreCase));
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Operación móvil de @brandName" />
+    <title>@pageTitle - @brandName</title>
+    <link rel="icon" type="image/svg+xml" href="~/brand/stage2/icon_stage2-identity_favicon_20260821_32.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/stage2/tokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/field.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/utilities.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="djj-stage2 djj-field-layout" data-djj-layout="field" data-authenticated-user-id="@(Context.Session.GetInt32("UserId")?.ToString() ?? string.Empty)">
+    <a class="djj-skip-link" href="#djj-main-content">Saltar al contenido principal</a>
+    <partial name="_DjjIconSprite" />
+
+    <header class="djj-field-topbar">
+        <a class="djj-field-topbar__brand" asp-controller="DriverDeliveries" asp-action="Index" aria-label="@brandName — Rutas">
+            <img src="~/brand/stage2/logo_stage2-identity_mark_20260821_color.svg" width="144" height="144" alt="" />
+            <span class="djj-field-topbar__copy"><strong>@pageTitle</strong><span>@userName</span></span>
+        </a>
+        <span class="djj-field-context">Operación de campo</span>
+    </header>
+
+    <main id="djj-main-content" class="djj-field-content" tabindex="-1">
+        <nav aria-label="Migas de pan">
+            <ol class="djj-breadcrumb">
+                <li><a asp-controller="DriverDeliveries" asp-action="Index">Rutas</a></li>
+                <li aria-hidden="true"><svg class="djj-icon djj-icon--sm"><use href="#djj-icon-caret-right"></use></svg></li>
+                <li aria-current="page">@pageTitle</li>
+            </ol>
+        </nav>
+        <partial name="_Stage2Messages" />
+        @RenderBody()
+    </main>
+
+    <nav class="djj-field-bottom-nav" aria-label="Navegación de campo">
+        <a asp-controller="DriverDeliveries" asp-action="Index" aria-current="@(IsCurrent("DriverDeliveries") ? "page" : null)"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-truck"></use></svg><span>Entregas</span></a>
+        <a asp-controller="Profile" asp-action="Edit" aria-current="@(IsCurrent("Profile") ? "page" : null)"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-user"></use></svg><span>Perfil</span></a>
+    </nav>
+
+    <script src="~/js/secure-offline-storage.js" asp-append-version="true"></script>
+    <script src="~/js/stage2/layouts.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

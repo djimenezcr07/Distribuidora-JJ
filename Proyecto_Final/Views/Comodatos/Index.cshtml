@@ -1,0 +1,27 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.ComodatoListItemViewModel>
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Comodatos"; var estado = ViewBag.Estado as string; var buscar = ViewBag.Buscar as string; var items = Model?.ToList() ?? new(); }
+<div class="djj-assets djj-stack">
+    <partial name="_AssetsNavigation" />
+    <header class="djj-page-header"><div><h1>Comodatos de equipos</h1><p>Clientes, ubicación y trazabilidad de los equipos prestados.</p></div><a asp-action="Assign" class="djj-button djj-button--primary">Asignar comodato</a></header>
+    <form asp-action="Index" method="get" class="djj-card djj-padded djj-filter-bar"><div class="djj-field"><label for="loan-search">Buscar comodatos</label><input id="loan-search" name="buscar" value="@buscar" class="djj-input" placeholder="Código, activo o cliente" /></div><div class="djj-field"><label for="loan-state">Estado</label><select id="loan-state" name="estado" class="djj-select"><option value="">Todos los estados</option>
+    @foreach (var option in new[] { "Activo", "Devuelto", "Retirado" }) { <option value="@option" selected="@(estado == option)">@option</option> }
+    </select></div><div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--primary">Buscar</button><a asp-action="Index" class="djj-button djj-button--outline">Limpiar</a></div></form>
+    <section class="djj-card djj-data-section"><header><div><h2>Equipos en comodato</h2><p>@items.Count registro(s) en este resultado.</p></div></header><div class="djj-table-wrap" tabindex="0" aria-label="Comodatos y devoluciones desplazables"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">Equipo, cliente, fechas, estado y devolución de cada comodato</caption><thead><tr><th scope="col">Comodato / activo</th><th scope="col">Cliente</th><th scope="col">Ubicación</th><th scope="col">Fechas / días</th><th scope="col">Estado</th><th scope="col">Destino</th><th scope="col">Acciones</th></tr></thead><tbody>
+    @if (!items.Any()) { <tr><td colspan="7">No hay comodatos para estos filtros.</td></tr> }
+    @foreach (var c in items) {
+        <tr><th scope="row">#@c.ComodatoId · @c.CodigoActivo<small class="djj-table__note">@c.ActivoNombre · @c.ActivoTipo</small></th><td>@c.ClienteNombre<small class="djj-table__note">@c.ClienteIdentificacion</small></td><td>@(string.IsNullOrWhiteSpace(c.Ubicacion) ? "Sin ubicación registrada" : c.Ubicacion)</td><td><span class="djj-table__nowrap">Desde @c.FechaAsignacion.ToString("dd/MM/yyyy")</span><small class="djj-table__note">@c.DiasEnComodato día(s)</small>@if (c.FechaDevolucion.HasValue) { <small class="djj-table__note djj-table__nowrap">Devuelto: @c.FechaDevolucion.Value.ToString("dd/MM/yyyy")</small> }</td><td><span class="djj-badge djj-badge--@AssetPresentation.ComodatoTone(c.Estado)">@c.Estado</span></td><td>@(string.IsNullOrWhiteSpace(c.DestinoDevolucion) ? "Sin destino registrado" : c.DestinoDevolucion)</td><td><div class="djj-row-actions"><a asp-controller="Assets" asp-action="Details" asp-route-id="@c.ActivoId" class="djj-button djj-button--outline" aria-label="Ver activo @c.CodigoActivo">Ver activo</a>
+        @if (c.Estado == "Activo") { <button type="button" class="djj-button djj-button--outline" data-djj-return-toggle="ret-@c.ComodatoId" aria-controls="ret-@c.ComodatoId" aria-expanded="false" aria-label="Devolver equipo del comodato @c.ComodatoId">Devolver</button> }
+        </div></td></tr>
+        @if (c.Estado == "Activo") {
+            <tr id="ret-@c.ComodatoId" hidden><td colspan="7"><form asp-action="Return" method="post" class="djj-assets-return" data-djj-confirm="¿Cerrar este comodato? El activo cambiará de estado según el destino.">
+                @Html.AntiForgeryToken()<input type="hidden" name="ComodatoId" value="@c.ComodatoId" />
+                <div class="djj-field"><label for="return-destination-@c.ComodatoId">Destino del equipo @c.CodigoActivo</label><select id="return-destination-@c.ComodatoId" name="Destino" class="djj-select"><option value="Inventario">Reingresar a inventario</option><option value="Mantenimiento">Enviar a mantenimiento</option></select></div>
+                <div class="djj-field"><label for="return-condition-@c.ComodatoId">Condición de devolución (opcional)</label><input id="return-condition-@c.ComodatoId" name="CondicionDevolucion" maxlength="300" class="djj-input" /></div>
+                <button type="submit" class="djj-button djj-button--primary">Registrar devolución</button>
+            </form></td></tr>
+        }
+    }
+    </tbody></table></div></section>
+</div>
+@section Scripts { <script src="~/js/stage2/assets-ui.js" asp-append-version="true"></script> }

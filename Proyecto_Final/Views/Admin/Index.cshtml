@@ -1,0 +1,93 @@
+@model Proyecto_Final.Models.Admin.DashboardSummaryViewModel
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Panel general";
+    var secondaryLinks = new[]
+    {
+        ("Inventory", "Movements", "history", "Movimientos", "Entradas y salidas"),
+        ("Roles", "Index", "shield", "Roles", "Acceso por perfil"),
+        ("Permissions", "Index", "shield", "Permisos", "Capacidades del sistema"),
+        ("Clients", "Index", "users", "Clientes", "Perfiles comerciales"),
+        ("SellerOrders", "Index", "store", "Venta móvil", "Pedidos del vendedor"),
+        ("Consultations", "Index", "chat", "Consultas", "Atención y seguimiento"),
+        ("Audit", "Index", "history", "Auditoría", "Actividad registrada"),
+        ("Payroll", "Index", "calculator", "Planilla", "Períodos y cálculos"),
+        ("Chat", "Index", "chat", "Departamentos", "Chat interno"),
+        ("Assistant", "Index", "robot", "Asistente", "Ayuda contextual")
+    };
+}
+
+<header class="djj-page-header">
+    <div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Resumen operativo</span><h1>Panel de administrador</h1><p>Productos, pedidos y ventas en una vista basada en los datos actuales del sistema.</p></div>
+    <div class="djj-page-header__actions"><a class="djj-button djj-button--primary djj-button--inline-mobile" asp-controller="Inventory" asp-action="Create"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-package"></use></svg>Nuevo producto</a></div>
+</header>
+
+<section class="djj-admin-kpis" aria-label="Indicadores principales">
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Total productos</p><p class="djj-kpi-card__value">@Model.TotalProductos</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-package"></use></svg></span></article>
+    <article class="djj-kpi-card djj-kpi-card--success"><div><p class="djj-kpi-card__label">Productos activos</p><p class="djj-kpi-card__value">@Model.ProductosActivos</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-check"></use></svg></span></article>
+    <article class="djj-kpi-card djj-kpi-card--warning"><div><p class="djj-kpi-card__label">Stock bajo</p><p class="djj-kpi-card__value">@Model.StockBajo</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-warning"></use></svg></span></article>
+    <article class="djj-kpi-card djj-kpi-card--danger"><div><p class="djj-kpi-card__label">Productos agotados</p><p class="djj-kpi-card__value">@Model.ProductosAgotados</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-warning"></use></svg></span></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Total pedidos</p><p class="djj-kpi-card__value">@Model.TotalPedidos</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-orders"></use></svg></span></article>
+    <article class="djj-kpi-card djj-kpi-card--warning"><div><p class="djj-kpi-card__label">Pedidos pendientes</p><p class="djj-kpi-card__value">@Model.PedidosPendientes</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-history"></use></svg></span></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Pedidos en proceso</p><p class="djj-kpi-card__value">@Model.PedidosEnProceso</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-truck"></use></svg></span></article>
+    <article class="djj-kpi-card djj-kpi-card--success"><div><p class="djj-kpi-card__label">Pedidos entregados</p><p class="djj-kpi-card__value">@Model.PedidosEntregados</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-check"></use></svg></span></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Ventas totales</p><p class="djj-kpi-card__value">₡@Model.VentasTotales.ToString("N2")</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-chart"></use></svg></span></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Ventas del mes</p><p class="djj-kpi-card__value">₡@Model.VentasMesActual.ToString("N2")</p></div><span class="djj-kpi-card__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-receipt"></use></svg></span></article>
+</section>
+
+<section class="djj-admin-panels" aria-label="Detalle operativo">
+    <article class="djj-card">
+        <div class="djj-card__header"><div><h2>Productos críticos</h2><p>Existencias agotadas o bajo el umbral configurado.</p></div><a class="djj-button djj-button--ghost djj-button--sm djj-button--inline-mobile" asp-controller="Inventory" asp-action="Index">Ver inventario</a></div>
+        @if (Model.ProductosCriticos == null || !Model.ProductosCriticos.Any())
+        {
+            <div class="djj-state"><span class="djj-state__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-check"></use></svg></span><h3>Sin productos críticos</h3><p>No hay existencias críticas registradas.</p></div>
+        }
+        else
+        {
+            <div class="djj-table-shell"><table class="djj-table"><thead><tr><th>Producto</th><th>Categoría</th><th class="djj-table__number">Stock</th><th class="djj-table__status">Estado</th></tr></thead><tbody>
+                @foreach (var item in Model.ProductosCriticos)
+                {
+                    var status = item.Stock <= 0 ? "danger" : "warning";
+                    <tr><td>@item.Nombre</td><td>@item.Categoria</td><td class="djj-table__number">@item.Stock</td><td class="djj-table__status"><span class="djj-status-badge djj-status-badge--@status">@item.EstadoStock</span></td></tr>
+                }
+            </tbody></table></div>
+        }
+    </article>
+
+    <article class="djj-card">
+        <div class="djj-card__header"><div><h2>Pedidos recientes</h2><p>Últimos movimientos registrados en pedidos.</p></div><a class="djj-button djj-button--ghost djj-button--sm djj-button--inline-mobile" asp-controller="OrdersAdmin" asp-action="Index">Ver pedidos</a></div>
+        @if (Model.PedidosRecientes == null || !Model.PedidosRecientes.Any())
+        {
+            <div class="djj-state"><span class="djj-state__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-orders"></use></svg></span><h3>Sin pedidos recientes</h3><p>No hay pedidos recientes para mostrar.</p></div>
+        }
+        else
+        {
+            <div class="djj-table-shell"><table class="djj-table"><thead><tr><th>Pedido</th><th>Cliente</th><th>Fecha</th><th class="djj-table__status">Estado</th><th class="djj-table__number">Total</th></tr></thead><tbody>
+                @foreach (var item in Model.PedidosRecientes)
+                {
+                    var status = item.Estado == "Pendiente" ? "warning" : item.Estado == "Entregado" ? "success" : "neutral";
+                    <tr><td>#@item.PedidoId</td><td>@item.Cliente</td><td>@item.FechaPedido.ToString("dd/MM/yyyy")</td><td class="djj-table__status"><span class="djj-status-badge djj-status-badge--@status">@item.Estado</span></td><td class="djj-table__number">₡@item.Total.ToString("N2")</td></tr>
+                }
+            </tbody></table></div>
+        }
+    </article>
+</section>
+
+<section class="djj-admin-section" aria-labelledby="djj-quick-title">
+    <div class="djj-admin-section__heading"><h2 id="djj-quick-title">Operación principal</h2><p>Tres destinos alineados con los indicadores y alertas de este panel.</p></div>
+    <div class="djj-admin-primary-actions">
+        <a class="djj-admin-quick-link djj-admin-quick-link--primary" asp-controller="Inventory" asp-action="Index"><span class="djj-admin-quick-link__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-warehouse"></use></svg></span><span class="djj-admin-quick-link__copy"><strong>Inventario</strong><span>Productos y existencias</span></span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a>
+        <a class="djj-admin-quick-link djj-admin-quick-link--primary" asp-controller="OrdersAdmin" asp-action="Index"><span class="djj-admin-quick-link__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-orders"></use></svg></span><span class="djj-admin-quick-link__copy"><strong>Pedidos</strong><span>Seguimiento operativo</span></span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a>
+        <a class="djj-admin-quick-link djj-admin-quick-link--primary" asp-controller="Billing" asp-action="Index"><span class="djj-admin-quick-link__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-receipt"></use></svg></span><span class="djj-admin-quick-link__copy"><strong>Facturación</strong><span>Comprobantes y estados</span></span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a>
+    </div>
+    <details class="djj-admin-module-disclosure">
+        <summary>Ver los otros 11 módulos</summary>
+        <div class="djj-admin-quick-grid">
+            <a class="djj-admin-quick-link" asp-controller="AccountsReceivableAdmin" asp-action="Index"><span class="djj-admin-quick-link__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-credit"></use></svg></span><span class="djj-admin-quick-link__copy"><strong>Crédito y cobro</strong><span>Cuentas por cobrar</span></span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a>
+            @foreach (var link in secondaryLinks)
+            {
+                <a class="djj-admin-quick-link" asp-controller="@link.Item1" asp-action="@link.Item2"><span class="djj-admin-quick-link__icon"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-@link.Item3"></use></svg></span><span class="djj-admin-quick-link__copy"><strong>@link.Item4</strong><span>@link.Item5</span></span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a>
+            }
+        </div>
+    </details>
+</section>

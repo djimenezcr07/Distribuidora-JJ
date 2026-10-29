@@ -1,0 +1,30 @@
+@model Proyecto_Final.Models.Admin.DeliveryBoardViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Tablero de entregas";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var canRoutes = await PermissionService.HasCodePermissionAsync(role, "RUTAS_GESTIONAR");
+}
+<div class="djj-logistics djj-stack" data-snapshot-url="@Url.Action("Snapshot", "DeliveryBoard")" data-route-detail-base="@Url.Action("Detail", "RoutesAdmin")" data-can-view-routes="@canRoutes.ToString().ToLowerInvariant()">
+    <partial name="_LogisticsNavigation" />
+    <header class="djj-page-header"><div><h1>Tablero de entregas</h1><p>Resumen de todas las rutas. Actualización automática cada 15 segundos.</p><small id="board-updated">Actualizado: @Model.GeneradoUtc.ToLocalTime().ToString("HH:mm:ss")</small></div><button type="button" class="djj-button djj-button--outline" id="board-pause" aria-pressed="false">Pausar actualización</button></header>
+    <p id="board-status" role="status" aria-live="polite"></p>
+    <div class="djj-kpi-grid djj-grid--4" aria-label="Resumen operativo">
+        <div class="djj-kpi-card"><span>Rutas activas</span><strong id="active-routes">@Model.RutasActivas</strong></div>
+        <div class="djj-kpi-card"><span>Entregas pendientes</span><strong id="pending-deliveries">@Model.EntregasPendientes</strong></div>
+        <div class="djj-kpi-card"><span>Entregas completadas</span><strong id="completed-deliveries">@Model.EntregasCompletadas</strong></div>
+        <div class="djj-kpi-card"><span>Entregas fallidas</span><strong id="failed-deliveries">@Model.EntregasFallidas</strong></div>
+    </div>
+    <p id="board-attention" class="djj-alert djj-alert--warning" hidden="@(Model.EntregasFallidas == 0)">Atención requerida: @Model.EntregasFallidas entrega(s) fallida(s). Consultá el detalle de las rutas para revisar los motivos.</p>
+    <form class="djj-card djj-logistics-filter djj-logistics-pad" id="board-filter" role="search"><div class="djj-field"><label for="board-search">Buscar en las rutas mostradas</label><input class="djj-input" id="board-search" type="search" placeholder="Ruta, zona, chofer o vehículo" /></div><div class="djj-field"><label for="board-state">Estado</label><select id="board-state" class="djj-input"><option value="">Todos</option><option>Planificada</option><option>Despachada</option><option>Completada</option><option>Cancelada</option></select></div><button class="djj-button djj-button--outline" type="reset">Limpiar</button></form>
+    <p class="djj-text-secondary">Los filtros solo afectan la tabla; las métricas mantienen el total de todas las rutas.</p>
+    <section class="djj-card"><div class="djj-table-wrap" tabindex="0" aria-label="Rutas del tablero desplazables"><table class="djj-table"><caption class="djj-sr-only">Rutas, asignación y progreso de entregas</caption><thead><tr><th scope="col">Ruta / zona</th><th scope="col">Chofer / vehículo</th><th scope="col">Estado</th><th scope="col">Despacho</th><th scope="col">Progreso</th>@if (canRoutes) { <th scope="col">Detalle</th> }</tr></thead><tbody id="delivery-board-body">
+    @if (!Model.Rutas.Any()) { <tr><td colspan="@(canRoutes ? 6 : 5)">No hay rutas para mostrar.</td></tr> }
+    @foreach (var route in Model.Rutas) {
+        <tr data-board-row><td><strong>@route.Codigo</strong><small class="djj-table__note">@route.Zona</small></td><td>@route.Chofer<small class="djj-table__note">@route.VehiculoPlaca</small></td><td><span class="djj-badge djj-badge--@LogisticsStatusPresentation.RouteTone(route.Estado)">@route.Estado</span></td><td class="djj-table__nowrap">@(route.FechaDespacho?.ToString("dd/MM/yyyy HH:mm") ?? "Sin despacho")</td><td>@route.TotalPedidos pedidos<small class="djj-table__note">@route.Entregados entregadas · @route.Fallidos fallidas · @route.Pendientes pendientes</small></td>@if (canRoutes) { <td><a asp-controller="RoutesAdmin" asp-action="Detail" asp-route-id="@route.RutaId" class="djj-button djj-button--outline">Ver ruta<span class="djj-sr-only"> @route.Codigo</span></a></td> }</tr>
+    }
+    </tbody></table></div></section>
+</div>
+@section Scripts { <script src="~/js/stage2/delivery-board.js" asp-append-version="true"></script> }

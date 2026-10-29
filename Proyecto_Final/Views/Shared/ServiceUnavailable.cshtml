@@ -1,0 +1,9 @@
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_StatusLayout"; ViewData["Title"] = "Servicio temporalmente no disponible"; var requestId = PublicSurfacePresentation.SafeRequestId(ViewData["TraceId"] as string); }
+<section class="djj-card djj-state-card" aria-labelledby="unavailable-title">
+    <span class="djj-state-card__code" aria-hidden="true">503</span>
+    <h1 id="unavailable-title">Servicio temporalmente no disponible</h1>
+    <p>No podemos completar esta solicitud en este momento. Intentalo nuevamente en unos minutos.</p>
+    @if (requestId is not null) { <p>Identificador de seguimiento: <code class="djj-trace-id">@requestId</code></p> }
+    <div class="djj-surface-actions"><a asp-controller="Home" asp-action="Index" class="djj-button djj-button--primary">Ir al inicio</a></div>
+</section>

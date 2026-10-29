@@ -1,0 +1,31 @@
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Chat V2";
+}
+<section class="djj-chat-v2" data-djj-chat-v2 data-api-root="@Url.Content("~/ChatV2/")">
+    <header class="djj-page-header"><div class="djj-page-header__copy"><h1>Chat V2</h1><p>Conversaciones personales, departamentos y atención a clientes según tu autorización vigente.</p></div></header>
+    <p id="chat-v2-status" class="djj-alert djj-alert--info" role="status" aria-live="polite">Comprobando disponibilidad y sesión…</p>
+    <p class="djj-field__hint">La integración permanece bloqueada hasta acreditar su infraestructura y permisos. Esta página no envía mensajes al chat anterior.</p>
+    @Html.AntiForgeryToken()
+    <div class="djj-card djj-chat-v2-tools">
+        <div class="djj-field"><label for="chat-v2-domain">Modalidad</label><select id="chat-v2-domain" class="djj-select" disabled><option value="P" disabled>Personal / interno</option><option value="D" disabled>Departamental</option><option value="C" disabled>Atención a clientes</option></select></div>
+        <div class="djj-field"><label for="chat-v2-resource">Tus conversaciones autorizadas</label><select id="chat-v2-resource" class="djj-select" disabled><option value="">Sin conversaciones disponibles</option></select></div>
+        <button id="chat-v2-refresh" class="djj-button djj-button--secondary" type="button">Actualizar disponibilidad</button>
+    </div>
+    <div class="djj-card">
+        <h2>Conversación</h2>
+        <div id="chat-v2-messages" class="djj-chat-v2-messages" role="log" aria-label="Mensajes autorizados" aria-live="polite" aria-relevant="additions"></div>
+        <p id="chat-v2-empty" class="djj-field__hint">No se ha abierto ninguna conversación. Las opciones se habilitan después de comprobar el acceso.</p>
+        <form id="chat-v2-compose" class="djj-chat-v2-compose">
+            <div class="djj-field"><label for="chat-v2-content">Mensaje</label><textarea id="chat-v2-content" class="djj-textarea" maxlength="1000" rows="3" disabled aria-describedby="chat-v2-help"></textarea></div>
+            <button id="chat-v2-send" class="djj-button djj-button--primary" type="submit" disabled>Enviar</button>
+        </form>
+        <p id="chat-v2-help" class="djj-field__hint">Máximo 1000 caracteres. Un envío de resultado desconocido conserva su intento en esta página; primero se comprueba el recibo. Recargar con F5 no recupera el intento.</p>
+        <button id="chat-v2-retry" class="djj-button djj-button--secondary" type="button" hidden disabled>Comprobar envío pendiente</button>
+    </div>
+</section>
+@section Styles { <link rel="stylesheet" href="~/css/stage2/chat-v2.css" asp-append-version="true" /> }
+@section Scripts {
+    <script src="~/js/stage2/chat-v2-continuity.js" asp-append-version="true" defer></script>
+    <script src="~/js/stage2/chat-v2.js" asp-append-version="true" defer></script>
+}

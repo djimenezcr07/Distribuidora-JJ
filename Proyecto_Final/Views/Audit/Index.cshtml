@@ -1,0 +1,37 @@
+@model Proyecto_Final.Models.Admin.AuditLogFilterViewModel
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Auditoría del sistema";
+    var search = string.IsNullOrEmpty(Model.Buscar) ? string.Empty : SecurityWorkspacePresentation.SafeAuditText(Model.Buscar);
+
+}
+@using Proyecto_Final.Models.Presentation
+<section class="djj-security"><partial name="_SecurityNavigation" />
+<header class="djj-page-header"><div class="djj-page-header__copy"><h1>Auditoría del sistema</h1><p>Acciones y contexto para revisar la trazabilidad del sistema.</p></div></header>
+<form asp-controller="Audit" asp-action="Index" method="get" class="djj-filter-bar"><div class="djj-field"><label for="modulo">Módulo</label><select id="modulo" name="modulo" class="djj-select">
+                                <option value="">Todos</option>
+                                <option value="Autenticación" selected="@(Model.Modulo == "Autenticación")">Autenticación</option>
+                                <option value="Usuarios" selected="@(Model.Modulo == "Usuarios")">Usuarios</option>
+                                <option value="Inventario" selected="@(Model.Modulo == "Inventario")">Inventario</option>
+                                <option value="Pedidos" selected="@(Model.Modulo == "Pedidos")">Pedidos</option>
+                                <option value="Auditoría" selected="@(Model.Modulo == "Auditoría")">Auditoría</option>
+                            </select></div><div class="djj-field"><label for="accion">Acción</label><select id="accion" name="accion" class="djj-select">
+                                <option value="">Todas</option>
+                                <option value="Login" selected="@(Model.Accion == "Login")">Login</option>
+                                <option value="Logout" selected="@(Model.Accion == "Logout")">Logout</option>
+                                <option value="Registro" selected="@(Model.Accion == "Registro")">Registro</option>
+                                <option value="Crear" selected="@(Model.Accion == "Crear")">Crear</option>
+                                <option value="Editar" selected="@(Model.Accion == "Editar")">Editar</option>
+                                <option value="Eliminar/Inactivar" selected="@(Model.Accion == "Eliminar/Inactivar")">Eliminar/Inactivar</option>
+                                <option value="Movimiento" selected="@(Model.Accion == "Movimiento")">Movimiento</option>
+                                <option value="Cambio de estado" selected="@(Model.Accion == "Cambio de estado")">Cambio de estado</option>
+                            </select></div><div class="djj-field"><label for="buscar">Buscar</label><input id="buscar" name="buscar" value="@search" maxlength="200" class="djj-input" placeholder="Usuario, correo, módulo o descripción" /></div><button type="submit" class="djj-button djj-button--primary">Filtrar</button><a asp-action="Index" class="djj-button djj-button--secondary">Limpiar filtros</a></form>
+<p class="djj-field__hint">Máximo 200 registros recientes. Las fechas se muestran como las entrega el sistema, sin asignarles una zona horaria.</p>
+<div class="djj-table-scroll" role="region" aria-label="Registros de auditoría" tabindex="0"><table class="djj-table djj-audit-table"><caption class="djj-sr-only">Fecha, actor, rol, módulo, acción, descripción y contexto</caption><thead><tr><th scope="col">Registro y fecha</th><th scope="col">Actor</th><th scope="col">Rol</th><th scope="col">Módulo</th><th scope="col">Acción</th><th scope="col">Detalle</th><th scope="col">Contexto</th></tr></thead><tbody>
+@if (!Model.Registros.Any()) { <tr><td colspan="7">No hay registros de auditoría para estos filtros.</td></tr> }
+@foreach (var item in Model.Registros) {
+<tr><td><strong>#@item.AuditoriaId</strong><small class="djj-table__note">@item.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</small></td><td><strong>@SecurityWorkspacePresentation.SafeAuditText(item.UsuarioNombre)</strong><small class="djj-table__note">@SecurityWorkspacePresentation.SafeAuditText(item.UsuarioCorreo)</small><small class="djj-table__note">Usuario: @(item.UsuarioId?.ToString() ?? "No registrado")</small></td><td>@SecurityWorkspacePresentation.SafeAuditText(item.Rol)</td><td>@SecurityWorkspacePresentation.SafeAuditText(item.Modulo)</td><td><span class="djj-badge djj-badge--neutral">@SecurityWorkspacePresentation.SafeAuditText(item.Accion)</span></td><td class="djj-audit-detail">@SecurityWorkspacePresentation.SafeAuditText(item.Descripcion)</td><td><details><summary>Ver contexto</summary><dl><dt>IP</dt><dd>@SecurityWorkspacePresentation.SafeAuditText(item.DireccionIp)</dd><dt>Agente de usuario</dt><dd>@SecurityWorkspacePresentation.SafeAuditText(item.UserAgent)</dd></dl></details></td></tr>
+}
+</tbody></table></div></section>

@@ -1,0 +1,19 @@
+/* Public information and dependency-free failure surfaces use existing Stage 2 tokens. */
+.djj-public-page { padding-block: var(--djj-space-8); }
+.djj-public-prose { max-width: 52rem; }
+.djj-contact-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: var(--djj-space-4); margin-bottom: var(--djj-space-5); }
+.djj-contact-details h2, .djj-contact-grid h2 { font-size: var(--djj-font-size-lg); }
+.djj-contact-grid { display: grid; gap: var(--djj-space-5); align-items: start; }
+.djj-contact-grid > *, .djj-contact-details > * { min-width: 0; overflow-wrap: anywhere; }
+.djj-contact-list { margin: 0; padding-left: var(--djj-space-5); }
+.djj-contact-list li + li { margin-top: var(--djj-space-3); }
+.djj-surface-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--djj-space-3); margin-top: var(--djj-space-5); }
+.djj-state-card .djj-surface-actions { justify-content: center; }
+.djj-status-brand { display: flex; justify-content: center; padding: var(--djj-space-6) var(--djj-page-gutter) 0; }
+.djj-status-brand img { width: 14rem; height: auto; }
+.djj-status-surface .djj-state-card { min-width: 0; overflow-wrap: anywhere; }
+.djj-trace-id { font-size: var(--djj-font-size-sm); overflow-wrap: anywhere; }
+.djj-financial-report .djj-kpi-card__value { white-space: normal; overflow-wrap: anywhere; }
+.djj-financial-report .djj-table { min-width: 42rem; }
+.djj-financial-report .djj-table td { overflow-wrap: anywhere; max-width: 24rem; }
+@media (min-width: 64rem) { .djj-contact-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } }

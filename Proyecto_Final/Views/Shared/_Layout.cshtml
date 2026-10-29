@@ -1,0 +1,712 @@
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Services
+@inject AdminDbService AdminDbService
+@inject IRolePermissionService PermissionService
+@{
+    var SiteBrandName = Company.Value.BrandName;
+    var SiteBrandSubtitle = Company.Value.BrandSubtitle;
+    var pageTitle = ViewData["Title"]?.ToString();
+    var documentTitle = string.IsNullOrWhiteSpace(pageTitle)
+        ? SiteBrandName
+        : $"{pageTitle} - {SiteBrandName}";
+}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>@documentTitle</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Distribuidora JJ, licorera, distribuidora, licores, whisky, vinos, cervezas, ron, vodka" name="keywords">
+    <meta content="@SiteBrandName - @SiteBrandSubtitle" name="description">
+
+    <link href="@Url.Content("~/brand/stage2/icon_stage2-identity_favicon_20260821_32.svg")" rel="icon" type="image/svg+xml">
+    <link href="@Url.Content("~/brand/stage2/icon_stage2-identity_favicon_20260821_32.png")" rel="icon" type="image/png" sizes="32x32">
+    <link href="@Url.Content("~/brand/apple-touch-icon.png")?v=djj-1" rel="apple-touch-icon" sizes="180x180">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="~/lib/animate/animate.min.css" rel="stylesheet">
+    <link href="~/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="~/css/style.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/css/custom-theme.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/css/ui-modern-2027.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sprint3-ui-polish.css" rel="stylesheet" asp-append-version="true">
+    <link href="~/css/sprint3-modal.css" rel="stylesheet" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/sprint4-frontend-polish.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/brand-system.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/brand-overrides.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/sprint4-admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body data-authenticated-user-id="@(Context.Session.GetInt32("UserId")?.ToString() ?? string.Empty)">
+    @{
+        var userName = Context.Session.GetString("UserFullName");
+        var userRole = Context.Session.GetString("UserRole");
+        var isLoggedIn = !string.IsNullOrWhiteSpace(Context.Session.GetString("UserEmail"));
+        var isAdmin = isLoggedIn && string.Equals(userRole, "Administrador", StringComparison.OrdinalIgnoreCase);
+        var isClient = isLoggedIn && string.Equals(userRole, "Cliente", StringComparison.OrdinalIgnoreCase);
+        var isChofer = isLoggedIn && string.Equals(userRole, "Chofer", StringComparison.OrdinalIgnoreCase);
+        var userId = Context.Session.GetInt32("UserId") ?? 0;
+        var effectivePermissions = isLoggedIn && !isAdmin
+            ? await PermissionService.GetPermissionCodesAsync(userRole)
+            : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        bool HasPermission(string code) => isAdmin || effectivePermissions.Contains(code);
+        var isEmployeePortalUser = isLoggedIn && await AdminDbService.IsEmployeeUserAsync(userId);
+        var canViewBudgets = HasPermission("PRESUPUESTOS_VER");
+        var canViewExpenses = HasPermission("GASTOS_VER");
+        var canCompareBudgets = HasPermission("PRESUPUESTOS_COMPARAR");
+        var canViewDeliveryBoard = HasPermission("ENTREGAS_TABLERO_VER");
+        var canViewDocumentAlerts = HasPermission("DOCUMENTOS_VER");
+        var canViewSuppliers = HasPermission("PROVEEDORES_VER");
+        var canViewPurchaseOrders = HasPermission("COMPRAS_ORDENES_VER");
+        var canViewPriceHistory = HasPermission("COMPRAS_PRECIOS_VER");
+        var canViewEmployees = HasPermission("EMPLEADOS_VER");
+        var canManageLeaveRequests = HasPermission("EMPLEADOS_SOLICITUDES");
+        var canApproveAttendance = HasPermission("RRHH_JORNADAS_APROBAR");
+        var canViewPayroll = HasPermission("PLANILLA_VER");
+        var canManagePaySlips = HasPermission("PLANILLA_BOLETAS_GESTIONAR");
+        var canCreateMobileSale = HasPermission("VENTA_MOVIL_CREAR");
+        var canAuthorizeOrders = HasPermission("PEDIDOS_AUTORIZAR_RECHAZAR");
+        var canViewManagementDashboard = HasPermission("REPORTES_DASHBOARD");
+        var canViewSalesReports = HasPermission("REPORTES_VENTAS_VER");
+        var canViewSellerReports = HasPermission("REPORTES_VENDEDORES_VER");
+        var canViewKpis = HasPermission("REPORTE_KPI");
+        var canUseFinance = HasPermission("LIQUIDACION_FINANCIERA");
+        var canUseChat = HasPermission("CHAT_USAR");
+        var canManageChat = HasPermission("CHAT_DEPARTAMENTOS_GESTIONAR");
+        var categoriasLayout = await AdminDbService.GetStoreCategoriesAsync();
+    }
+
+    <div class="container-fluid topbar">
+        <div class="row align-items-center py-2 px-xl-5">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="d-inline-flex align-items-center flex-wrap">
+                    <small class="text-light"><i class="fa fa-map-marker-alt mr-2 text-primary"></i>San José, Costa Rica</small>
+                    <small class="px-2 text-light">|</small>
+                    <small class="text-light"><i class="fa fa-shield-alt mr-2 text-primary"></i>Compra segura y catálogo actualizado</small>
+                </div>
+            </div>
+
+            <div class="col-lg-6 text-center text-lg-right">
+                @if (isLoggedIn)
+                {
+                    <div class="user-panel float-lg-right">
+                        <a asp-controller="Profile" asp-action="Edit" class="text-decoration-none text-reset">
+                            <div class="text-left mr-1">
+                                <p class="user-panel__name">
+                                    <i class="fa fa-user mr-1 text-primary"></i>@userName
+                                </p>
+                                <p class="user-panel__role">@userRole</p>
+                            </div>
+                        </a>
+
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0" data-clear-private-storage="true">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary logout-btn" style="color: #fff !important;">
+                                <i class="fa fa-sign-out-alt mr-1"></i>Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid bg-dark mb-30 modern-nav-shell">
+        <div class="row px-xl-5">
+            <div class="col-lg-2 d-none d-lg-block">
+                <a class="btn d-flex align-items-center justify-content-between bg-primary w-100 header-categories-button" data-toggle="collapse" href="#navbar-vertical">
+                    <h6 class="text-dark m-0"><i class="fa fa-bars mr-2"></i>Categorías</h6>
+                    <i class="fa fa-angle-down text-dark"></i>
+                </a>
+
+                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light header-categories-panel" id="navbar-vertical">
+                    <div class="navbar-nav w-100">
+                        @foreach (var categoria in categoriasLayout)
+                        {
+                            <a asp-controller="Home" asp-action="Shop" asp-route-categoria="@categoria" class="nav-item nav-link">@categoria</a>
+                        }
+                    </div>
+                </nav>
+            </div>
+
+            <div class="col-lg-10">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 py-lg-0 px-0 brand-navbar-shell">
+                    <a asp-controller="Home" asp-action="Index" class="brand-navbar text-decoration-none" aria-label="@SiteBrandName">
+                        <span class="brand-navbar__mark" aria-hidden="true">
+                            <img class="brand-navbar__icon" src="@Url.Content("~/brand/logo-icon.png")" alt="" onerror="this.style.display='none';" />
+                            <span class="brand-navbar__initials">DJJ</span>
+                        </span>
+                        <span class="brand-navbar__copy">
+                            <span class="brand-navbar__name">@SiteBrandName</span>
+                            <span class="brand-navbar__subtitle">@SiteBrandSubtitle</span>
+                        </span>
+                    </a>
+
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
+                        <div class="navbar-nav ml-lg-auto py-0 main-nav-clean main-nav-2027">
+                            <a asp-controller="Home" asp-action="Index" class="nav-item nav-link"><i class="fa fa-home mr-1"></i>Inicio</a>
+
+                            @if (!isAdmin && (canViewBudgets || canViewExpenses || canCompareBudgets || canViewDeliveryBoard || canViewDocumentAlerts))
+                            {
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-coins mr-1"></i>Finanzas</a>
+                                    <div class="dropdown-menu border-0 rounded-0 m-0">
+                                        @if (canViewBudgets) { <a asp-controller="Budgets" asp-action="Index" class="dropdown-item">Presupuestos anuales</a> }
+                                        @if (canViewExpenses) { <a asp-controller="Expenses" asp-action="Index" class="dropdown-item">Gastos operativos</a> }
+                                        @if (canCompareBudgets) { <a asp-controller="BudgetComparison" asp-action="Index" class="dropdown-item">Presupuesto vs. real</a> }
+                                        @if (canViewDeliveryBoard) { <a asp-controller="DeliveryBoard" asp-action="Index" class="dropdown-item">Tablero de entregas</a> }
+                                        @if (canViewDocumentAlerts) { <a asp-controller="Documents" asp-action="Alerts" class="dropdown-item"><i class="fa fa-bell text-warning mr-1"></i>Alertas documentales</a> }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!isAdmin && (canViewSuppliers || canViewPurchaseOrders || canViewPriceHistory))
+                            {
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-shopping-cart mr-1"></i>Compras</a>
+                                    <div class="dropdown-menu border-0 rounded-0 m-0">
+                                        @if (canViewSuppliers) { <a asp-controller="Suppliers" asp-action="Index" class="dropdown-item">Proveedores</a> }
+                                        @if (canViewPurchaseOrders) { <a asp-controller="PurchaseOrders" asp-action="Index" class="dropdown-item">Órdenes de compra</a> }
+                                        @if (canViewPriceHistory) { <a asp-controller="PriceHistory" asp-action="Index" class="dropdown-item">Histórico de precios</a> }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!isAdmin && (canViewEmployees || canManageLeaveRequests || canApproveAttendance || canViewPayroll || canManagePaySlips))
+                            {
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user-tie mr-1"></i>Personal</a>
+                                    <div class="dropdown-menu border-0 rounded-0 m-0">
+                                        @if (canViewEmployees) { <a asp-controller="Employees" asp-action="Index" class="dropdown-item">Empleados</a> }
+                                        @if (canManageLeaveRequests) { <a asp-controller="Employees" asp-action="LeaveRequests" class="dropdown-item">Solicitudes (licencias)</a> }
+                                        @if (canApproveAttendance) { <a asp-controller="Attendance" asp-action="Index" class="dropdown-item">Aprobar jornadas</a> }
+                                        @if (canViewPayroll) { <a asp-controller="Payroll" asp-action="Index" class="dropdown-item">Planilla</a> }
+                                        @if (canManagePaySlips) { <a asp-controller="PaySlips" asp-action="Index" class="dropdown-item">Boletas de pago</a> }
+                                    </div>
+                                </div>
+                            }
+
+                            @if (isAdmin)
+                            {
+                                <div class="nav-item dropdown admin-nav-dropdown admin-accordion-dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fa fa-th-large mr-1"></i>Administración
+                                    </a>
+                                    <div class="dropdown-menu admin-acc-menu border-0 m-0" aria-label="Administración">
+                                        <div class="admin-acc__head">
+                                            <span class="admin-acc__eyebrow">Panel</span>
+                                            <span class="admin-acc__title">Administración</span>
+                                            <span class="admin-acc__meta">8 áreas · 33 módulos</span>
+                                        </div>
+                                        <div class="admin-acc__scroll">
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-boxes"></i></span>
+                                                    <span class="acc-sec__label">Inventario</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Inventory" asp-action="Index" class="acc-item"><i class="fa fa-boxes"></i><span>Inventario</span></a>
+                                                    <a asp-controller="Inventory" asp-action="Movements" class="acc-item"><i class="fa fa-exchange-alt"></i><span>Movimientos</span></a>
+                                                    <a asp-controller="Inventory" asp-action="TransformStock" class="acc-item"><i class="fa fa-recycle"></i><span>Transformar producto</span></a>
+                                                    <a asp-controller="Combos" asp-action="Index" class="acc-item"><i class="fa fa-box-open"></i><span>Combos</span></a>
+                                                    <a asp-controller="Returns" asp-action="Index" class="acc-item"><i class="fa fa-undo"></i><span>Devoluciones</span></a>
+                                                    <a asp-controller="Returns" asp-action="Quarantine" class="acc-item"><i class="fa fa-biohazard"></i><span>Cuarentena</span></a>
+                                                    <a asp-controller="Assets" asp-action="Index" class="acc-item"><i class="fa fa-snowflake"></i><span>Activos</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-shopping-bag"></i></span>
+                                                    <span class="acc-sec__label">Ventas y Pedidos</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="OrdersAdmin" asp-action="Index" class="acc-item"><i class="fa fa-clipboard-list"></i><span>Pedidos</span></a>
+                                                    <a asp-controller="Billing" asp-action="Index" class="acc-item"><i class="fa fa-file-invoice-dollar"></i><span>Facturación</span></a>
+                                                    <a asp-controller="AccountsReceivableAdmin" asp-action="Index" class="acc-item"><i class="fa fa-receipt"></i><span>Cuentas por Cobrar</span></a>
+                                                    <a asp-controller="Promotions" asp-action="Index" class="acc-item"><i class="fa fa-tags"></i><span>Promociones</span></a>
+                                                    <a asp-controller="WarrantyRequestsAdmin" asp-action="Index" class="acc-item"><i class="fa fa-shield-alt"></i><span>Solicitudes de Garantía</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-truck"></i></span>
+                                                    <span class="acc-sec__label">Logística y Flota</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="RoutesAdmin" asp-action="Index" class="acc-item"><i class="fa fa-route"></i><span>Rutas y Entregas</span></a>
+                                                    <a asp-controller="DeliveryBoard" asp-action="Index" class="acc-item"><i class="fa fa-th-large"></i><span>Tablero de entregas</span></a>
+                                                    <a asp-controller="Vehicles" asp-action="Index" class="acc-item"><i class="fa fa-truck"></i><span>Vehículos</span></a>
+                                                    <a asp-controller="Fleet" asp-action="Mileage" class="acc-item"><i class="fa fa-tachometer-alt"></i><span>Kilometraje</span></a>
+                                                    <a asp-controller="Fleet" asp-action="Maintenance" class="acc-item"><i class="fa fa-wrench"></i><span>Mantenimiento</span></a>
+                                                    <a asp-controller="Fleet" asp-action="Alerts" class="acc-item"><i class="fa fa-bell"></i><span>Alertas de flota</span></a>
+                                                    <a asp-controller="Comodatos" asp-action="Index" class="acc-item"><i class="fa fa-handshake"></i><span>Comodatos</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-coins"></i></span>
+                                                    <span class="acc-sec__label">Finanzas</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Finance" asp-action="Index" class="acc-item"><i class="fa fa-cash-register"></i><span>Liquidación de cobros</span></a>
+                                                    <a asp-controller="Budgets" asp-action="Index" class="acc-item"><i class="fa fa-wallet"></i><span>Presupuestos anuales</span></a>
+                                                    <a asp-controller="Expenses" asp-action="Index" class="acc-item"><i class="fa fa-receipt"></i><span>Gastos operativos</span></a>
+                                                    <a asp-controller="BudgetComparison" asp-action="Index" class="acc-item"><i class="fa fa-chart-bar"></i><span>Presupuesto vs. real</span></a>
+                                                    <a asp-controller="FinancialReportAdmin" asp-action="Index" class="acc-item"><i class="fa fa-chart-line"></i><span>Ingresos y Egresos</span></a>
+                                                    <a asp-controller="Suppliers" asp-action="Index" class="acc-item"><i class="fa fa-address-book"></i><span>Proveedores</span></a>
+                                                    <a asp-controller="PurchaseOrders" asp-action="Index" class="acc-item"><i class="fa fa-shopping-cart"></i><span>Órdenes de compra</span></a>
+                                                    <a asp-controller="PriceHistory" asp-action="Index" class="acc-item"><i class="fa fa-chart-area"></i><span>Histórico de precios</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-chart-line"></i></span>
+                                                    <span class="acc-sec__label">Reportes y Gerencia</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Admin" asp-action="Index" class="acc-item"><i class="fa fa-tachometer-alt"></i><span>Dashboard</span></a>
+                                                    <a asp-controller="ManagementDashboard" asp-action="Index" class="acc-item"><i class="fa fa-chart-line"></i><span>Tablero gerencial</span></a>
+                                                    <a asp-controller="SalesReports" asp-action="Index" class="acc-item"><i class="fa fa-file-alt"></i><span>Reporte de ventas</span></a>
+                                                    <a asp-controller="SellerPerformance" asp-action="Index" class="acc-item"><i class="fa fa-user-chart"></i><span>Desempeño de vendedores</span></a>
+                                                    <a asp-controller="Kpis" asp-action="Index" class="acc-item"><i class="fa fa-bullseye"></i><span>Metas de ventas</span></a>
+                                                    <a asp-controller="Kpis" asp-action="Report" class="acc-item"><i class="fa fa-chart-bar"></i><span>Reporte de KPIs</span></a>
+                                                    <a asp-controller="InventoryIntelligence" asp-action="Index" class="acc-item"><i class="fa fa-brain"></i><span>Inteligencia de inventario</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-users"></i></span>
+                                                    <span class="acc-sec__label">Clientes</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Clients" asp-action="Index" class="acc-item"><i class="fa fa-users"></i><span>Clientes</span></a>
+                                                    <a asp-controller="Reclamos" asp-action="Index" class="acc-item"><i class="fa fa-exclamation-circle"></i><span>Reclamos</span></a>
+                                                    <a asp-controller="Consultations" asp-action="Index" class="acc-item"><i class="fa fa-comments"></i><span>Consultas</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-user-tie"></i></span>
+                                                    <span class="acc-sec__label">Personal</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Employees" asp-action="Index" class="acc-item"><i class="fa fa-id-badge"></i><span>Empleados</span></a>
+                                                    <a asp-controller="Employees" asp-action="LeaveRequests" class="acc-item"><i class="fa fa-calendar-check"></i><span>Solicitudes (licencias)</span></a>
+                                                    <a asp-controller="Attendance" asp-action="Index" class="acc-item"><i class="fa fa-clock"></i><span>Aprobar jornadas</span></a>
+                                                    <a asp-controller="Payroll" asp-action="Index" class="acc-item"><i class="fa fa-calculator"></i><span>Planilla</span></a>
+                                                    <a asp-controller="PaySlips" asp-action="Index" class="acc-item"><i class="fa fa-file-invoice-dollar"></i><span>Boletas de pago</span></a>
+                                                </div>
+                                            </details>
+
+                                            <details class="acc-sec">
+                                                <summary class="acc-sec__head">
+                                                    <span class="acc-sec__icon"><i class="fa fa-shield-alt"></i></span>
+                                                    <span class="acc-sec__label">Seguridad</span>
+                                                    <i class="fa fa-chevron-down acc-sec__chev"></i>
+                                                </summary>
+                                                <div class="acc-sec__list">
+                                                    <a asp-controller="Roles" asp-action="Index" class="acc-item"><i class="fa fa-user-shield"></i><span>Roles</span></a>
+                                                    <a asp-controller="Permissions" asp-action="Index" class="acc-item"><i class="fa fa-key"></i><span>Permisos</span></a>
+                                                    <a asp-controller="Documents" asp-action="Index" class="acc-item"><i class="fa fa-folder-open"></i><span>Documentos digitales</span></a>
+                                                    <a asp-controller="Documents" asp-action="Alerts" class="acc-item"><i class="fa fa-bell"></i><span>Alertas documentales</span></a>
+                                                    <a asp-controller="Audit" asp-action="Index" class="acc-item"><i class="fa fa-history"></i><span>Auditoría</span></a>
+                                                </div>
+                                            </details>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <a asp-controller="Home" asp-action="Shop" class="nav-item nav-link"><i class="fa fa-store mr-1"></i>Tienda</a>
+                            <a asp-controller="Cart" asp-action="Index" class="nav-item nav-link"><i class="fa fa-shopping-cart mr-1"></i>Carrito</a>
+
+                            @if (isClient)
+                            {
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                        <i class="fa fa-user-circle mr-1"></i> Mi cuenta
+                                    </a>
+
+                                    <div class="dropdown-menu rounded-0 border-0 m-0">
+
+                                        <a asp-controller="ClientPortal"
+                                           asp-action="Index"
+                                           class="dropdown-item">
+                                            <i class="fa fa-box"></i> Mis pedidos
+                                        </a>
+
+                                        <a asp-controller="ClientPortal"
+                                           asp-action="Warranties"
+                                           class="dropdown-item">
+                                            <i class="fa fa-undo"></i> Mis garantías
+                                        </a>
+
+                                        <a asp-controller="ClientPortal"
+                                           asp-action="Statement"
+                                           class="dropdown-item">
+                                            <i class="fa fa-file-invoice"></i> Estado de cuenta
+                                        </a>
+
+                                    </div>
+                                </div>
+                            }
+
+                                @{
+                                    var puedeUsarChat = canUseChat;
+                                }
+
+                            @if (puedeUsarChat)
+                            {
+                                <div class="nav-item dropdown admin-nav-dropdown">
+
+                                    <a href="#"
+                                       class="nav-link dropdown-toggle"
+                                       data-toggle="dropdown">
+
+                                        <i class="fa fa-comments mr-1"></i>
+                                        Chat
+
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-right admin-dropdown-menu rounded-0 border-0 m-0">
+
+                                        <button type="button"
+                                                id="btnPrivateChat"
+                                                class="dropdown-item">
+
+                                            <i class="fa fa-user"></i>
+                                            Chats privados
+
+                                        </button>
+
+                                        <button type="button"
+                                                id="btnDepartmentChat"
+                                                class="dropdown-item">
+
+                                            <i class="fa fa-users"></i>
+                                            Departamentos
+
+                                        </button>
+
+                                        @if (canManageChat)
+                                        {
+                                            <a asp-controller="Chat" asp-action="Index" class="dropdown-item">
+                                                <i class="fa fa-cog"></i>
+                                                Administrar departamentos
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </div>
+                            }
+
+                            @if (isEmployeePortalUser)
+                            {
+                                <a asp-controller="EmployeePortal" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-id-badge mr-1"></i>Mi portal
+                                </a>
+                                <a asp-controller="MyAttendance" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-clock mr-1"></i>Mis jornadas
+                                </a>
+                                <a asp-controller="MyPaySlips" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-file-invoice-dollar mr-1"></i>Mis boletas
+                                </a>
+                            }
+
+                            @if (canCreateMobileSale)
+                            {
+                                <a asp-controller="SellerOrders" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-mobile-alt mr-1"></i>Venta móvil
+                                </a>
+                                @if (HasPermission("METAS_PROPIAS_VER"))
+                                {
+                                    <a asp-controller="MyGoal" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                        <i class="fa fa-bullseye mr-1"></i>Mi meta
+                                    </a>
+                                }
+                            }
+
+                            @if (canAuthorizeOrders)
+                            {
+                                <a asp-controller="ManagerOrders" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-clipboard-check mr-1"></i>Pedidos retenidos
+                                </a>
+                            }
+                            @if (canViewManagementDashboard)
+                            {
+                                <a asp-controller="ManagementDashboard" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-chart-line mr-1"></i>Tablero
+                                </a>
+                            }
+                            @if (canViewSalesReports)
+                            {
+                                <a asp-controller="SalesReports" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-file-alt mr-1"></i>Ventas
+                                </a>
+                            }
+                            @if (canViewSellerReports)
+                            {
+                                <a asp-controller="SellerPerformance" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-users mr-1"></i>Vendedores
+                                </a>
+                            }
+                            @if (canViewKpis)
+                            {
+                                <a asp-controller="Kpis" asp-action="Report" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-chart-bar mr-1"></i>KPIs
+                                </a>
+                            }
+
+                            @if (isChofer)
+                            {
+                                <a asp-controller="DriverDeliveries" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-truck mr-1"></i>Mis entregas
+                                </a>
+                                <a asp-controller="Fleet" asp-action="Mileage" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-tachometer-alt mr-1"></i>Kilometraje
+                                </a>
+                            }
+
+                            @if (canUseFinance)
+                            {
+                                <a asp-controller="Finance" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-cash-register mr-1"></i>Liquidación de cobros
+                                </a>
+                            }
+
+                            @if (isLoggedIn && !isClient)
+                            {
+                                <a asp-controller="Assistant" asp-action="Index" class="nav-item nav-link nav-highlight">
+                                    <i class="fa fa-robot mr-1"></i>Asistente
+                                </a>
+                            }
+
+                            @if (!isLoggedIn)
+                            {
+                                <a asp-controller="Account" asp-action="Login" class="nav-item nav-link text-primary font-weight-bold"><i class="fa fa-user mr-1"></i>Iniciar sesión</a>
+                                <a asp-controller="Account" asp-action="Register" class="nav-item nav-link"><i class="fa fa-user-plus mr-1"></i>Registro</a>
+                            }
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <main role="main">
+        @if (TempData["LoginSuccess"] is string loginSuccess && !string.IsNullOrWhiteSpace(loginSuccess))
+        {
+            <div class="container mt-3"><div class="alert alert-success">@loginSuccess</div></div>
+        }
+        @if (TempData["SuccessMessage"] is string successMessage && !string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="container mt-3"><div class="alert alert-success">@successMessage</div></div>
+        }
+        @if (TempData["ErrorMessage"] is string errorMessage && !string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="container mt-3"><div class="alert alert-danger">@errorMessage</div></div>
+        }
+
+        @RenderBody()
+    </main>
+
+    <footer class="container-fluid s3-footer mt-5 pt-5">
+        <div class="row px-xl-5 pb-4">
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Home" asp-action="Index" class="s3-footer__brand brand-footer text-decoration-none">
+                    <span class="brand-footer__mark"><i class="fa fa-store text-primary"></i></span>
+                    <span class="brand-footer__copy">
+                        <span class="brand-footer__name">@SiteBrandName</span>
+                        <small>@SiteBrandSubtitle</small>
+                    </span>
+                </a>
+                <p class="s3-footer__text mb-3">
+                    Sistema web para consulta de productos, gestion de pedidos, venta movil, inventario, facturacion y administracion general de la distribuidora.
+                </p>
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-primary btn-sm" style="color: #fff !important;">
+                    <i class="fa fa-envelope mr-1"></i>Ir a contacto
+                </a>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h6 class="s3-footer__title">Navegación</h6>
+                <ul class="s3-footer__list">
+                    <li><a asp-controller="Home" asp-action="Index"><i class="fa fa-angle-right mr-1"></i>Inicio</a></li>
+                    <li><a asp-controller="Home" asp-action="Shop"><i class="fa fa-angle-right mr-1"></i>Tienda</a></li>
+                    <li><a asp-controller="Cart" asp-action="Index"><i class="fa fa-angle-right mr-1"></i>Carrito</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact"><i class="fa fa-angle-right mr-1"></i>Contacto</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="s3-footer__title">Categorías</h6>
+                <ul class="s3-footer__list">
+                    @foreach (var categoria in categoriasLayout.Take(6))
+                    {
+                        <li>
+                            <a asp-controller="Home" asp-action="Shop" asp-route-categoria="@categoria">
+                                <i class="fa fa-angle-right mr-1"></i>@categoria
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <h6 class="s3-footer__title">Contacto</h6>
+                <div class="s3-footer__contact-item">
+                    <i class="fa fa-map-marker-alt"></i>
+                    <span>San José, Costa Rica</span>
+                </div>
+                <div class="s3-footer__contact-item">
+                    <i class="fa fa-envelope"></i>
+                    <span>Contacto por formulario web</span>
+                </div>
+                <div class="s3-footer__contact-item">
+                    <i class="fa fa-phone-alt"></i>
+                    <span>+506 2222-2222</span>
+                </div>
+                <div class="s3-footer__contact-item">
+                    <i class="fa fa-clock"></i>
+                    <span>Lunes a sábado · 8:00 a.m. - 6:00 p.m.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mx-xl-5 py-4 s3-footer__bottom">
+            <div class="col-md-6 px-xl-0">
+                <p class="mb-md-0 text-center text-md-left">&copy; @DateTime.Now.Year <a class="text-primary" href="#">@SiteBrandName</a>. Todos los derechos reservados.</p>
+            </div>
+            <div class="col-md-6 px-xl-0 text-center text-md-right">
+                <img class="img-fluid s3-footer__payments" src="@Url.Content("~/img/payments.png")" alt="Métodos de pago">
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="btn back-to-top"
+   style="background-color: #FFD700 !important; color: white !important;">
+    <i class="fa fa-angle-double-up" style="color: white !important;"></i>
+</a>
+
+@* Chat *@
+@if (puedeUsarChat)
+{
+    <form id="chatAntiforgery" class="d-none" aria-hidden="true">
+        @Html.AntiForgeryToken()
+    </form>
+    <div id="chatWindow" class="chat-window">
+
+    <div class="chat-header">
+        <span>
+            <i class="fa fa-comments"></i>
+            Chat
+        </span>
+
+        <button type="button" id="closeChat">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <div class="chat-body">
+
+        <div class="chat-search">
+            <i class="fa fa-search"></i>
+
+            <input type="text"
+                   id="chatUserSearch"
+                   placeholder="Buscar usuario..."
+                   autocomplete="off">
+        </div>
+
+        <div id="chatUsersList" class="chat-users-list">
+            <div class="chat-loading">
+                Abre el chat para cargar los usuarios.
+            </div>
+        </div>
+
+    </div>
+
+    </div>
+}
+
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/easing/easing.min.js"></script>
+    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+    <script src="~/js/sprint3-modal.js" asp-append-version="true"></script>
+    <script src="~/js/sprint4-admin.js" asp-append-version="true"></script>
+    <script src="~/js/secure-offline-storage.js" asp-append-version="true"></script>
+
+    <script>
+        // Acordeón del menú de Administración:
+        // - mantiene abierto el dropdown mientras se interactúa con el acordeón
+        // - solo una sección abierta a la vez
+        // - al cerrar el menú, se colapsan todas las secciones (reabre mostrando solo las 8 áreas)
+        (function () {
+            var dropdown = document.querySelector('.admin-accordion-dropdown');
+            if (!dropdown) return;
+
+            var menu = dropdown.querySelector('.admin-acc-menu');
+            if (!menu) return;
+
+            var sections = menu.querySelectorAll('details.acc-sec');
+
+            // Evita que Bootstrap cierre el dropdown al pulsar una cabecera de sección.
+            // Los enlaces de módulo (navegación real) sí dejan cerrar el menú.
+            menu.addEventListener('click', function (e) {
+                if (e.target.closest('a.acc-item')) return;
+                e.stopPropagation();
+            });
+
+            // Comportamiento de acordeón: al abrir una sección se cierran las demás.
+            sections.forEach(function (sec) {
+                sec.addEventListener('toggle', function () {
+                    if (!sec.open) return;
+                    sections.forEach(function (other) {
+                        if (other !== sec) other.open = false;
+                    });
+                });
+            });
+
+            // Al cerrarse el dropdown, colapsa todo para reabrir en limpio.
+            $(dropdown).on('hidden.bs.dropdown', function () {
+                sections.forEach(function (sec) { sec.open = false; });
+            });
+        })();
+    </script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    @if (puedeUsarChat)
+    {
+        <script asp-append-version="true" src="~/js/chat.js"></script>
+    }
+</body>
+</html>

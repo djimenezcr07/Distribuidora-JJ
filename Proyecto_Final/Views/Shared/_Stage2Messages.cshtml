@@ -1,0 +1,21 @@
+@if (TempData["SuccessMessage"] is string successMessage && !string.IsNullOrWhiteSpace(successMessage))
+{
+    <div class="djj-alert djj-alert--success" role="status">
+        <svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-check"></use></svg>
+        <p>@successMessage</p>
+    </div>
+}
+@if (TempData["ErrorMessage"] is string errorMessage && !string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="djj-alert djj-alert--danger" role="alert">
+        <svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-warning"></use></svg>
+        <p>@errorMessage</p>
+    </div>
+}
+@if (TempData["LoginSuccess"] is string loginMessage && !string.IsNullOrWhiteSpace(loginMessage))
+{
+    <div class="djj-alert djj-alert--success" role="status">
+        <svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-check"></use></svg>
+        <p>@loginMessage</p>
+    </div>
+}

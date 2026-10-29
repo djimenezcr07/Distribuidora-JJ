@@ -1,0 +1,6 @@
+@model Proyecto_Final.Models.Admin.OrderDetailViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Pedido registrado"; var numeroFactura = ViewBag.NumeroFactura as string ?? Model.NumeroFactura; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Ventas · Resultado y seguimiento</span><h1>Pedido #@Model.PedidoId registrado</h1><p>Consultá el estado actual y los importes del pedido. La información puede cambiar después del registro.</p></div></header>
+@if (Model.HasInvoice && !string.IsNullOrWhiteSpace(numeroFactura)) { <div class="djj-alert djj-alert--success" role="status"><strong>Factura generada:</strong> @numeroFactura</div> } else { <div class="djj-alert" role="status">No hay una factura disponible para este pedido en la consulta actual.</div> }
+<div class="djj-order-sections"><partial name="_OrderWorkflowSummary" model="Model" /><partial name="_OrderWorkflowLines" model="Model" /></div>
+<nav class="djj-order-navigation" aria-label="Siguientes acciones del pedido"><a asp-action="Index" class="djj-button djj-button--primary">Nuevo pedido</a><a asp-action="MyOrders" class="djj-button djj-button--ghost">Mis pedidos</a><partial name="_OrderWorkflowDetailLink" model="Model.PedidoId" /></nav>

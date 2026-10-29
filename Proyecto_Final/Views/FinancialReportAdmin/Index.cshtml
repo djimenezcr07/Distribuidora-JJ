@@ -1,0 +1,28 @@
+@model Proyecto_Final.Models.Admin.FinancialReportViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Ingresos y egresos"; }
+@section Styles { <link rel="stylesheet" href="~/css/stage2/public-surfaces.css" asp-append-version="true" /> }
+<div class="djj-analytics djj-financial-report">
+    <header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Finanzas · Reportes</span><h1>Ingresos y egresos</h1><p>Movimientos de pedidos con pago simulado y gastos registrados.</p></div></header>
+    <aside class="djj-alert djj-alert--info" aria-label="Alcance del reporte"><p>Los ingresos corresponden a pedidos con EstadoPago «Confirmado simulado». El balance compara esos importes con los gastos registrados; no acredita ingresos fiscales ni una conciliación contable.</p></aside>
+    <section class="djj-card djj-analytics-filter" aria-labelledby="financial-filters">
+        <h2 id="financial-filters">Período del reporte</h2>
+        <form method="get" asp-action="Index" class="djj-filter-bar djj-filter-bar--analytics">
+            <div class="djj-field"><label asp-for="FechaInicio">Fecha inicial</label><input asp-for="FechaInicio" type="date" class="djj-input" /><span asp-validation-for="FechaInicio" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="FechaFin">Fecha final</label><input asp-for="FechaFin" type="date" class="djj-input" /><span asp-validation-for="FechaFin" class="djj-field__error"></span></div>
+            <div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--primary">Filtrar</button><a asp-action="Index" class="djj-button djj-button--ghost">Ver todos los períodos</a></div>
+        </form>
+    </section>
+    <p class="djj-analytics-period">Desde @(Model.FechaInicio?.ToString("dd/MM/yyyy") ?? "el primer registro") hasta @(Model.FechaFin?.ToString("dd/MM/yyyy") ?? "el último registro").</p>
+    <section class="djj-analytics-kpis" aria-label="Totales del período">
+        <article class="djj-kpi-card"><h2 class="djj-kpi-card__label">Ingresos con pago simulado</h2><p class="djj-kpi-card__value">₡@Model.TotalIngresos.ToString("N2")</p><small>EstadoPago «Confirmado simulado»</small></article>
+        <article class="djj-kpi-card"><h2 class="djj-kpi-card__label">Egresos registrados</h2><p class="djj-kpi-card__value">₡@Model.TotalEgresos.ToString("N2")</p><small>Gastos del período seleccionado</small></article>
+        <article class="djj-kpi-card"><h2 class="djj-kpi-card__label">Balance del reporte</h2><p class="djj-kpi-card__value">₡@Model.Balance.ToString("N2")</p><small>Ingresos simulados menos egresos registrados</small></article>
+    </section>
+    <section aria-labelledby="financial-movements"><h2 id="financial-movements">Movimientos financieros</h2>
+        <div class="djj-table-shell" role="region" aria-labelledby="financial-movements" tabindex="0"><table class="djj-table">
+            <caption>Detalle de ingresos simulados y egresos del período. Montos en colones.</caption>
+            <thead><tr><th scope="col">Fecha</th><th scope="col">Tipo</th><th scope="col">Descripción</th><th scope="col">Referencia</th><th scope="col" class="djj-align-right">Monto</th></tr></thead>
+            <tbody>@if (Model.Movimientos.Any()) { foreach (var movimiento in Model.Movimientos) { <tr><td>@movimiento.Fecha.ToString("dd/MM/yyyy")</td><td>@movimiento.Tipo</td><td>@movimiento.Descripcion</td><td>@movimiento.Referencia</td><td class="djj-align-right">₡@movimiento.Monto.ToString("N2")</td></tr> } } else { <tr><td colspan="5"><div class="djj-state"><h3>Sin movimientos en este período</h3><p>No hay ingresos simulados ni gastos registrados para los filtros seleccionados.</p></div></td></tr> }</tbody>
+        </table></div>
+    </section>
+</div>

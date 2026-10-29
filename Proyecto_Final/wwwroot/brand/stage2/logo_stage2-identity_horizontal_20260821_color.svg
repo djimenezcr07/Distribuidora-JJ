@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160" viewBox="0 0 640 160" role="img" aria-labelledby="title desc">
+  <title id="title">Distribuidora JJ</title>
+  <desc id="desc">Monograma JJ rojo, blanco y dorado con el subtítulo Licorera - Distribuidora.</desc>
+  <rect x="12" y="12" width="136" height="136" rx="28" fill="#8B0E16"/>
+  <path d="M39 46H66V91C66 113 54 126 36 126C27 126 20 122 15 115" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M88 46H115V91C115 113 103 126 85 126C76 126 69 122 64 115" fill="none" stroke="#D4AF37" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="176" y="76" fill="#1F1F1F" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" letter-spacing="0.7">DISTRIBUIDORA JJ</text>
+  <rect x="177" y="91" width="52" height="4" rx="2" fill="#D4AF37"/>
+  <text x="176" y="121" fill="#625B5C" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="600" letter-spacing="2.2">LICORERA - DISTRIBUIDORA</text>
+</svg>

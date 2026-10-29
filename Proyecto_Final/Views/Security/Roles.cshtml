@@ -1,0 +1,85 @@
+@{
+    ViewData["Title"] = "Seguridad";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid s3-page-shell py-4">
+    <div class="s3-cart-hero mb-4">
+        <div>
+            <span class="s3-eyebrow">
+                <i class="fa fa-shield-alt"></i>
+                Seguridad del sistema
+            </span>
+            <h1>Gestión de seguridad</h1>
+            <p>
+                Este apartado fue reorganizado. Ahora la administración de roles, permisos y auditoría se gestiona desde los módulos nuevos del sistema.
+            </p>
+        </div>
+
+        <div class="s3-cart-hero__icon">
+            <i class="fa fa-user-shield"></i>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 22px;">
+                <div class="card-body p-4">
+                    <div class="mb-3" style="width: 54px; height: 54px; border-radius: 18px; background: rgba(212, 175, 55, .15); display: grid; place-items: center;">
+                        <i class="fa fa-users-cog text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+
+                    <h4 class="font-weight-bold mb-2">Roles</h4>
+                    <p class="text-muted">
+                        Crear, editar, activar o inactivar roles del sistema.
+                    </p>
+
+                    <a asp-controller="Roles" asp-action="Index" class="btn btn-primary btn-block">
+                        <i class="fa fa-arrow-right mr-1"></i>
+                        Ir a Roles
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 22px;">
+                <div class="card-body p-4">
+                    <div class="mb-3" style="width: 54px; height: 54px; border-radius: 18px; background: rgba(212, 175, 55, .15); display: grid; place-items: center;">
+                        <i class="fa fa-key text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+
+                    <h4 class="font-weight-bold mb-2">Permisos</h4>
+                    <p class="text-muted">
+                        Asignar permisos específicos a cada rol del sistema.
+                    </p>
+
+                    <a asp-controller="Permissions" asp-action="Index" class="btn btn-primary btn-block">
+                        <i class="fa fa-arrow-right mr-1"></i>
+                        Ir a Permisos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 22px;">
+                <div class="card-body p-4">
+                    <div class="mb-3" style="width: 54px; height: 54px; border-radius: 18px; background: rgba(212, 175, 55, .15); display: grid; place-items: center;">
+                        <i class="fa fa-clipboard-list text-primary" style="font-size: 1.5rem;"></i>
+                    </div>
+
+                    <h4 class="font-weight-bold mb-2">Auditoría</h4>
+                    <p class="text-muted">
+                        Revisar acciones importantes realizadas dentro del sistema.
+                    </p>
+
+                    <a asp-controller="Audit" asp-action="Index" class="btn btn-primary btn-block">
+                        <i class="fa fa-arrow-right mr-1"></i>
+                        Ir a Auditoría
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

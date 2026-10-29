@@ -1,0 +1,26 @@
+@model Proyecto_Final.Models.Admin.ComodatoAssignViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Asignar comodato"; }
+<div class="djj-assets djj-stack">
+    <partial name="_AssetsNavigation" />
+    <header class="djj-page-header"><div><h1>Asignar comodato</h1><p>Registrá el préstamo de un equipo disponible a un cliente.</p></div><a asp-action="Index" class="djj-button djj-button--outline">Volver</a></header>
+    <form asp-action="Assign" method="post" class="djj-card djj-padded djj-assets-form">
+        @Html.AntiForgeryToken()<div asp-validation-summary="All" class="djj-assets-error" role="alert"></div>
+        <fieldset class="djj-assets-fieldset"><legend>Equipo y fecha</legend><div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="ActivoId"></label><select asp-for="ActivoId" class="djj-select"><option value="">— Seleccione un activo disponible —</option>@foreach (var a in Model.ActivosDisponibles) { <option value="@a.ActivoId">@a.CodigoActivo — @a.Nombre (@a.Tipo)</option> }</select><span asp-validation-for="ActivoId" class="djj-assets-error"></span></div>
+            <div class="djj-field"><label asp-for="FechaAsignacion"></label><input asp-for="FechaAsignacion" type="date" class="djj-input" /><span asp-validation-for="FechaAsignacion" class="djj-assets-error"></span></div>
+        </div>
+        @if (!Model.ActivosDisponibles.Any()) { <p class="djj-alert djj-alert--warning">No hay equipos disponibles para asignar. Registrá un activo o consultá las devoluciones en Comodatos.</p> }
+        </fieldset>
+        <fieldset class="djj-assets-fieldset"><legend>Cliente y ubicación</legend><div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="ClienteNombre"></label><input asp-for="ClienteNombre" class="djj-input" /><span asp-validation-for="ClienteNombre" class="djj-assets-error"></span></div>
+            <div class="djj-field"><label asp-for="ClienteIdentificacion"></label><input asp-for="ClienteIdentificacion" class="djj-input" /><span asp-validation-for="ClienteIdentificacion" class="djj-assets-error"></span></div>
+            <div class="djj-field djj-form-grid__full"><label asp-for="Ubicacion"></label><input asp-for="Ubicacion" class="djj-input" placeholder="Dirección o local donde queda el equipo" /><span asp-validation-for="Ubicacion" class="djj-assets-error"></span></div>
+        </div></fieldset>
+        <fieldset class="djj-assets-fieldset"><legend>Condición y observaciones</legend><div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="CondicionEntrega"></label><input asp-for="CondicionEntrega" class="djj-input" placeholder="Estado del equipo al entregarlo" /><span asp-validation-for="CondicionEntrega" class="djj-assets-error"></span></div>
+            <div class="djj-field"><label asp-for="Observaciones"></label><textarea asp-for="Observaciones" class="djj-textarea" rows="3"></textarea><span asp-validation-for="Observaciones" class="djj-assets-error"></span></div>
+        </div></fieldset>
+        <div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--primary" disabled="@(!Model.ActivosDisponibles.Any())">Registrar comodato</button><a asp-action="Index" class="djj-button djj-button--outline">Cancelar</a></div>
+    </form>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

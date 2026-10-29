@@ -1,0 +1,393 @@
+@model IReadOnlyList<Proyecto_Final.Models.Chat.ChatDepartmentAdminViewModel>
+@using Proyecto_Final.Models.Chat
+
+@{
+    ViewData["Title"] = "Administrar departamentos de chat";
+
+    var availableUsers =
+        ViewBag.ChatUsers as IReadOnlyList<ChatUserViewModel>
+        ?? new List<ChatUserViewModel>();
+}
+
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="mb-1">
+                Departamentos de chat
+            </h2>
+
+            <p class="text-muted mb-0">
+                Cree grupos de comunicación y administre sus miembros.
+            </p>
+        </div>
+    </div>
+
+    @if (ViewBag.LoadError is string loadError)
+    {
+        <div class="alert alert-danger" role="alert">@loadError</div>
+    }
+    else
+    {
+    <!-- Crear departamento -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+            <strong>Crear departamento</strong>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-controller="Chat"
+                  asp-action="CreateDepartment"
+                  method="post"
+                  class="form-row">
+
+                @Html.AntiForgeryToken()
+
+                <div class="form-group col-md-4">
+
+                    <label for="departmentName">
+                        Nombre
+                    </label>
+
+                    <input id="departmentName"
+                           name="Name"
+                           type="text"
+                           class="form-control"
+                           minlength="2"
+                           maxlength="120"
+                           placeholder="Ejemplo: Compras"
+                           required />
+                </div>
+
+                <div class="form-group col-md-6">
+
+                    <label for="departmentDescription">
+                        Descripción
+                    </label>
+
+                    <input id="departmentDescription"
+                           name="Description"
+                           type="text"
+                           class="form-control"
+                           maxlength="300"
+                           placeholder="Descripción del departamento" />
+                </div>
+
+                <input type="hidden"
+                       name="Active"
+                       value="true" />
+
+                <div class="form-group col-md-2 d-flex align-items-end">
+
+                    <button type="submit"
+                            class="btn btn-primary btn-block">
+
+                        Crear
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Estado vacío -->
+    @if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            Todavía no hay departamentos configurados.
+        </div>
+    }
+
+    <!-- Departamentos existentes -->
+    @foreach (var department in Model)
+    {
+        var currentMemberIds = department.Members
+            .Select(member => member.UserId)
+            .ToHashSet();
+
+        var candidates = availableUsers
+            .Where(user =>
+                !currentMemberIds.Contains(user.UsuarioId))
+            .OrderBy(user => user.NombreCompleto)
+            .ToList();
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <!-- Editar departamento -->
+                <form asp-controller="Chat"
+                      asp-action="UpdateDepartment"
+                      method="post"
+                      class="form-row align-items-end">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="DepartmentId"
+                           value="@department.DepartmentId" />
+
+                    <div class="form-group col-md-3">
+
+                        <label for="department-name-@department.DepartmentId">
+                            Nombre
+                        </label>
+
+                        <input id="department-name-@department.DepartmentId"
+                               name="Name"
+                               type="text"
+                               value="@department.Name"
+                               class="form-control"
+                               minlength="2"
+                               maxlength="120"
+                               required />
+                    </div>
+
+                    <div class="form-group col-md-5">
+
+                        <label for="department-description-@department.DepartmentId">
+                            Descripción
+                        </label>
+
+                        <input id="department-description-@department.DepartmentId"
+                               name="Description"
+                               type="text"
+                               value="@department.Description"
+                               class="form-control"
+                               maxlength="300" />
+                    </div>
+
+                    <div class="form-group col-md-2">
+
+                        <div class="custom-control custom-checkbox mb-2">
+
+                            <input type="checkbox"
+                                   class="custom-control-input"
+                                   id="active-@department.DepartmentId"
+                                   name="Active"
+                                   value="true"
+                                   checked="@(department.Active ? "checked" : null)" />
+
+                            <input type="hidden"
+                                   name="Active"
+                                   value="false" />
+
+                            <label class="custom-control-label"
+                                   for="active-@department.DepartmentId">
+
+                                Activo
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2">
+
+                        <button type="submit"
+                                class="btn btn-outline-primary btn-block">
+
+                            Guardar
+                        </button>
+                    </div>
+
+                </form>
+
+                <hr />
+
+                <!-- Miembros actuales -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
+
+                    <h5 class="mb-0">
+                        Miembros
+
+                        <span class="badge badge-secondary">
+                            @department.MemberCount
+                        </span>
+                    </h5>
+
+                    <span class="text-muted small">
+                        Departamento #@department.DepartmentId
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table table-sm table-hover">
+
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Correo</th>
+                                <th>Permiso</th>
+                                <th class="text-right">Acción</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @if (department.Members.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4"
+                                        class="text-center text-muted py-4">
+
+                                        Este departamento todavía no tiene miembros.
+                                    </td>
+                                </tr>
+                            }
+
+                            @foreach (var member in department.Members)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @member.FullName
+                                    </td>
+
+                                    <td>
+                                        @member.Email
+                                    </td>
+
+                                    <td>
+                                        @if (member.CanPost)
+                                        {
+                                            <span class="badge badge-success">
+                                                Puede publicar
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-secondary">
+                                                Solo lectura
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td class="text-right">
+
+                                        <form asp-controller="Chat"
+                                              asp-action="RemoveMember"
+                                              method="post"
+                                              class="d-inline">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="departmentId"
+                                                   value="@department.DepartmentId" />
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@member.UserId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('¿Desea retirar este usuario del departamento?');">
+
+                                                Retirar
+                                            </button>
+
+                                        </form>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr />
+
+                <!-- Agregar miembro -->
+                <h6 class="mb-3">
+                    Agregar miembro
+                </h6>
+
+                @if (candidates.Count > 0)
+                {
+                    <form asp-controller="Chat"
+                          asp-action="AddMember"
+                          method="post"
+                          class="form-row align-items-end">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="departmentId"
+                               value="@department.DepartmentId" />
+
+                        <div class="form-group col-md-7 mb-2">
+
+                            <label for="user-@department.DepartmentId">
+                                Usuario
+                            </label>
+
+                            <select id="user-@department.DepartmentId"
+                                    name="userId"
+                                    class="form-control"
+                                    required>
+
+                                <option value="">
+                                    Seleccione un usuario
+                                </option>
+
+                                @foreach (var user in candidates)
+                                {
+                                    <option value="@user.UsuarioId">
+                                        @user.NombreCompleto — @user.Correo
+                                    </option>
+                                }
+
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-3 mb-2">
+
+                            <div class="custom-control custom-checkbox mt-md-4 pt-md-2">
+
+                                <input type="checkbox"
+                                       class="custom-control-input"
+                                       id="post-@department.DepartmentId"
+                                       name="canPost"
+                                       value="true"
+                                       checked />
+
+                                <input type="hidden"
+                                       name="canPost"
+                                       value="false" />
+
+                                <label class="custom-control-label"
+                                       for="post-@department.DepartmentId">
+
+                                    Puede publicar
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-2 mb-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-block">
+
+                                Agregar
+                            </button>
+                        </div>
+
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-light border mb-0">
+                        Todos los usuarios disponibles ya pertenecen
+                        a este departamento.
+                    </div>
+                }
+
+            </div>
+        </div>
+    }
+
+    }
+</div>

@@ -1,0 +1,15 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.ComodatoProfitabilityViewModel>
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Rentabilidad de comodatos"; var items = Model?.ToList() ?? new(); }
+<div class="djj-assets djj-stack">
+    <partial name="_AssetsNavigation" />
+    <header class="djj-page-header"><div><h1>Rentabilidad de equipos prestados</h1><p>Compras del cliente desde la asignación, ordenadas por el importe de la consulta.</p></div></header>
+    <p class="djj-alert djj-alert--info">El importe representa compras del cliente, no utilidad ni retorno de inversión del equipo. Incluye pedidos entregados, aprobados o en proceso desde la asignación.</p>
+    <div class="djj-kpi-grid" aria-label="Cobertura de esta consulta"><div class="djj-kpi-card"><span>Comodatos consultados</span><strong>@items.Count</strong></div><div class="djj-kpi-card"><span>Sin pedidos registrados</span><strong>@items.Count(r => r.NumPedidos == 0)</strong></div><div class="djj-kpi-card"><span>Sin usuario de cliente vinculado</span><strong>@items.Count(r => !r.ClienteUsuarioId.HasValue)</strong></div></div>
+    <section class="djj-card djj-data-section"><header><div><h2>Compras por comodato activo</h2><p>Las compras pueden aparecer en más de un equipo del mismo cliente; no se suman como ingresos de los activos.</p></div></header><div class="djj-table-wrap" tabindex="0" aria-label="Compras por comodato desplazables"><table class="djj-table"><caption class="djj-sr-only">Comodatos activos y compras del cliente desde la asignación</caption><thead><tr><th scope="col">Comodato / activo</th><th scope="col">Cliente</th><th scope="col">Asignado / días</th><th scope="col">Pedidos</th><th scope="col" class="djj-align-right">Total comprado (₡)</th><th scope="col">Última compra</th></tr></thead><tbody>
+    @if (!items.Any()) { <tr><td colspan="6">No hay comodatos activos para esta consulta.</td></tr> }
+    @foreach (var r in items) {
+        <tr><th scope="row">#@r.ComodatoId · @r.CodigoActivo<small class="djj-table__note">@r.ActivoNombre · @r.ActivoTipo</small></th><td>@r.ClienteNombre@if (!r.ClienteUsuarioId.HasValue) { <small class="djj-table__note">Sin usuario vinculado para cruzar compras</small> }</td><td><span class="djj-table__nowrap">@r.FechaAsignacion.ToString("dd/MM/yyyy")</span><small class="djj-table__note">@r.DiasEnComodato día(s)</small></td><td>@r.NumPedidos@if (r.NumPedidos == 0) { <span class="djj-badge djj-badge--warning">Sin pedidos registrados</span> }</td><td class="djj-align-right djj-table__nowrap">@AssetPresentation.Money(r.TotalComprado)</td><td class="djj-table__nowrap">@(r.UltimaCompra?.ToString("dd/MM/yyyy") ?? "Sin compra registrada")</td></tr>
+    }
+    </tbody></table></div></section>
+</div>

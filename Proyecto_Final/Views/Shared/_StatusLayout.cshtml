@@ -1,0 +1,20 @@
+@{ ViewData["Stage2Layout"] = true; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>@ViewData["Title"] - Distribuidora JJ</title>
+    <link rel="icon" type="image/svg+xml" href="~/brand/stage2/icon_stage2-identity_favicon_20260821_32.svg" />
+    <link rel="stylesheet" href="~/css/stage2/tokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/public-surfaces.css" asp-append-version="true" />
+</head>
+<body class="djj-stage2 djj-status-surface" data-djj-layout="status">
+    <a class="djj-skip-link" href="#djj-main-content">Saltar al contenido principal</a>
+    <header class="djj-status-brand"><a asp-controller="Home" asp-action="Index" aria-label="Distribuidora JJ — Inicio"><img src="~/brand/stage2/logo_stage2-identity_compact_20260821_color.svg" width="420" height="120" alt="Distribuidora JJ" /></a></header>
+    <main id="djj-main-content" class="djj-state-page" tabindex="-1">@RenderBody()</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+@model Proyecto_Final.Models.Admin.ComboDetailViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = Model.Nombre; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Inventario · Combo #@Model.ComboId</span><h1>@Model.Nombre</h1><p>@(string.IsNullOrWhiteSpace(Model.Descripcion) ? "Sin descripción comercial." : Model.Descripcion)</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a combos</a></header>
+<partial name="_ComboNavigation" />
+<div class="djj-kpi-grid" aria-label="Resumen del combo">
+    <article class="djj-kpi-card"><span>Precio de venta</span><strong class="djj-number">₡@Model.Precio.ToString("N2")</strong></article>
+    <article class="djj-kpi-card"><span>Disponibilidad real</span><strong>@Model.StockDisponibleCombo</strong><small>Combos completos</small></article>
+    <article class="djj-kpi-card"><span>Componentes</span><strong>@Model.Componentes.Count</strong></article>
+    <article class="djj-kpi-card"><span>Estado</span><div class="djj-badge djj-badge--@(Model.Activo ? "success" : "neutral")">@(Model.Activo ? "Activo" : "Inactivo")</div><small>@Model.EstadoDisponibilidad</small></article>
+</div>
+<div class="djj-detail-layout">
+    <section class="djj-card djj-data-section" aria-labelledby="component-title"><header><div><h2 id="component-title">Composición y cobertura</h2><p>Unidades requeridas y capacidad de cada producto.</p></div></header>
+        @if (Model.Componentes.Count == 0) { <div class="djj-empty-state"><h3>Sin componentes</h3><p>Este combo no tiene productos asociados.</p></div> }
+        else {
+            <div class="djj-table-wrap" tabindex="0" role="region" aria-labelledby="component-title"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">Productos, estado, cantidades por combo, stock y cobertura</caption><thead><tr><th scope="col">Producto</th><th scope="col">Estado</th><th scope="col" class="djj-align-right">Por combo</th><th scope="col" class="djj-align-right">Stock actual</th><th scope="col" class="djj-align-right">Combos posibles</th></tr></thead><tbody>
+                @foreach (var line in Model.Componentes) { <tr><td><strong class="djj-table__primary">@line.ProductoNombre</strong></td><td><span class="djj-badge djj-badge--@(line.ProductoActivo ? "success" : "neutral")">@(line.ProductoActivo ? "Activo" : "Inactivo")</span></td><td class="djj-align-right">@line.Cantidad</td><td class="djj-align-right">@line.StockDisponible</td><td class="djj-align-right">@line.CombosPosibles</td></tr> }
+            </tbody></table></div>
+        }
+    </section>
+    <section class="djj-card" aria-labelledby="combo-trace"><h2 id="combo-trace">Trazabilidad</h2><dl class="djj-detail-grid"><div><dt>Registrado por</dt><dd>@Model.RegistradoPorNombre</dd></div><div><dt>Fecha de creación</dt><dd>@Model.FechaCreacionUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd></div></dl><p class="djj-field__hint">La disponibilidad refleja el componente con menor cobertura. Un producto inactivo impide vender el combo; se vuelve a verificar el stock al confirmar el pedido.</p></section>
+</div>

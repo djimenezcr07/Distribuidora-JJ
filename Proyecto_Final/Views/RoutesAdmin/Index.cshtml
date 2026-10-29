@@ -1,0 +1,120 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.RouteListItemViewModel>
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Rutas de entrega";
+    var estadoActual = ViewBag.Estado as string;
+    var buscar = ViewBag.Buscar as string;
+
+    string BadgeEstado(string estado) => estado switch
+    {
+        "Planificada" => "warning",
+        "Despachada" => "info",
+        "Completada" => "success",
+        "Cancelada" => "danger",
+        _ => "neutral"
+    };
+}
+
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-page-header djj-cluster djj-logistics-between">
+                <div>
+                    <h1>Rutas y entregas</h1>
+                    <p>Genera y organiza rutas de reparto agrupando pedidos por zona y asignando chofer y vehículo.</p>
+                </div>
+                <a asp-action="Create" class="djj-button djj-button--primary">
+                    Nueva ruta
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <form asp-action="Index" method="get" class="djj-logistics-grid">
+                    <div>
+                        <label for="route-state">Estado</label>
+                        <select id="route-state" name="estado" class="djj-input">
+                            <option value="">Todos</option>
+                            <option value="Planificada" selected="@(estadoActual == "Planificada")">Planificada</option>
+                            <option value="Despachada" selected="@(estadoActual == "Despachada")">Despachada</option>
+                            <option value="Completada" selected="@(estadoActual == "Completada")">Completada</option>
+                            <option value="Cancelada" selected="@(estadoActual == "Cancelada")">Cancelada</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="route-search">Buscar</label>
+                        <input type="text" id="route-search" name="buscar" value="@buscar" class="djj-input" placeholder="Código, zona, chofer o placa" />
+                    </div>
+                    <div>
+                        <button type="submit" class="djj-button djj-button--primary">Filtrar</button>
+                        <a asp-action="Index" class="djj-button djj-button--outline">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-card">
+                <div class="djj-logistics-pad djj-logistics-divider djj-cluster djj-logistics-between">
+                    <h2>Listado de rutas</h2>
+                    <span class="djj-text-secondary">Total registros: @(Model?.Count() ?? 0)</span>
+                </div>
+                <div class="djj-table-wrap" tabindex="0" aria-label="Tabla desplazable">
+                    <table class="djj-table"><caption class="djj-sr-only">RoutesAdmin/Index · registros operativos</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Código</th>
+                                <th scope="col">Zona</th>
+                                <th scope="col">Chofer</th>
+                                <th scope="col">Vehículo</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col" class="djj-logistics-center">Pedidos</th>
+                                <th scope="col" class="djj-logistics-center">Progreso</th>
+                                <th scope="col">Creada</th>
+                                <th scope="col" class="djj-logistics-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model == null || !Model.Any())
+                            {
+                                <tr><td colspan="9" class="djj-logistics-center djj-text-secondary">No hay rutas registradas.</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var r in Model)
+                                {
+                                    <tr>
+                                        <td class="djj-logistics-strong">@r.Codigo</td>
+                                        <td>@r.Zona</td>
+                                        <td>@r.Chofer</td>
+                                        <td>@r.VehiculoPlaca</td>
+                                        <td><span class="djj-badge djj-badge--@BadgeEstado(r.Estado)">@r.Estado</span></td>
+                                        <td class="djj-logistics-center">@r.TotalPedidos</td>
+                                        <td class="djj-logistics-center">
+                                            <span class="djj-logistics-success">@r.Entregados entregadas</span> /
+                                            <span class="djj-logistics-danger">@r.Fallidos fallidas</span> /
+                                            <span class="djj-text-secondary">@r.Pendientes pendientes</span>
+                                        </td>
+                                        <td>@r.FechaCreacion.ToString("dd/MM/yyyy HH:mm")<small class="djj-table__note">Despacho: @(r.FechaDespacho?.ToString("dd/MM/yyyy HH:mm") ?? "Pendiente")</small></td>
+                                        <td class="djj-logistics-center">
+                                            <a asp-action="Detail" asp-route-id="@r.RutaId" class="djj-button djj-button--outline">
+                                                Ver
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

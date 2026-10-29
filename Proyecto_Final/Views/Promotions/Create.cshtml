@@ -1,0 +1,15 @@
+@model Proyecto_Final.Models.Admin.PromotionFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Nueva promoción"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Comercial · Promociones</span><h1>Nueva promoción</h1><p>Configurá un descuento o una regalía para el producto y segmento elegidos.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a promociones</a></header>
+<partial name="_PromotionNavigation" />
+<form asp-action="Create" method="post" class="djj-workspace-form" data-djj-promotion-form>
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="djj-validation-summary" data-djj-validation-summary tabindex="-1" role="alert"></div>
+    <partial name="_PromotionFields" model="Model" />
+    <div class="djj-form-actions"><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Guardar promoción</button></div>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/stage2/promotions.js" asp-append-version="true"></script>
+}

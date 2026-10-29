@@ -1,0 +1,23 @@
+@model Proyecto_Final.Models.Admin.InventoryMovementFormViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Registrar movimiento"; var productos = ViewBag.Productos as List<SelectListItem> ?? new(); }
+
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Inventario · Movimiento</span><h1>Registrar movimiento</h1><p>Actualizá existencias con una entrada, salida o ajuste trazable.</p></div></header>
+<div class="djj-form-layout">
+  <form asp-controller="Inventory" asp-action="RegisterMovement" method="post" class="djj-card djj-workspace-form">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="djj-validation-summary" role="alert" tabindex="-1" data-djj-validation-summary></div>
+    <fieldset><legend>Movimiento</legend>
+      <div class="djj-field"><label asp-for="ProductoId" class="djj-field__label"></label><select asp-for="ProductoId" asp-items="productos" class="djj-select"><option value="">Seleccioná un producto</option></select><span asp-validation-for="ProductoId" class="djj-field__error"></span></div>
+      <div class="djj-form-grid"><div class="djj-field"><label asp-for="TipoMovimiento" class="djj-field__label"></label><select asp-for="TipoMovimiento" id="tipoMovimiento" class="djj-select"><option value="Entrada">Entrada</option><option value="Salida">Salida</option><option value="Ajuste">Ajuste</option></select><span asp-validation-for="TipoMovimiento" class="djj-field__error"></span></div><div class="djj-field"><label asp-for="Cantidad" class="djj-field__label"></label><input asp-for="Cantidad" class="djj-input" inputmode="numeric" /><span asp-validation-for="Cantidad" class="djj-field__error"></span></div></div>
+    </fieldset>
+    <fieldset id="datosGasto"><legend>Información de compra</legend>
+      <label class="djj-check"><input asp-for="GeneraGasto" id="generaGasto" />Esta entrada representa una compra</label>
+      <div id="camposGasto" class="djj-form-grid"><div class="djj-field"><label asp-for="CostoUnitario" class="djj-field__label"></label><input asp-for="CostoUnitario" type="number" min="0" step="0.01" class="djj-input" /><span asp-validation-for="CostoUnitario" class="djj-field__error"></span></div><div class="djj-field"><label asp-for="CategoriaGasto" class="djj-field__label"></label><select asp-for="CategoriaGasto" class="djj-select"><option value="">Seleccioná una categoría</option><option value="Compra de inventario">Compra de inventario</option><option value="Transporte">Transporte</option><option value="Otro">Otro</option></select><span asp-validation-for="CategoriaGasto" class="djj-field__error"></span></div><p class="djj-alert djj-alert--info">El gasto se calcula multiplicando la cantidad por el costo unitario.</p></div>
+    </fieldset>
+    <div class="djj-field"><label asp-for="Motivo" class="djj-field__label"></label><textarea asp-for="Motivo" class="djj-textarea" rows="4"></textarea><span asp-validation-for="Motivo" class="djj-field__error"></span></div>
+    <div class="djj-form-actions"><a asp-action="Movements" class="djj-button djj-button--ghost">Cancelar</a><button type="submit" class="djj-button djj-button--primary">Guardar movimiento</button></div>
+  </form>
+  <aside class="djj-card djj-form-guidance"><h2>Guía rápida</h2><ul><li><strong>Entrada:</strong> aumenta el stock.</li><li><strong>Salida:</strong> disminuye el stock.</li><li><strong>Ajuste:</strong> establece un valor directo.</li><li>Indicá un motivo claro para conservar la trazabilidad.</li></ul></aside>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script>document.addEventListener("DOMContentLoaded",()=>{const tipo=document.getElementById("tipoMovimiento"),gasto=document.getElementById("datosGasto"),genera=document.getElementById("generaGasto"),campos=document.getElementById("camposGasto");const sync=()=>{const entrada=tipo.value==="Entrada";gasto.hidden=!entrada;campos.hidden=!(entrada&&genera.checked);};tipo.addEventListener("change",sync);genera.addEventListener("change",sync);sync();});</script> }

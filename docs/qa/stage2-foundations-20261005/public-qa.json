@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "Home",
+    "Shop",
+    "Detail/19",
+    "Account/Login"
+  ],
+  "viewports": [
+    1440,
+    390
+  ],
+  "console": [],
+  "networkErrors": [],
+  "loginEmptyPostCount": 0,
+  "authenticatedQa": "Pendiente: Edge permanece en Login sin identidad autenticada",
+  "notes": [
+    "Imágenes lazy fuera de pantalla no se clasifican como rotas",
+    "Agua 600ml tiene una imagen de whisky ya asignada en datos; no se modifica SQL"
+  ]
+}

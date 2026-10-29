@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Permisos de Rol";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var perfil = ViewBag.Perfil as Proyecto_Final.Models.Perfil ?? new Proyecto_Final.Models.Perfil();
+    var todosModulos = ViewBag.TodosModulos as List<Proyecto_Final.Models.Modulo> ?? new List<Proyecto_Final.Models.Modulo>();
+    var asignados = ViewBag.Asignados as List<int> ?? new List<int>();
+}
+
+<div class="container mt-5 mb-5" style="max-width: 700px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2" style="border-bottom: 1px dotted #ccc;">
+        <h2 style="font-weight: bold; color: #333;">PERMISOS: <span style="color: #D4AF37;">@perfil.Nombre.ToUpper()</span></h2>
+        <a asp-action="Roles" class="btn btn-outline-secondary">Volver</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-controller="Security" asp-action="GuardarPermisos" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="perfilId" value="@perfil.PerfilId" />
+
+                <p class="text-muted mb-4">Selecciona los módulos a los que este rol tendrá acceso dentro del sistema:</p>
+
+                <div class="row">
+                    @foreach (var modulo in todosModulos)
+                    {
+                        var isChecked = asignados.Contains(modulo.ModuloId) ? "checked" : "";
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch fs-5">
+                                <input class="form-check-input" type="checkbox" name="modulosSeleccionados" value="@modulo.ModuloId" id="mod_@modulo.ModuloId" @isChecked>
+                                <label class="form-check-label ms-2" for="mod_@modulo.ModuloId">
+                                    Módulo @modulo.NombreModulo
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn shadow-sm" style="background-color: #D4AF37; color: #212529; font-weight: bold; padding: 12px;">
+                        GUARDAR CONFIGURACIÓN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

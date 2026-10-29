@@ -1,0 +1,13 @@
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canSecurity = admin || await PermissionService.HasModulePermissionAsync(role, "Seguridad");
+    var canAudit = admin || await PermissionService.HasModulePermissionAsync(role, "Auditoria");
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<nav class="djj-domain-nav" aria-label="Seguridad y auditoría">
+@if (canSecurity) { <a asp-controller="Roles" asp-action="Index" aria-current="@(controller == "Roles" ? "page" : null)">Roles</a><a asp-controller="Permissions" asp-action="Index" aria-current="@(controller == "Permissions" ? "page" : null)">Permisos</a> }
+@if (canAudit) { <a asp-controller="Audit" asp-action="Index" aria-current="@(controller == "Audit" ? "page" : null)">Auditoría</a> }
+</nav>

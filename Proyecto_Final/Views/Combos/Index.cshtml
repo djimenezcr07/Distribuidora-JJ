@@ -1,0 +1,47 @@
+@model IReadOnlyList<Proyecto_Final.Models.Admin.ComboListItemViewModel>
+@inject IRolePermissionService PermissionService
+@{
+    var isAdmin = Context.Session.GetString("UserRole") == "Administrador";
+    var canManage = isAdmin || (await PermissionService.GetPermissionCodesAsync(Context.Session.GetString("UserRole") ?? "")).Contains("COMBOS_GESTIONAR");
+}
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Combos"; }
+<header class="djj-page-header">
+    <div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Inventario · Combos</span><h1>Combos comerciales</h1><p>Precio, composición y disponibilidad de tus ofertas.</p></div>
+    @if (canManage) { <a asp-action="Create" class="djj-button djj-button--primary">Nuevo combo</a> }
+</header>
+<partial name="_ComboNavigation" />
+<div class="djj-kpi-grid" aria-label="Resumen de combos">
+    <article class="djj-kpi-card"><span>Total</span><strong>@Model.Count</strong></article>
+    <article class="djj-kpi-card"><span>Activos</span><strong>@Model.Count(x => x.Activo)</strong></article>
+    <article class="djj-kpi-card"><span>Vendibles hoy</span><strong>@Model.Count(x => x.PuedeVenderse)</strong></article>
+</div>
+<section class="djj-card djj-data-section" aria-labelledby="combo-list-title">
+    <header><div><h2 id="combo-list-title">Catálogo de combos</h2><p>El stock disponible depende de todos los componentes.</p></div></header>
+    @if (!Model.Any()) {
+        <div class="djj-empty-state"><h3>Aún no hay combos</h3><p>Definí una oferta con al menos un componente y cantidad positiva.</p>
+            @if (canManage) { <a asp-action="Create" class="djj-button djj-button--primary">Crear primer combo</a> }
+        </div>
+    } else {
+        <div class="djj-table-wrap" tabindex="0" role="region" aria-labelledby="combo-list-title">
+            <table class="djj-table djj-table--compact"><caption class="djj-sr-only">Combos, precios en colones, composición, disponibilidad y acciones</caption>
+                <thead><tr><th scope="col">Combo</th><th scope="col" class="djj-align-right">Precio</th><th scope="col" class="djj-align-right">Componentes</th><th scope="col" class="djj-align-right">Disponibles</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+                <tbody>@foreach (var combo in Model) {
+                    <tr>
+                        <td><a asp-action="Detail" asp-route-id="@combo.ComboId" class="djj-table__primary">@combo.Nombre</a>
+                            <small class="djj-table__note">@(string.IsNullOrWhiteSpace(combo.Descripcion) ? "Sin descripción comercial." : combo.Descripcion)</small>
+                            <small class="djj-table__note">Creado @combo.FechaCreacionUtc.ToLocalTime().ToString("dd/MM/yyyy") por @combo.RegistradoPorNombre</small></td>
+                        <td class="djj-align-right djj-number">₡@combo.Precio.ToString("N2")</td><td class="djj-align-right">@combo.CantidadProductos</td><td class="djj-align-right">@combo.StockDisponibleCombo unidades</td>
+                        <td><span class="djj-badge djj-badge--@(combo.Activo ? "success" : "neutral")">@(combo.Activo ? "Activo" : "Inactivo")</span><small class="djj-table__note">@combo.EstadoDisponibilidad</small></td>
+                        <td><div class="djj-row-actions"><a asp-action="Detail" asp-route-id="@combo.ComboId" class="djj-button djj-button--outline djj-button--sm" aria-label="Ver detalle de @combo.Nombre">Detalle</a>
+                            @if (canManage) {
+                                <form asp-action="ToggleStatus" asp-route-id="@combo.ComboId" method="post" data-djj-confirm="¿Confirma que desea @(combo.Activo ? "inactivar" : "activar") el combo @combo.Nombre?">
+                                    @Html.AntiForgeryToken()<button type="submit" class="djj-button djj-button--@(combo.Activo ? "danger-outline" : "ghost") djj-button--sm" aria-label="@(combo.Activo ? "Inactivar" : "Activar") @combo.Nombre">@(combo.Activo ? "Inactivar" : "Activar")</button>
+                                </form>
+                            }
+                        </div></td>
+                    </tr>
+                }</tbody>
+            </table>
+        </div>
+    }
+</section>

@@ -1,0 +1,40 @@
+﻿@model Proyecto_Final.Models.Perfil
+
+@{
+    ViewData["Title"] = "Crear Nuevo Rol";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5 mb-5" style="max-width: 600px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2" style="border-bottom: 1px dotted #ccc;">
+        <h2 style="font-weight: bold; color: #333;">CREAR NUEVO ROL</h2>
+        <a asp-action="Roles" class="btn btn-outline-secondary">Volver al listado</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-controller="Security" asp-action="CrearRol" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label" style="font-weight: bold; color: #555;">Nombre del Perfil <span class="text-danger">*</span></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej. Cajero, Vendedor..." required />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Descripcion" class="form-label" style="font-weight: bold; color: #555;">Descripción</label>
+                    <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Breve descripción de los accesos de este rol..."></textarea>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn" style="background-color: #D4AF37; color: white; font-weight: bold; padding: 12px;">
+                        GUARDAR ROL
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+@model Proyecto_Final.Models.Admin.ReclamoDetailViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Detalle de reclamo";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "RECLAMOS_GESTIONAR");
+}
+<div class="djj-customer-service">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Reclamo #@Model.ReclamoId</h1><p>Detalle y trazabilidad de la inconformidad.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a reclamos</a></header>
+<partial name="_CustomerServiceNavigation" />
+<section class="djj-card djj-form-card"><h2>@Model.Asunto</h2><div class="djj-row-actions"><span class="djj-badge djj-badge--@CustomerServicePresentation.ComplaintTone(Model.Estado)">@Model.Estado</span><span class="djj-badge djj-badge--@CustomerServicePresentation.PriorityTone(Model.Prioridad)">@Model.Prioridad</span></div><dl class="djj-service-metadata">
+<dt>Cliente</dt><dd>@Model.ClienteNombre<small class="djj-table__note">@Model.ClienteCorreo · @(Model.ClienteTelefono ?? "Sin teléfono")</small></dd><dt>Categoría</dt><dd>@Model.Categoria</dd>
+<dt>Registro</dt><dd>@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm") · @(Model.RegistradoPorNombre ?? "Sin responsable registrado")</dd><dt>Actualización</dt><dd>@(Model.FechaActualizacion?.ToString("dd/MM/yyyy HH:mm") ?? "Sin actualización")</dd>
+<dt>Pedido relacionado</dt><dd>@(Model.PedidoId.HasValue ? $"Pedido #{Model.PedidoId}" : "Sin pedido asociado")</dd>
+<dt>Factura relacionada</dt><dd>@(Model.NumeroFactura ?? (Model.FacturaId.HasValue ? $"Factura #{Model.FacturaId}" : "Sin factura asociada"))<small class="djj-table__note">@(Model.FechaFactura?.ToString("dd/MM/yyyy")) @(Model.FacturaTotal.HasValue ? $"₡{Model.FacturaTotal.Value:N2}" : "")</small></dd>
+<dt>Cierre</dt><dd>@(Model.FechaCierre?.ToString("dd/MM/yyyy HH:mm") ?? "Sin cierre") · @(Model.CerradoPorNombre ?? "Sin responsable de cierre")</dd></dl>
+<h3>Descripción</h3><p class="djj-service-text">@Model.Descripcion</p><h3>Resolución documentada</h3><p class="djj-service-text">@(string.IsNullOrWhiteSpace(Model.ResolucionDescripcion) ? "Sin resolución documentada." : Model.ResolucionDescripcion)</p></section>
+@if (CustomerServicePresentation.ComplaintClosed(Model.Estado)) { <div class="djj-alert djj-alert--info" role="status"><p>Este reclamo está cerrado y no admite más cambios de estado.</p></div> }
+else if (canManage)
+{
+<section class="djj-card djj-form-card"><h2>Seguimiento del caso</h2><form asp-action="UpdateStatus" method="post" data-djj-service-form data-djj-confirm="¿Guardar el seguimiento de este reclamo? El cierre conserva la resolución y no admite más cambios.">
+@Html.AntiForgeryToken()<input type="hidden" name="ReclamoId" value="@Model.ReclamoId" />
+<div class="djj-field"><label for="EstadoSelect">Estado</label><select name="Estado" id="EstadoSelect" class="djj-select" required>@if (!new[] { "Abierto", "EnProceso", "Cerrado" } .Contains(Model.Estado)) { <option value="" selected disabled>Seleccioná un estado permitido</option> }
+@foreach (var state in new[] { "Abierto", "EnProceso", "Cerrado" }) { <option value="@state" selected="@(Model.Estado == state)">@state</option> }</select></div>
+<div class="djj-field"><label for="ResolucionTxt">Resolución <span id="ResolucionReq" hidden aria-hidden="true">*</span></label><textarea name="Resolucion" id="ResolucionTxt" class="djj-textarea" rows="6" maxlength="1000" aria-describedby="complaint-resolution-help"></textarea><small id="complaint-resolution-help">Obligatoria para cerrar el reclamo. Máximo 1000 caracteres.</small></div>
+<div class="djj-form-actions"><button type="submit" class="djj-button djj-button--primary">Guardar seguimiento</button></div></form></section>
+}
+</div>
+@section Scripts { <script src="~/js/stage2/customer-service.js" asp-append-version="true"></script> }

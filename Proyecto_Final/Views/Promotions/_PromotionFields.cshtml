@@ -1,0 +1,30 @@
+@model Proyecto_Final.Models.Admin.PromotionFormViewModel
+<div class="djj-commerce-grid">
+    <section class="djj-card" aria-labelledby="promotion-general"><h2 id="promotion-general">Datos generales</h2>
+        <div class="djj-field"><label asp-for="Nombre"></label><input asp-for="Nombre" class="djj-input" /><span asp-validation-for="Nombre" class="djj-field-error"></span></div>
+        <div class="djj-field"><label asp-for="Descripcion"></label><textarea asp-for="Descripcion" class="djj-textarea" rows="3"></textarea><span asp-validation-for="Descripcion" class="djj-field-error"></span></div>
+    </section>
+    <section class="djj-card" aria-labelledby="promotion-benefit"><h2 id="promotion-benefit">Beneficio</h2>
+        <div class="djj-field"><label for="promoTipo">Tipo de promoción</label><select asp-for="Tipo" class="djj-select" id="promoTipo"><option value="DescuentoPorcentual">Descuento porcentual</option><option value="RegaliaPorVolumen">Regalía por volumen</option></select><span asp-validation-for="Tipo" class="djj-field-error"></span></div>
+        <div class="promo-descuento djj-field"><label asp-for="PorcentajeDescuento"></label><input asp-for="PorcentajeDescuento" type="number" step="0.01" min="0" max="100" class="djj-input" aria-describedby="promotion-discount-help" /><span asp-validation-for="PorcentajeDescuento" class="djj-field-error"></span><small id="promotion-discount-help" class="djj-field__hint">Se aplica solo a la línea del producto estratégico.</small></div>
+        <div class="promo-regalia djj-form-grid">
+            <div class="djj-field"><label asp-for="ProductoRegaloId"></label><select asp-for="ProductoRegaloId" class="djj-select"><option value="">— Producto de regalía —</option>@foreach (var p in Model.Productos) { <option value="@p.ProductoId">@p.Nombre</option> }</select><span asp-validation-for="ProductoRegaloId" class="djj-field-error"></span></div>
+            <div class="djj-field"><label asp-for="CantidadRegalo"></label><input asp-for="CantidadRegalo" type="number" min="1" class="djj-input" /><span asp-validation-for="CantidadRegalo" class="djj-field-error"></span></div>
+        </div>
+    </section>
+    <section class="djj-card" aria-labelledby="promotion-products"><h2 id="promotion-products">Producto y condiciones</h2>
+        <div class="djj-field"><label asp-for="ProductoId"></label><select asp-for="ProductoId" class="djj-select"><option value="">— Seleccione el producto estratégico —</option>@foreach (var p in Model.Productos) { <option value="@p.ProductoId">@p.Nombre (₡@p.Precio.ToString("N2"))</option> }</select><span asp-validation-for="ProductoId" class="djj-field-error"></span></div>
+        <div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="CantidadMinima"></label><input asp-for="CantidadMinima" type="number" min="1" class="djj-input" /><span asp-validation-for="CantidadMinima" class="djj-field-error"></span></div>
+            <div class="djj-field"><label asp-for="Prioridad"></label><input asp-for="Prioridad" type="number" min="0" class="djj-input" /><span asp-validation-for="Prioridad" class="djj-field-error"></span></div>
+        </div>
+    </section>
+    <section class="djj-card" aria-labelledby="promotion-period"><h2 id="promotion-period">Vigencia</h2><div class="djj-form-grid">
+        <div class="djj-field"><label asp-for="FechaInicio"></label><input asp-for="FechaInicio" type="date" class="djj-input" /><span asp-validation-for="FechaInicio" class="djj-field-error"></span></div>
+        <div class="djj-field"><label asp-for="FechaFin"></label><input asp-for="FechaFin" type="date" class="djj-input" /><span asp-validation-for="FechaFin" class="djj-field-error"></span></div>
+    </div><p class="djj-field__hint">La promoción se aplica durante este intervalo, siempre que su estado sea Activa.</p></section>
+    <section class="djj-card" aria-labelledby="promotion-segment"><h2 id="promotion-segment">Segmentación</h2>
+        <div class="djj-field"><label asp-for="SegmentoCliente"></label><select asp-for="SegmentoCliente" class="djj-select"><option value="Todos">Todos los clientes</option><option value="Mayorista">Solo mayoristas</option><option value="Minorista">Solo minoristas</option></select><span asp-validation-for="SegmentoCliente" class="djj-field-error"></span></div><p class="djj-field__hint">La asignación individual de clientes se administra en Segmentos de cliente.</p>
+    </section>
+    <section class="djj-card" aria-labelledby="promotion-state"><h2 id="promotion-state">Estado y revisión</h2><p>@(Model.PromocionId == 0 ? "Las promociones se crean con estado Activa. Su aplicación depende también de la vigencia y del segmento." : "La vigencia comercial y el estado técnico se consultan en el listado. La inactivación se realiza desde allí con confirmación.")</p><p class="djj-field__hint">Revisá los productos, el beneficio y las fechas antes de guardar.</p></section>
+</div>

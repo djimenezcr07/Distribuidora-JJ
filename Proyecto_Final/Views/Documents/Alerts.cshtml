@@ -1,0 +1,42 @@
+@model Proyecto_Final.Models.Admin.DocumentAlertsIndexViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Alertas documentales";
+    var canGenerate = ViewData["DocumentOwnerScope"] is true;
+    var canHandle = ViewData["DocumentOwnerScope"] is true;
+}
+<div class="djj-documents">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Gestión documental</span><h1>Alertas de vencimiento</h1><p>Vencimientos y responsables según la fecha de negocio de Costa Rica.</p></div>
+@if (canGenerate) { <form asp-action="GenerateAlerts" method="post" data-djj-confirm="¿Generar las alertas de vencimiento? El proceso puede enviar notificaciones.">@Html.AntiForgeryToken()<button class="djj-button djj-button--primary" type="submit">Generar sin duplicar</button></form> }</header>
+<partial name="_DocumentsNavigation" />
+<section class="djj-document-kpis" aria-label="Resumen de alertas">
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Alertas activas</p><p class="djj-kpi-card__value">@Model.ActiveCount</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Documentos vencidos</p><p class="djj-kpi-card__value">@Model.ExpiredCount</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">En esta página</p><p class="djj-kpi-card__value">@Model.Alerts.Items.Count</p></div></article>
+</section>
+<section class="djj-card djj-filter-card" aria-labelledby="alert-filter-title"><h2 id="alert-filter-title">Filtrar alertas</h2>
+<form asp-action="Alerts" method="get" class="djj-filter-bar">
+    <div class="djj-field"><label asp-for="Filter.Status">Estado</label><select asp-for="Filter.Status" name="Status" class="djj-select"><option value="">Todos</option><option>Activa</option><option>Atendida</option></select></div>
+    <div class="djj-field"><label asp-for="Filter.DepartmentId">Departamento</label><select asp-for="Filter.DepartmentId" name="DepartmentId" class="djj-select"><option value="">Todos</option>@foreach (var department in Model.Departments) { <option value="@department.Id">@department.Name</option> }</select></div>
+    <div class="djj-field"><label asp-for="Filter.MaxDays">Horizonte máximo (días)</label><input asp-for="Filter.MaxDays" name="MaxDays" type="number" min="0" max="365" class="djj-input" placeholder="Sin límite" /></div>
+    <div class="djj-filter-bar__actions"><button class="djj-button djj-button--neutral" type="submit">Aplicar</button><a asp-action="Alerts" class="djj-button djj-button--ghost">Limpiar</a></div>
+</form></section>
+<section class="djj-card djj-data-section" aria-labelledby="alert-list-title"><header><div><h2 id="alert-list-title">Bandeja de atención</h2><p>@Model.Alerts.Total alerta(s) para estos filtros.</p></div></header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Alertas: tabla desplazable"><table class="djj-table djj-table--compact djj-document-table"><caption class="djj-sr-only">Alertas documentales y responsables</caption><thead><tr><th scope="col">Documento / tipo</th><th scope="col">Departamento / responsable</th><th scope="col">Vencimiento</th><th scope="col">Días restantes</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody>
+@if (!Model.Alerts.Items.Any()) { <tr><td colspan="6"><div class="djj-empty-state"><h3>Sin alertas para estos filtros</h3><p>Cambiá los filtros para consultar otro período o estado.</p></div></td></tr> }
+@foreach (var alert in Model.Alerts.Items)
+{
+    <tr><td><a asp-action="Detail" asp-route-id="@alert.DocumentId" class="djj-table__primary">@alert.DocumentTitle</a><small class="djj-table__note">@alert.TypeName</small></td><td>@(alert.DepartmentName ?? "General")<small class="djj-table__note">@alert.ResponsibleName</small></td>
+    <td>@alert.ExpirationDate.ToString("dd/MM/yyyy")<small class="djj-table__note"><span class="djj-badge djj-badge--@DocumentPresentation.ExpirationTone(alert.ExpirationStatus)">@alert.ExpirationStatus</span></small></td>
+    <td>@alert.DaysRemaining día(s)<small class="djj-table__note">@(alert.DaysRemaining < 0 ? "Después del vencimiento" : alert.DaysRemaining == 0 ? "Vence hoy" : "Hasta el vencimiento")</small></td>
+    <td><span class="djj-badge djj-badge--@(alert.Status == "Activa" ? "info" : "neutral")">@alert.Status</span><small class="djj-table__note">@alert.CreatedUtc.ToString("dd/MM/yyyy HH:mm") UTC</small></td>
+    <td><div class="djj-row-actions"><a asp-action="Details" asp-route-id="@alert.DocumentId" class="djj-button djj-button--ghost djj-button--sm" aria-label="Ver documento @alert.DocumentTitle">Ver</a>
+    @if (canHandle && alert.Status == "Activa") { <form asp-action="MarkAlertHandled" method="post" data-djj-confirm="¿Marcar esta alerta como atendida?">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@alert.AlertId" /><button class="djj-button djj-button--success djj-button--sm" type="submit" aria-label="Atender alerta de @alert.DocumentTitle">Atender</button></form> }</div></td></tr>
+}
+</tbody></table></div>
+<nav class="djj-document-pagination" aria-label="Paginación de alertas"><span>Página @Model.Alerts.Page de @Model.Alerts.TotalPages · @Model.Alerts.Total alerta(s)</span><div class="djj-row-actions">
+@if (Model.Alerts.Page > 1) { <a asp-action="Alerts" asp-route-Page="@(Model.Alerts.Page-1)" asp-route-PageSize="@Model.Filter.PageSize" asp-route-Status="@Model.Filter.Status" asp-route-DepartmentId="@Model.Filter.DepartmentId" asp-route-MaxDays="@Model.Filter.MaxDays" class="djj-button djj-button--ghost djj-button--sm">Anterior</a> }
+@if (Model.Alerts.Page < Model.Alerts.TotalPages) { <a asp-action="Alerts" asp-route-Page="@(Model.Alerts.Page+1)" asp-route-PageSize="@Model.Filter.PageSize" asp-route-Status="@Model.Filter.Status" asp-route-DepartmentId="@Model.Filter.DepartmentId" asp-route-MaxDays="@Model.Filter.MaxDays" class="djj-button djj-button--ghost djj-button--sm">Siguiente</a> }
+</div></nav></section>
+</div>

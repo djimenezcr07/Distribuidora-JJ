@@ -1,0 +1,291 @@
+@model Proyecto_Final.Models.Admin.RouteDetailViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = $"Ruta {Model.Cabecera.Codigo}";
+    var c = Model.Cabecera;
+    var esPlanificada = c.Estado == "Planificada";
+    var puedeCancelar = c.Estado == "Planificada";
+
+    string BadgeRuta(string e) => LogisticsStatusPresentation.RouteTone(e);
+    string BadgeEntrega(string e) => LogisticsStatusPresentation.DeliveryTone(e);
+    string TextoEntrega(string e) => e switch { "EnRuta" => "En ruta", _ => e };
+
+    // Enlace de verificación del recorrido en Google Maps (paradas con coordenada, en orden).
+    var invD = System.Globalization.CultureInfo.InvariantCulture;
+    var paradasConCoord = Model.Pedidos.Where(x => x.Latitud is >= -90 and <= 90 && x.Longitud is >= -180 and <= 180).ToList();
+    string? rutaMapsUrl = null;
+    if (paradasConCoord.Count > 0)
+    {
+        var dest = paradasConCoord[paradasConCoord.Count - 1];
+        rutaMapsUrl = $"https://www.google.com/maps/dir/?api=1&destination={dest.Latitud.GetValueOrDefault().ToString(invD)},{dest.Longitud.GetValueOrDefault().ToString(invD)}&travelmode=driving";
+        if (paradasConCoord.Count > 1)
+        {
+            var wps = paradasConCoord.Take(paradasConCoord.Count - 1)
+                .Select(s => $"{s.Latitud.GetValueOrDefault().ToString(invD)},{s.Longitud.GetValueOrDefault().ToString(invD)}");
+            rutaMapsUrl += "&waypoints=" + Uri.EscapeDataString(string.Join("|", wps));
+        }
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <div class="djj-logistics-grid">
+        <div>
+            <div class="djj-page-header djj-cluster djj-logistics-between">
+                <div>
+                    <h1>Ruta @c.Codigo <span class="djj-badge djj-badge--@BadgeRuta(c.Estado)">@c.Estado</span></h1>
+                    <p>Zona: <strong>@c.Zona</strong></p>
+                </div>
+                <div>
+                    <a asp-action="Evidences" asp-route-id="@c.RutaId" class="djj-button djj-button--outline">Evidencias</a>
+                    <a asp-action="Index" class="djj-button djj-button--outline">Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="djj-logistics-split djj-logistics-split--form-first">
+        <div>
+            <div class="djj-card djj-logistics-pad">
+                <h2>Detalle de la ruta</h2>
+                <dl class="djj-logistics-facts">
+                    <dt>Chofer</dt><dd>@c.Chofer</dd>
+                    <dt>Vehículo</dt><dd>@c.VehiculoPlaca<br /><small class="djj-text-secondary">@c.VehiculoDescripcion</small></dd>
+                    <dt>Creada por</dt><dd>@c.CreadaPorNombre</dd><dt>Creada</dt><dd>@c.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                    @if (c.FechaDespacho.HasValue)
+                    {
+                        <dt>Despachada</dt><dd>@c.FechaDespacho.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(c.Observaciones))
+                    {
+                        <dt>Observaciones</dt><dd>@c.Observaciones</dd>
+                    }
+                </dl>
+
+                @if (c.FechaCierre.HasValue) { <p>Cierre: @c.FechaCierre.Value.ToString("dd/MM/yyyy HH:mm")</p> }
+                <hr />
+                <div class="djj-cluster">
+                    @if (esPlanificada)
+                    {
+                        <form asp-action="Sequence" method="post"
+                              data-djj-confirm="¿Generar automáticamente el orden óptimo de entregas?">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="rutaId" value="@c.RutaId" />
+                            <button type="submit" class="djj-button djj-button--outline">Secuenciar automáticamente</button>
+                        </form>
+                        <form asp-action="Dispatch" method="post"
+                              data-djj-confirm="¿Despachar la ruta? Los pedidos pasarán a En ruta y se notificará a los clientes.">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="rutaId" value="@c.RutaId" />
+                            <button type="submit" class="djj-button djj-button--primary">Despachar ruta</button>
+                        </form>
+                    }
+                    @if (c.Estado == "Despachada")
+                    {
+                        <button type="button" class="djj-button djj-button--outline" data-djj-toggle="recalcBox" aria-controls="recalcBox" aria-expanded="false">
+                            Recalcular ruta
+                        </button>
+                    }
+                    @if (c.Estado == "Despachada")
+                    {
+                        <p class="djj-table__note">Liquidación y devoluciones bloqueadas: falta aprobar la conciliación de stock, facturas y notas de crédito.</p>
+                    }
+                    @if (puedeCancelar)
+                    {
+                        <button type="button" class="djj-button djj-button--danger-outline" data-djj-toggle="cancelBox" aria-controls="cancelBox" aria-expanded="false">
+                            Cancelar ruta
+                        </button>
+                    }
+                </div>
+
+                @if (puedeCancelar)
+                {
+                    <div class="djj-logistics-disclosure" id="cancelBox" hidden>
+                        <form asp-action="Cancel" method="post"
+                              data-djj-confirm="¿Confirma cancelar la ruta?">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="rutaId" value="@c.RutaId" />
+                            <div class="djj-field">
+                                <label for="cancel-reason">Motivo</label>
+                                <input type="text" id="cancel-reason" name="motivo" class="djj-input" maxlength="300" placeholder="Motivo de la cancelación" />
+                            </div>
+                            <button type="submit" class="djj-button djj-button--danger">Confirmar cancelación</button>
+                        </form>
+                    </div>
+                }
+
+                @if (c.Estado == "Despachada")
+                {
+                    <div class="djj-logistics-disclosure" id="recalcBox" hidden>
+                        <form asp-action="Recalculate" method="post"
+                              data-djj-confirm="¿Recalcular la ruta? Se reordenarán los puntos pendientes.">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="rutaId" value="@c.RutaId" />
+                            <div class="djj-field">
+                                <label for="recalc-stop">Punto afectado (opcional)</label>
+                                <select id="recalc-stop" name="excluirRutaPedidoId" class="djj-input">
+                                    <option value="">— Solo reordenar los pendientes —</option>
+                                    @foreach (var p in Model.Pedidos.Where(x => x.EstadoEntrega == "Pendiente" || x.EstadoEntrega == "EnRuta"))
+                                    {
+                                        <option value="@p.RutaPedidoId">#@p.PedidoId - @p.Cliente</option>
+                                    }
+                                </select>
+                                <small class="djj-text-secondary">Si un cliente está cerrado o hubo un imprevisto, selecciónelo para excluirlo.</small>
+                            </div>
+                            <div class="djj-field">
+                                <label for="recalc-reason">Motivo del imprevisto</label><input id="recalc-reason" type="text" name="motivoFallo" class="djj-input" maxlength="300" placeholder="Motivo (ej: cliente cerrado)" />
+                            </div>
+                            <button type="submit" class="djj-button djj-button--outline">Recalcular</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div>
+            <div class="djj-card">
+                <div class="djj-logistics-pad djj-logistics-divider djj-cluster djj-logistics-between">
+                    <h2>Pedidos de la ruta</h2>
+                    <div class="djj-cluster">
+                        @if (rutaMapsUrl != null)
+                        {
+                            <a href="@rutaMapsUrl" target="_blank" rel="noopener" class="djj-button djj-button--outline" title="Verificar el recorrido en Google Maps">
+                                Ver recorrido en Maps
+                            </a>
+                        }
+                        <span class="djj-text-secondary">Total: @Model.Pedidos.Count</span>
+                    </div>
+                </div>
+                <div class="djj-table-wrap" tabindex="0" aria-label="Tabla desplazable">
+                    <table class="djj-table"><caption class="djj-sr-only">RoutesAdmin/Detail · registros operativos</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col"># Pedido</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col">Dirección</th>
+                                <th scope="col">Entrega</th>
+                                <th scope="col" class="djj-logistics-center">Evidencias</th>
+                                @if (esPlanificada)
+                                {
+                                    <th scope="col" class="djj-logistics-center">Quitar</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Model.Pedidos)
+                            {
+                                <tr>
+                                    <td>@p.Secuencia</td>
+                                    <td class="djj-logistics-strong">#@p.PedidoId</td>
+                                    <td>@p.Cliente<small class="djj-table__note">@p.ClienteCorreo</small></td>
+                                    <td><small>@p.DireccionEntrega</small><small class="djj-table__note">₡@p.Total.ToString("N2") · Pedido: @p.EstadoPedido</small></td>
+                                    <td>
+                                        <span class="djj-badge djj-badge--@BadgeEntrega(p.EstadoEntrega)">@TextoEntrega(p.EstadoEntrega)</span><small class="djj-table__note">@(p.FechaEntrega?.ToString("dd/MM/yyyy HH:mm") ?? "Sin fecha de entrega")</small>
+                                        @if (p.EstadoEntrega == "Fallido" && !string.IsNullOrWhiteSpace(p.MotivoFallo))
+                                        {
+                                            <br /><small class="djj-logistics-danger">@p.MotivoFallo</small>
+                                        }
+                                    </td>
+                                    <td class="djj-logistics-center">@p.TotalEvidencias</td>
+                                    @if (esPlanificada)
+                                    {
+                                        <td class="djj-logistics-center">
+                                            <form asp-action="RemoveOrder" method="post" class="djj-inline-action"
+                                                  data-djj-confirm="¿Quitar el pedido de la ruta?">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="rutaId" value="@c.RutaId" />
+                                                <input type="hidden" name="pedidoId" value="@p.PedidoId" />
+                                                <button type="submit" class="djj-button djj-button--danger-outline" aria-label="Quitar pedido @p.PedidoId">Quitar</button>
+                                            </form>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            @if (esPlanificada)
+            {
+                <div class="djj-card">
+                    <div class="djj-logistics-pad djj-logistics-divider"><h2>Agregar pedido a la ruta</h2></div>
+                    <div class="djj-logistics-pad">
+                        @if (!Model.PedidosDisponibles.Any())
+                        {
+                            <p class="djj-text-secondary">No hay más pedidos por asignar.</p>
+                        }
+                        else
+                        {
+                            <form asp-action="AddOrder" method="post" class="djj-logistics-filter">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="rutaId" value="@c.RutaId" />
+                                <label for="add-order">Pedido disponible</label><select id="add-order" name="pedidoId" class="djj-input">
+                                    @foreach (var d in Model.PedidosDisponibles)
+                                    {
+                                        <option value="@d.PedidoId">#@d.PedidoId - @d.Cliente (@d.DireccionEntrega)</option>
+                                    }
+                                </select>
+                                <button type="submit" class="djj-button djj-button--outline">Agregar</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+
+                @if (Model.Pedidos.Any())
+                {
+                    <div class="djj-card">
+                        <div class="djj-logistics-pad djj-logistics-divider">
+                            <h2>Orden manual y ubicación en mapa (CU-251)</h2>
+                            <small class="djj-text-secondary">Pulse <strong>Ubicar</strong> en una parada y haga clic en el mapa para fijar su coordenada (o arrastre el pin). Guarde antes de despachar. La ubicación se recuerda para ese cliente.</small>
+                        </div>
+                        <div class="djj-logistics-pad">
+                            <p id="route-map-status" role="status">El mapa es opcional. Podés ingresar coordenadas y orden en la tabla.</p><div id="routePickerMap" aria-label="Mapa de paradas"></div>
+                            <form asp-action="SaveSequence" method="post" id="seqForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="rutaId" value="@c.RutaId" />
+                                <div class="djj-table-wrap" tabindex="0" aria-label="Orden y coordenadas desplazables"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">RoutesAdmin/Detail · registros operativos</caption>
+                                    <thead>
+                                        <tr><th scope="col">Orden</th><th scope="col"># Pedido</th><th scope="col">Latitud</th><th scope="col">Longitud</th><th scope="col">Ubicación</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var p in Model.Pedidos)
+                                        {
+                                            <tr class="seq-row" data-rutapedidoid="@p.RutaPedidoId" data-label="#@p.PedidoId @p.Cliente">
+                                                <td>
+                                                    <input type="hidden" name="rutaPedidoId" value="@p.RutaPedidoId" />
+                                                    <input type="number" aria-label="Orden del pedido @p.PedidoId" name="secuencia" value="@p.Secuencia" class="djj-input seq-input" min="1" />
+                                                </td>
+                                                <td class="djj-logistics-strong">#@p.PedidoId<br /><small class="djj-text-secondary">@p.Cliente</small></td>
+                                                <td><input type="number" step="0.000001" aria-label="Latitud del pedido @p.PedidoId" min="-90" max="90" name="lat" value="@(p.Latitud?.ToString(System.Globalization.CultureInfo.InvariantCulture))" class="djj-input lat-input" placeholder="9.93" /></td>
+                                                <td><input type="number" step="0.000001" aria-label="Longitud del pedido @p.PedidoId" min="-180" max="180" name="lng" value="@(p.Longitud?.ToString(System.Globalization.CultureInfo.InvariantCulture))" class="djj-input lng-input" placeholder="-84.08" /></td>
+                                                <td class="djj-logistics-center">
+                                                    <button type="button" class="djj-button djj-button--outline btn-locate" aria-label="Ubicar pedido @p.PedidoId en el mapa" aria-pressed="false">Ubicar</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table></div>
+                                <button type="submit" class="djj-button djj-button--outline">Guardar orden y ubicaciones</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/stage2/logistics-ui.js" asp-append-version="true"></script>
+    @if (esPlanificada && Model.Pedidos.Any()) {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="~/js/stage2/route-admin-map.js" asp-append-version="true"></script>
+    }
+}

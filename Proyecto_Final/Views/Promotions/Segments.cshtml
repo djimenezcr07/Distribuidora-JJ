@@ -1,0 +1,17 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.ClientSegmentViewModel>
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Segmentos de cliente"; var buscar = ViewBag.Buscar as string; var clients = Model.ToList(); }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Comercial · Segmentación</span><h1>Segmentos de cliente</h1><p>Asigná cada cliente a Minorista o Mayorista para dirigir las promociones.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Volver a promociones</a></header>
+<partial name="_PromotionNavigation" />
+<section class="djj-card djj-filter-card" aria-labelledby="segment-filters"><h2 id="segment-filters">Buscar clientes</h2><form asp-action="Segments" method="get" class="djj-filter-bar"><div class="djj-field"><label for="segment-search">Nombre o correo</label><input id="segment-search" type="search" name="buscar" value="@buscar" class="djj-input" /></div><div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--neutral">Buscar</button><a asp-action="Segments" class="djj-button djj-button--ghost">Limpiar</a></div></form></section>
+<section class="djj-card djj-data-section" aria-labelledby="segment-list"><header><div><h2 id="segment-list">Asignaciones de clientes</h2><p>@clients.Count cliente(s). Cambiar el segmento afecta las promociones que pueden recibir.</p></div></header>
+    @if (clients.Count == 0) { <div class="djj-empty-state"><h3>Sin clientes para mostrar</h3><p>@(string.IsNullOrWhiteSpace(buscar) ? "No hay clientes registrados." : "Probá con otro nombre o correo.")</p></div> }
+    else {
+        <div class="djj-table-wrap" tabindex="0" role="region" aria-labelledby="segment-list"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">Clientes, correo, segmento actual y cambio de asignación</caption><thead><tr><th scope="col">Cliente</th><th scope="col">Correo</th><th scope="col">Segmento actual</th><th scope="col">Cambiar a</th></tr></thead><tbody>
+            @foreach (var c in clients) { var destino = c.SegmentoCliente == "Mayorista" ? "Minorista" : "Mayorista";
+                <tr><td><strong class="djj-table__primary">@c.NombreCompleto</strong></td><td>@c.Correo</td><td><span class="djj-badge djj-badge--info">@c.SegmentoCliente</span></td><td><div class="djj-row-actions"><form asp-action="SetSegment" method="post" data-djj-confirm="¿Cambiar a @c.NombreCompleto del segmento @c.SegmentoCliente a @destino?">
+                    @Html.AntiForgeryToken()<input type="hidden" name="usuarioId" value="@c.UsuarioId" /><input type="hidden" name="segmento" value="@destino" /><button type="submit" class="djj-button djj-button--outline djj-button--sm" aria-label="Asignar @c.NombreCompleto a @destino">@destino</button>
+                </form></div></td></tr>
+            }
+        </tbody></table></div>
+    }
+</section>

@@ -1,0 +1,28 @@
+@model Proyecto_Final.Models.Admin.RolePermissionAssignmentViewModel
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Permisos del rol";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canAssign = admin || await PermissionService.HasCodePermissionAsync(role, "PERMISOS_ASIGNAR");
+    var esAdministrador = Model.EsAdministrador;
+    var readOnly = esAdministrador || !canAssign;
+}
+<section class="djj-security"><partial name="_SecurityNavigation" />
+
+<header class="djj-page-header"><div class="djj-page-header__copy"><h1>Permisos del rol: @Model.RolNombre</h1><p>@Model.RolDescripcion</p></div><a asp-action="Index" class="djj-button djj-button--secondary">Volver a permisos</a></header>
+<dl class="djj-security-facts"><div><dt>Permisos asignados</dt><dd>@Model.TotalAsignados / @Model.TotalPermisos</dd></div><div><dt>Estado del rol</dt><dd><span class="djj-badge djj-badge--@(Model.RolActivo ? "success" : "neutral")">@(Model.RolActivo ? "Activo" : "Inactivo")</span></dd></div><div><dt>Identificador</dt><dd>#@Model.PerfilId</dd></div></dl>
+@if (esAdministrador) { <p class="djj-alert djj-alert--info" role="status">Los permisos del Administrador se muestran para consulta; el contrato existente impide modificarlos desde esta pantalla.</p> }
+else if (!canAssign) { <p class="djj-alert djj-alert--info" role="status">Consulta de capacidades. Tu perfil no permite guardar asignaciones.</p> }
+<form asp-controller="Permissions" asp-action="Edit" method="post" class="djj-security-permissions">@Html.AntiForgeryToken()<input type="hidden" name="perfilId" value="@Model.PerfilId" />
+@if (!Model.Modulos.Any()) { <p class="djj-empty-state">No hay capacidades disponibles en el catálogo de este rol.</p> }
+@foreach (var grupo in Model.Modulos) {
+<fieldset class="djj-security-fieldset djj-card"><legend>@grupo.Modulo</legend>
+@foreach (var permiso in grupo.Permisos) {
+<div class="djj-permission-row"><div><label for="permiso_@permiso.PermisoId" class="djj-choice"><input type="checkbox" class="djj-checkbox" id="permiso_@permiso.PermisoId" name="permisosSeleccionados" value="@permiso.PermisoId" checked="@permiso.Asignado" disabled="@readOnly" aria-describedby="permiso_desc_@permiso.PermisoId" />@permiso.Nombre</label><p id="permiso_desc_@permiso.PermisoId">@permiso.Descripcion</p><code>@permiso.Codigo</code></div><span class="djj-badge djj-badge--@(permiso.Activo ? "success" : "neutral")">@(permiso.Activo ? "Activo" : "Inactivo")</span></div>
+}
+</fieldset>
+}
+<p class="djj-field__hint">Revisá las capacidades seleccionadas antes de guardar. Los cambios de asignación siguen el contrato de auditoría existente.</p><div class="djj-row-actions">@if (!readOnly) { <button type="submit" class="djj-button djj-button--primary">Guardar permisos</button> }<a asp-action="Index" class="djj-button djj-button--secondary">Cancelar</a></div></form></section>

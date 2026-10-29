@@ -1,0 +1,48 @@
+@model Proyecto_Final.Models.Admin.MetaProgresoViewModel
+@using System.Globalization
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Mi meta de ventas";
+    var period = new DateTime(Model.Anio, Model.Mes, 1).ToString("MMMM yyyy", CultureInfo.GetCultureInfo("es-CR"));
+}
+<div class="djj-analytics">
+<header class="djj-page-header">
+<div>
+<h1>Mi meta de ventas</h1>
+<p>Tu avance personal de @period.</p>
+</div>
+<span class="djj-badge djj-badge--info">Vista personal</span>
+</header>
+@if (Model.SinMetaDefinida) {
+<section class="djj-card djj-empty-state">
+<h2>Sin meta asignada</h2>
+<p>Todavía no tenés una meta para este mes. Consultá con tu gerente de ventas.</p>
+</section>
+} else {
+<section class="djj-card djj-goal-summary" aria-labelledby="goal-progress-title">
+<h2 id="goal-progress-title">Cumplimiento del mes</h2>
+<p>
+<strong class="djj-money djj-money--dominant">@Model.PorcentajeCumplimiento.ToString("0.##")%</strong> <span class="djj-badge @(Model.PorcentajeCumplimiento >= 100 ? "djj-badge--success" : "djj-badge--info")">@(Model.PorcentajeCumplimiento >= 100 ? "Meta alcanzada" : "Meta en curso")</span>
+</p>
+<progress class="djj-progress" max="100" value="@Math.Clamp(Model.PorcentajeBarra, 0m, 100m).ToString(CultureInfo.InvariantCulture)" aria-label="Cumplimiento de mi meta">@Model.PorcentajeCumplimiento.ToString("N1")%</progress>
+<p>Ventas reales frente a la meta mensual. La barra llega hasta 100%; el porcentaje muestra el avance completo.</p>
+</section>
+}
+<section class="djj-analytics-kpis" aria-label="Mi resultado mensual">
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Vendido</p>
+<p class="djj-kpi-card__value">₡@Model.VentasReales.ToString("N2")</p>
+<small>Ventas facturadas · @period</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Meta mensual</p>
+<p class="djj-kpi-card__value">@(Model.SinMetaDefinida ? "Sin asignar" : "₡" + Model.MontoMeta.ToString("N2"))</p>
+<small>Meta personal del mes</small>
+</article>
+<article class="djj-kpi-card">
+<p class="djj-kpi-card__label">Pendiente para la meta</p>
+<p class="djj-kpi-card__value">@(Model.SinMetaDefinida ? "—" : "₡" + Model.MontoPendiente.ToString("N2"))</p>
+<small>@(Model.SinMetaDefinida ? "Requiere una meta asignada" : "Monto restante para alcanzar el objetivo")</small>
+</article>
+</section>
+</div>

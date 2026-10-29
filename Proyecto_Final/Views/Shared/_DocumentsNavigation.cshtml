@@ -1,0 +1,12 @@
+@using Microsoft.AspNetCore.Http
+@{
+    var canView = ViewData["DocumentOwnerScope"] is true;
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+@if (canView)
+{
+    <nav class="djj-domain-nav" aria-label="Gestión documental">
+        <a asp-controller="Documents" asp-action="Index" aria-current="@(action == "Index" ? "page" : null)">Documentos</a>
+        <a asp-controller="Documents" asp-action="Alerts" aria-current="@(action == "Alerts" ? "page" : null)">Alertas de vencimiento</a>
+    </nav>
+}

@@ -1,0 +1,35 @@
+@model Proyecto_Final.Models.Store.StoreProductViewModel
+@{
+    Layout = "_StorefrontLayout";
+    ViewData["Title"] = Model.Nombre;
+    var imagen = string.IsNullOrWhiteSpace(Model.ImagenUrl) ? Url.Content("~/img/product-placeholder.svg") : Url.Content(Model.ImagenUrl);
+    var stockTone = Model.Stock <= 0 ? "danger" : Model.Stock <= 5 ? "warning" : "success";
+    var requestedReturnUrl = Context.Request.Query["returnUrl"].ToString();
+    var returnUrl = Url.IsLocalUrl(requestedReturnUrl) ? requestedReturnUrl : Url.Action("Shop", "Home", new { categoria = Model.Categoria });
+}
+
+<main class="djj-container djj-store-page">
+    <nav class="djj-store-page__breadcrumb" aria-label="Migas de pan"><ol class="djj-breadcrumb"><li><a asp-controller="Home" asp-action="Index">Inicio</a></li><li aria-hidden="true"><svg class="djj-icon djj-icon--sm"><use href="#djj-icon-caret-right"></use></svg></li><li><a href="@returnUrl">Catálogo</a></li><li aria-hidden="true"><svg class="djj-icon djj-icon--sm"><use href="#djj-icon-caret-right"></use></svg></li><li aria-current="page">@Model.Nombre</li></ol></nav>
+    <article class="djj-product-detail">
+        <div class="djj-product-detail__media"><span class="djj-status-badge djj-status-badge--neutral"><svg class="djj-icon djj-icon--sm" aria-hidden="true"><use href="#djj-icon-tag"></use></svg>@Model.Categoria</span><img data-djj-product-image src="@imagen" alt="@Model.Nombre" width="640" height="640" /></div>
+        <div class="djj-product-detail__content">
+            <header><span class="djj-page-header__eyebrow">Producto del catálogo</span><h1>@Model.Nombre</h1></header>
+            <strong class="djj-product-detail__price">₡@Model.Precio.ToString("N0")</strong>
+            <p class="djj-product-detail__description">@(string.IsNullOrWhiteSpace(Model.Descripcion) ? "Producto disponible en el catálogo activo." : Model.Descripcion)</p>
+            <dl class="djj-product-detail__facts"><div><dt>Estado</dt><dd><span class="djj-status-badge djj-status-badge--@stockTone">@Model.EstadoStock</span></dd></div><div><dt>Inventario</dt><dd>@Model.Stock unidad(es)</dd></div></dl>
+            @if (Model.Stock > 0)
+            {
+                <form asp-controller="Cart" asp-action="Add" method="post" class="djj-product-purchase">
+                    @Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@Model.ProductoId" />
+                    <div class="djj-field"><label class="djj-field__label" for="productQuantity">Cantidad</label><input class="djj-input djj-product-purchase__quantity" id="productQuantity" type="number" name="cantidad" value="1" min="1" max="@Model.Stock" inputmode="numeric" /></div>
+                    <button class="djj-button djj-button--primary" type="submit"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-cart"></use></svg>Agregar al carrito</button>
+                </form>
+            }
+            else
+            {
+                <div class="djj-alert djj-alert--warning" role="status"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-warning"></use></svg><div><strong>Producto agotado</strong><p>Este producto no tiene unidades disponibles en este momento.</p></div></div>
+            }
+            <a class="djj-button djj-button--ghost djj-button--inline-mobile" href="@returnUrl"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-store"></use></svg>Volver al catálogo</a>
+        </div>
+    </article>
+</main>

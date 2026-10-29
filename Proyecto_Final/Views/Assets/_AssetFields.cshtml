@@ -1,0 +1,36 @@
+@model Proyecto_Final.Models.Admin.AssetFormViewModel
+<fieldset class="djj-assets-fieldset">
+    <legend>Identificación del equipo</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field">
+            <label asp-for="CodigoActivo">Código de activo (placa)</label>
+            <input asp-for="CodigoActivo" class="djj-input" placeholder="Ej: ACT-0001" />
+            <span asp-validation-for="CodigoActivo" class="djj-assets-error"></span>
+        </div>
+        <div class="djj-field">
+            <label asp-for="Nombre">Nombre</label>
+            <input asp-for="Nombre" class="djj-input" placeholder="Ej: Nevera exhibidora 2 puertas" />
+            <span asp-validation-for="Nombre" class="djj-assets-error"></span>
+        </div>
+    </div>
+</fieldset>
+<fieldset class="djj-assets-fieldset">
+    <legend>Clasificación y descripción</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field">
+            <label asp-for="Tipo">Tipo</label>
+            <select asp-for="Tipo" class="djj-select">
+                @if (!new[] { "Nevera", "Exhibidor", "Otro" }.Contains(Model.Tipo) && !string.IsNullOrWhiteSpace(Model.Tipo))
+                { <option value="@Model.Tipo">@Model.Tipo</option> }
+                <option value="Nevera">Nevera</option><option value="Exhibidor">Exhibidor</option><option value="Otro">Otro</option>
+            </select>
+            <span asp-validation-for="Tipo" class="djj-assets-error"></span>
+        </div>
+        <div class="djj-field">
+            <label asp-for="Descripcion">Descripción</label>
+            <textarea asp-for="Descripcion" class="djj-textarea" rows="3"></textarea>
+            <span asp-validation-for="Descripcion" class="djj-assets-error"></span>
+        </div>
+    </div>
+</fieldset>
+<p class="djj-alert djj-alert--info">El estado del equipo y el cliente que lo recibe se administran mediante asignación y devolución en Comodatos.</p>

@@ -1,0 +1,38 @@
+/* =========================================================
+   Brand system - Distribuidora JJ
+   Visual-only variables and aliases for the shared UI.
+   ========================================================= */
+
+:root {
+    --brand-red-primary: #8B0E16;
+    --brand-red-secondary: #C41E26;
+    --brand-gold-primary: #D4AF37;
+    --brand-gold-light: #F2D77A;
+    --brand-black: #1F1F1F;
+    --brand-white: #FFFFFF;
+
+    --brand-red-primary-rgb: 139, 14, 22;
+    --brand-red-secondary-rgb: 196, 30, 38;
+    --brand-gold-primary-rgb: 212, 175, 55;
+    --brand-black-rgb: 31, 31, 31;
+
+    --brand-surface: #FAFAFA;
+    --brand-border: rgba(var(--brand-black-rgb), .12);
+    --brand-shadow: 0 16px 38px rgba(var(--brand-black-rgb), .12);
+    --brand-focus-ring: 0 0 0 .2rem rgba(var(--brand-gold-primary-rgb), .34);
+
+    --theme-gold: var(--brand-gold-primary);
+    --theme-gold-dark: #B78F24;
+    --theme-dark: var(--brand-black);
+    --theme-soft-dark: #2A2021;
+
+    --ui-gold: var(--brand-gold-primary);
+    --ui-gold-2: var(--brand-gold-light);
+    --ui-gold-dark: #A77F1D;
+    --ui-black: #151515;
+    --ui-black-2: var(--brand-black);
+
+    --s3-gold: var(--brand-gold-primary);
+    --s3-gold-light: var(--brand-gold-light);
+    --s3-black: #151515;
+}

@@ -1,0 +1,467 @@
+@model Proyecto_Final.Models.Admin.SellerOrderCreateViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Venta móvil"; }
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Ventas · Pedidos del vendedor</span><h1>Venta móvil</h1><p>Seleccioná un cliente y las cantidades del pedido. El servidor valida precios, disponibilidad y autorización al registrar.</p></div><a asp-action="MyOrders" class="djj-button djj-button--ghost">Mis pedidos</a></header>
+<section class="djj-card djj-form-card djj-order-offline" aria-labelledby="offline-title">
+    <div class="djj-order-queue-row"><div><span id="connectionStatus" class="djj-badge djj-order-connection" role="status"><span id="connectionStatusText">En línea</span></span><h2 id="offline-title">Pedidos sin conexión</h2><p>Los pedidos se guardan en este navegador por hasta 24 horas para el usuario actual. Al recuperar conexión, la cola intenta sincronizarse automáticamente.</p></div><div class="djj-row-actions"><span class="djj-badge djj-badge--warning" role="status" aria-live="polite" aria-atomic="true">Pendientes: <span id="pendingOrdersCount">0</span></span><button type="button" id="togglePendingOrders" class="djj-button djj-button--ghost" aria-controls="pendingOrdersPanel" aria-expanded="false">Ver pendientes</button><button type="button" id="syncPendingOrders" class="djj-button djj-button--neutral">Sincronizar ahora</button></div></div>
+</section>
+<div id="sellerOfflineMessage" class="djj-alert" role="alert" hidden></div>
+<section id="pendingOrdersPanel" class="djj-card djj-form-card" aria-labelledby="pending-title" hidden><div class="djj-order-queue-row"><div><h2 id="pending-title">Guardados en este navegador</h2><p>Los pedidos con error se pueden reintentar cuando haya conexión.</p></div><button type="button" id="clearSyncedOrders" class="djj-button djj-button--ghost djj-button--sm">Limpiar sincronizados</button></div><div id="pendingOrdersList"></div></section>
+<form asp-controller="SellerOrders" asp-action="Create" method="post" id="sellerOrderForm" class="djj-order-create">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="djj-validation-summary" data-djj-validation-summary role="alert" tabindex="-1"></div>
+    <div class="djj-order-create-grid">
+        <div class="djj-order-sections">
+            <section class="djj-card djj-form-card" aria-labelledby="order-client-title"><h2 id="order-client-title">Cliente y entrega</h2><div class="djj-form-grid">
+                <div class="djj-field"><label asp-for="ClienteUsuarioId"></label><select asp-for="ClienteUsuarioId" class="djj-select" aria-describedby="client-error"><option value="0">Seleccione un cliente...</option>@foreach (var cliente in Model.Clientes) { <option value="@cliente.UsuarioId" data-address="@cliente.Direccion">@cliente.DisplayText</option> }</select><span id="client-error" asp-validation-for="ClienteUsuarioId" class="djj-field-error"></span></div>
+                <div class="djj-field"><label asp-for="IdentificacionCliente"></label><input asp-for="IdentificacionCliente" class="djj-input" placeholder="Cédula física o jurídica" aria-describedby="identification-error" /><span id="identification-error" asp-validation-for="IdentificacionCliente" class="djj-field-error"></span></div>
+                <div class="djj-field"><label asp-for="TipoEntrega"></label><select asp-for="TipoEntrega" class="djj-select" aria-describedby="delivery-error"><option>Entrega por vendedor</option><option>Retiro en local</option><option>Envío a domicilio</option></select><span id="delivery-error" asp-validation-for="TipoEntrega" class="djj-field-error"></span></div>
+                <div class="djj-field"><label asp-for="DireccionEntrega"></label><textarea asp-for="DireccionEntrega" class="djj-textarea" rows="4" placeholder="Dirección, señas o punto de entrega" aria-describedby="address-error"></textarea><span id="address-error" asp-validation-for="DireccionEntrega" class="djj-field-error"></span></div>
+            </div></section>
+            <section class="djj-card djj-form-card" aria-labelledby="order-notes-title"><h2 id="order-notes-title">Observaciones</h2><div class="djj-field"><label asp-for="Observaciones">Notas para despacho o facturación <span>(opcional)</span></label><textarea asp-for="Observaciones" class="djj-textarea" rows="3" aria-describedby="notes-error"></textarea><span id="notes-error" asp-validation-for="Observaciones" class="djj-field-error"></span></div></section>
+        </div>
+        <section class="djj-order-sections" aria-labelledby="products-title">
+            <div class="djj-card djj-form-card"><h2 id="products-title">Productos disponibles</h2><p>Solo se registran productos con cantidad mayor a cero. La disponibilidad se vuelve a validar al procesar el pedido.</p><div class="djj-field"><label for="productSearch">Buscar producto o categoría</label><input type="search" id="productSearch" class="djj-input" /></div><span asp-validation-for="Productos" class="djj-field-error"></span></div>
+            <div class="djj-order-products" id="productsGrid">
+                @for (var i = 0; i < Model.Productos.Count; i++)
+                {
+                    <article class="djj-card djj-order-product seller-product-item" data-product-id="@Model.Productos[i].ProductoId" data-name="@Model.Productos[i].Nombre.ToLower()" data-category="@Model.Productos[i].Categoria.ToLower()" data-display-name="@Model.Productos[i].Nombre" data-display-category="@Model.Productos[i].Categoria" data-price="@Model.Productos[i].Precio.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@Model.Productos[i].Stock">
+                        <input type="hidden" asp-for="Productos[i].ProductoId" /><input type="hidden" asp-for="Productos[i].Nombre" /><input type="hidden" asp-for="Productos[i].Categoria" /><input type="hidden" asp-for="Productos[i].Precio" /><input type="hidden" asp-for="Productos[i].Stock" />
+                        <h3>@Model.Productos[i].Nombre</h3><p>@Model.Productos[i].Categoria</p><div class="djj-order-product-price"><strong class="djj-order-money">₡@Model.Productos[i].Precio.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-CR"))</strong><span class="djj-badge">Stock: @Model.Productos[i].Stock</span></div>
+                        <div class="djj-field"><label asp-for="Productos[i].Cantidad">Cantidad de @Model.Productos[i].Nombre</label><input asp-for="Productos[i].Cantidad" type="number" min="0" max="@Model.Productos[i].Stock" class="djj-input seller-quantity" aria-describedby="quantity-error-@i" data-price="@Model.Productos[i].Precio.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-stock="@Model.Productos[i].Stock" /><span id="quantity-error-@i" asp-validation-for="Productos[i].Cantidad" class="djj-field-error"></span></div>
+                    </article>
+                }
+                @if (!Model.Productos.Any()) { <div class="djj-card djj-empty-state"><h3>Sin productos disponibles</h3><p>No hay productos para agregar a este pedido.</p></div> }
+            </div>
+        </section>
+    </div>
+    <section class="djj-card djj-form-card" aria-labelledby="order-total-title"><div class="djj-order-queue-row"><div><h2 id="order-total-title">Resumen económico</h2><p><span id="selectedItems">@Model.Productos.Count(p => p.Cantidad > 0)</span> producto(s) · <span id="selectedUnits">@Model.TotalItems</span> unidad(es)</p><p>Total estimado: <strong id="selectedTotal" class="djj-order-money djj-money--dominant">₡@Model.Total.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("es-CR"))</strong></p><p class="djj-table__note">Estimación de la selección actual. El total definitivo y la retención para revisión se determinan en el servidor.</p></div><div class="djj-row-actions"><button type="button" id="saveOfflineOrder" class="djj-button djj-button--ghost">Guardar sin conexión</button><button type="submit" class="djj-button djj-button--primary">Registrar pedido</button></div></div></section>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const search = document.getElementById('productSearch');
+            const items = Array.from(document.querySelectorAll('.seller-product-item'));
+            const quantities = Array.from(document.querySelectorAll('.seller-quantity'));
+            const selectedItems = document.getElementById('selectedItems');
+            const selectedUnits = document.getElementById('selectedUnits');
+            const selectedTotal = document.getElementById('selectedTotal');
+            const clientSelect = document.getElementById('ClienteUsuarioId');
+            const address = document.getElementById('DireccionEntrega');
+            const form = document.getElementById('sellerOrderForm');
+            const saveOfflineButton = document.getElementById('saveOfflineOrder');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const connectionStatusText = document.getElementById('connectionStatusText');
+            const pendingOrdersCount = document.getElementById('pendingOrdersCount');
+            const togglePendingOrders = document.getElementById('togglePendingOrders');
+            const syncPendingOrdersButton = document.getElementById('syncPendingOrders');
+            const clearSyncedOrdersButton = document.getElementById('clearSyncedOrders');
+            const pendingOrdersPanel = document.getElementById('pendingOrdersPanel');
+            const pendingOrdersList = document.getElementById('pendingOrdersList');
+            const offlineMessage = document.getElementById('sellerOfflineMessage');
+            const storageScope = 'seller-offline-orders-v2';
+            const storageTtlMs = 24 * 60 * 60 * 1000;
+            const offlineStorage = window.DistribuidoraJJOfflineStorage;
+            const syncUrl = '@Url.Action("SyncOffline", "SellerOrders")';
+            let isSyncing = false;
+            function formatCurrency(value) {
+                return '₡' + value.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function escapeHtml(value) {
+                return String(value || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function createGuid() {
+                if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+                    return window.crypto.randomUUID();
+                }
+
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (char) {
+                    const random = Math.random() * 16 | 0;
+                    const value = char === 'x' ? random : (random & 0x3 | 0x8);
+                    return value.toString(16);
+                });
+            }
+
+            function getToken() {
+                const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+                return tokenInput ? tokenInput.value : '';
+            }
+
+            function showMessage(type, message) {
+                offlineMessage.className = 'djj-alert djj-alert--' + type;
+                offlineMessage.hidden = false;
+                offlineMessage.textContent = message;
+
+            }
+
+            function hideMessage() {
+                offlineMessage.hidden = true;
+                offlineMessage.textContent = '';
+            }
+
+            function loadOrders() {
+                const orders = offlineStorage ? offlineStorage.read(storageScope) : null;
+                return Array.isArray(orders) ? orders : [];
+            }
+
+            function saveOrders(orders) {
+                if (!offlineStorage) {
+                    showMessage('danger', 'El almacenamiento seguro sin conexión no está disponible.');
+                    return;
+                }
+                offlineStorage.write(storageScope, orders, storageTtlMs);
+                renderPendingOrders();
+            }
+
+            function updateConnectionStatus() {
+                const online = navigator.onLine;
+                connectionStatus.classList.toggle('is-offline', !online);
+                connectionStatusText.textContent = online ? 'En línea' : 'Sin conexión';
+                saveOfflineButton.classList.toggle('djj-button--neutral', !online);
+                saveOfflineButton.classList.toggle('djj-button--ghost', online);
+
+                if (!online) {
+                    showMessage('warning', 'Sin conexión. El pedido se guardará localmente y se sincronizará cuando vuelva internet.');
+                }
+            }
+
+            function updateSummary() {
+                let productCount = 0;
+                let unitCount = 0;
+                let total = 0;
+
+                quantities.forEach(input => {
+                    const qty = parseInt(input.value || '0', 10);
+                    const price = parseFloat(input.dataset.price || '0');
+                    if (qty > 0) {
+                        productCount += 1;
+                        unitCount += qty;
+                        total += qty * price;
+                    }
+                });
+
+                selectedItems.textContent = productCount;
+                selectedUnits.textContent = unitCount;
+                selectedTotal.textContent = formatCurrency(total);
+            }
+
+            function filterProducts() {
+                const term = (search.value || '').trim().toLowerCase();
+                items.forEach(item => {
+                    const match = !term || item.dataset.name.includes(term) || item.dataset.category.includes(term);
+                    item.style.display = match ? '' : 'none';
+                });
+            }
+
+            function buildOrderFromForm() {
+                const clienteUsuarioId = parseInt(clientSelect.value || '0', 10);
+                const tipoEntrega = (document.getElementById('TipoEntrega').value || '').trim();
+                const direccionEntrega = (document.getElementById('DireccionEntrega').value || '').trim();
+                const identificacionCliente = (document.getElementById('IdentificacionCliente').value || '').trim();
+                const observaciones = (document.getElementById('Observaciones').value || '').trim();
+                const productos = [];
+                const errors = [];
+                let totalItems = 0;
+
+                if (clienteUsuarioId <= 0) {
+                    errors.push('Debe seleccionar un cliente.');
+                }
+
+                if (!tipoEntrega) {
+                    errors.push('Debe seleccionar el tipo de entrega.');
+                }
+
+                if (!direccionEntrega) {
+                    errors.push('Debe indicar la dirección de entrega.');
+                }
+
+                quantities.forEach(input => {
+                    const qty = parseInt(input.value || '0', 10);
+                    if (qty <= 0) {
+                        return;
+                    }
+
+                    const item = input.closest('.seller-product-item');
+                    const stock = parseInt(item.dataset.stock || '0', 10);
+                    if (qty > stock) {
+                        errors.push('La cantidad de ' + item.dataset.displayName + ' supera el stock disponible.');
+                    }
+
+                    productos.push({
+                        productoId: parseInt(item.dataset.productId || '0', 10),
+                        cantidad: qty
+                    });
+
+                    totalItems += qty;
+                });
+
+                if (productos.length === 0) {
+                    errors.push('Debe seleccionar al menos un producto.');
+                }
+
+                return {
+                    isValid: errors.length === 0,
+                    errors: errors,
+                    order: {
+                        pedidoOfflineGuid: createGuid(),
+                        clienteUsuarioId: clienteUsuarioId,
+                        tipoEntrega: tipoEntrega,
+                        direccionEntrega: direccionEntrega,
+                        identificacionCliente: identificacionCliente,
+                        observaciones: observaciones,
+                        productos: productos,
+                        totalItems: totalItems,
+                        estadoOffline: 'Pendiente',
+                        mensajeError: '',
+                        pedidoId: null,
+                        redirectUrl: '',
+                        creadoEn: new Date().toISOString(),
+                        actualizadoEn: new Date().toISOString()
+                    }
+                };
+            }
+
+            function clearCurrentOrderForm() {
+                form.reset();
+                quantities.forEach(input => input.value = '0');
+                updateSummary();
+            }
+
+            function saveCurrentOrderOffline() {
+                const result = buildOrderFromForm();
+
+                if (!result.isValid) {
+                    showMessage('danger', result.errors[0]);
+                    return false;
+                }
+
+                const orders = loadOrders();
+                orders.push(result.order);
+                saveOrders(orders);
+                clearCurrentOrderForm();
+                pendingOrdersPanel.hidden = false;
+                togglePendingOrders.setAttribute('aria-expanded', 'true');
+                showMessage('success', 'Pedido guardado sin conexión. Quedó pendiente para sincronizar.');
+                return true;
+            }
+
+            function getStatusBadgeClass(status) {
+                switch (status) {
+                    case 'Sincronizado': return 'djj-badge--success';
+                    case 'Sincronizando': return 'djj-badge--info';
+                    case 'Error': return 'djj-badge--danger';
+                    default: return 'djj-badge--warning';
+                }
+            }
+
+            function renderPendingOrders() {
+                const orders = loadOrders();
+                const pendingCount = orders.filter(order => order.estadoOffline !== 'Sincronizado').length;
+                pendingOrdersCount.textContent = pendingCount;
+
+                if (orders.length === 0) {
+                    pendingOrdersList.innerHTML = '<div class="djj-table__note">No hay pedidos offline guardados en este navegador.</div>';
+                    return;
+                }
+
+                pendingOrdersList.innerHTML = orders.map(order => {
+                    const productsText = order.productos.map(product => '#' + product.productoId + ' x' + product.cantidad).join(', ');
+                    const createdAt = new Date(order.creadoEn).toLocaleString('es-CR');
+                    const status = order.estadoOffline || 'Pendiente';
+                    const badgeClass = getStatusBadgeClass(status);
+                    const errorHtml = order.mensajeError ? '<small class="djj-field-error">' + escapeHtml(order.mensajeError) + '</small>' : '';
+                    const detailLink = order.redirectUrl
+                        ? '<a class="djj-button djj-button--ghost djj-button--sm" href="' + escapeHtml(order.redirectUrl) + '">Ver pedido</a>'
+                        : '';
+
+                    return '<div class="djj-order-offline-card" data-guid="' + escapeHtml(order.pedidoOfflineGuid) + '">' +
+                        '<div class="djj-order-queue-row">' +
+                            '<div>' +
+                                '<strong>Cliente #' + escapeHtml(order.clienteUsuarioId) + '</strong>' +
+                                '<small class="djj-table__note">Guardado: ' + createdAt + '</small>' +
+                                '<small class="djj-table__note">Productos: ' + productsText + '</small>' +
+                                '<small class="djj-table__note">Unidades: ' + escapeHtml(order.totalItems || 0) + '</small>' +
+                                errorHtml +
+                            '</div>' +
+                            '<div class="djj-order-queue-actions">' +
+                                '<span class="djj-badge ' + badgeClass + '">' + escapeHtml(status) + '</span>' +
+                                '<div class="djj-row-actions">' +
+                                    detailLink +
+                                    '<button type="button" class="djj-button djj-button--danger-outline djj-button--sm" data-remove-offline="' + escapeHtml(order.pedidoOfflineGuid) + '">Eliminar</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            async function syncPendingOrders() {
+                if (isSyncing) {
+                    return;
+                }
+
+                if (!navigator.onLine) {
+                    showMessage('warning', 'No hay conexión. Los pedidos seguirán guardados localmente.');
+                    return;
+                }
+
+                const token = getToken();
+                let orders = loadOrders();
+                const candidates = orders.filter(order => order.estadoOffline !== 'Sincronizado');
+
+                if (candidates.length === 0) {
+                    showMessage('info', 'No hay pedidos pendientes para sincronizar.');
+                    return;
+                }
+
+                isSyncing = true;
+                syncPendingOrdersButton.disabled = true;
+                showMessage('info', 'Sincronizando pedidos pendientes...');
+
+                for (const candidate of candidates) {
+                    orders = loadOrders();
+                    const index = orders.findIndex(order => order.pedidoOfflineGuid === candidate.pedidoOfflineGuid);
+                    if (index < 0) {
+                        continue;
+                    }
+
+                    orders[index].estadoOffline = 'Sincronizando';
+                    orders[index].mensajeError = '';
+                    orders[index].actualizadoEn = new Date().toISOString();
+                    saveOrders(orders);
+
+                    try {
+                        const response = await fetch(syncUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': token
+                            },
+                            body: JSON.stringify({
+                                pedidoOfflineGuid: orders[index].pedidoOfflineGuid,
+                                clienteUsuarioId: orders[index].clienteUsuarioId,
+                                tipoEntrega: orders[index].tipoEntrega,
+                                direccionEntrega: orders[index].direccionEntrega,
+                                identificacionCliente: orders[index].identificacionCliente,
+                                observaciones: orders[index].observaciones,
+                                productos: orders[index].productos.map(product => ({
+                                    productoId: product.productoId,
+                                    cantidad: product.cantidad
+                                }))
+                            })
+                        });
+
+                        const data = await response.json();
+                        const success = data.success === true || data.Success === true;
+                        const message = data.message || data.Message || 'No fue posible sincronizar el pedido.';
+                        const pedidoId = data.pedidoId || data.PedidoId || null;
+                        const redirectUrl = data.redirectUrl || data.RedirectUrl || '';
+
+                        orders = loadOrders();
+                        const currentIndex = orders.findIndex(order => order.pedidoOfflineGuid === candidate.pedidoOfflineGuid);
+                        if (currentIndex < 0) {
+                            continue;
+                        }
+
+                        if (response.ok && success) {
+                            orders[currentIndex].estadoOffline = 'Sincronizado';
+                            orders[currentIndex].pedidoId = pedidoId;
+                            orders[currentIndex].redirectUrl = redirectUrl;
+                            orders[currentIndex].mensajeError = '';
+                        } else {
+                            orders[currentIndex].estadoOffline = 'Error';
+                            orders[currentIndex].mensajeError = message;
+                        }
+
+                        orders[currentIndex].actualizadoEn = new Date().toISOString();
+                        saveOrders(orders);
+                    } catch (error) {
+                        orders = loadOrders();
+                        const currentIndex = orders.findIndex(order => order.pedidoOfflineGuid === candidate.pedidoOfflineGuid);
+                        if (currentIndex >= 0) {
+                            orders[currentIndex].estadoOffline = 'Error';
+                            orders[currentIndex].mensajeError = 'Error de conexión al sincronizar. Intente nuevamente.';
+                            orders[currentIndex].actualizadoEn = new Date().toISOString();
+                            saveOrders(orders);
+                        }
+                    }
+                }
+
+                isSyncing = false;
+                syncPendingOrdersButton.disabled = false;
+
+                const remaining = loadOrders().filter(order => order.estadoOffline !== 'Sincronizado').length;
+                if (remaining === 0) {
+                    showMessage('success', 'Todos los pedidos offline fueron sincronizados correctamente.');
+                } else {
+                    showMessage('warning', 'Algunos pedidos no se pudieron sincronizar. Revise la lista de pendientes.');
+                }
+            }
+
+            quantities.forEach(input => input.addEventListener('input', updateSummary));
+            search.addEventListener('input', filterProducts);
+
+            clientSelect.addEventListener('change', function () {
+                const selected = clientSelect.options[clientSelect.selectedIndex];
+                const savedAddress = selected ? selected.getAttribute('data-address') : '';
+                if (savedAddress && !address.value.trim()) {
+                    address.value = savedAddress;
+                }
+            });
+
+            form.addEventListener('submit', function (event) {
+                if (!navigator.onLine) {
+                    event.preventDefault();
+                    saveCurrentOrderOffline();
+                }
+            });
+
+            saveOfflineButton.addEventListener('click', function () {
+                saveCurrentOrderOffline();
+            });
+
+            togglePendingOrders.addEventListener('click', function () {
+                pendingOrdersPanel.hidden = !pendingOrdersPanel.hidden;
+                togglePendingOrders.setAttribute('aria-expanded', String(!pendingOrdersPanel.hidden));
+            });
+
+            syncPendingOrdersButton.addEventListener('click', syncPendingOrders);
+
+            clearSyncedOrdersButton.addEventListener('click', function () {
+                const orders = loadOrders().filter(order => order.estadoOffline !== 'Sincronizado');
+                saveOrders(orders);
+                showMessage('success', 'Pedidos sincronizados eliminados de la lista local.');
+            });
+
+            pendingOrdersList.addEventListener('click', function (event) {
+                const button = event.target.closest('[data-remove-offline]');
+                if (!button) {
+                    return;
+                }
+
+                const guid = button.getAttribute('data-remove-offline');
+                const orders = loadOrders().filter(order => order.pedidoOfflineGuid !== guid);
+                saveOrders(orders);
+                showMessage('success', 'Pedido offline eliminado de este navegador.');
+            });
+
+            window.addEventListener('online', function () {
+                updateConnectionStatus();
+                syncPendingOrders();
+            });
+
+            window.addEventListener('offline', updateConnectionStatus);
+
+            updateSummary();
+            updateConnectionStatus();
+            renderPendingOrders();
+        })();
+    </script>
+}

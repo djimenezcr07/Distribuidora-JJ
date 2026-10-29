@@ -1,0 +1,43 @@
+@model Proyecto_Final.Models.Admin.DocumentIndexViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Documentos digitales";
+    var canManage = ViewData["DocumentOwnerScope"] is true;
+    var totalActive = Model.CurrentCount + Model.WarningCount + Model.ExpiredCount + Model.NoExpirationCount;
+}
+<div class="djj-documents">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Gestión documental</span><h1>Documentos digitales</h1><p>Tus documentos, su vigencia e historial. La delegación departamental requiere autorización acreditada.</p></div>@if (canManage) { <a asp-action="Create" class="djj-button djj-button--primary">Nuevo documento</a> }</header>
+<partial name="_DocumentsNavigation" />
+<section class="djj-document-kpis" aria-label="Resumen de documentos activos">
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Total activos</p><p class="djj-kpi-card__value">@totalActive</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Vigentes</p><p class="djj-kpi-card__value">@Model.CurrentCount</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Por vencer</p><p class="djj-kpi-card__value">@Model.WarningCount</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Vencidos</p><p class="djj-kpi-card__value">@Model.ExpiredCount</p></div></article>
+    <article class="djj-kpi-card"><div><p class="djj-kpi-card__label">Sin vencimiento</p><p class="djj-kpi-card__value">@Model.NoExpirationCount</p></div></article>
+</section>
+<section class="djj-card djj-filter-card" aria-labelledby="document-filters"><h2 id="document-filters">Buscar documentos</h2>
+<form asp-action="Index" method="get" class="djj-filter-bar">
+    <div class="djj-field"><label for="Search">Título o referencia</label><input id="Search" name="Search" value="@Model.Filter.Search" class="djj-input" type="search" /></div>
+    <div class="djj-field"><label for="TypeId">Tipo</label><select id="TypeId" name="TypeId" class="djj-select"><option value="">Todos los tipos</option>@foreach (var x in Model.Types) { <option value="@x.Id" selected="@(Model.Filter.TypeId == x.Id)">@x.Name</option> }</select></div>
+    <div class="djj-field"><label for="DepartmentId">Departamento</label><select id="DepartmentId" name="DepartmentId" class="djj-select"><option value="">Todos los departamentos</option>@foreach (var x in Model.Departments) { <option value="@x.Id" selected="@(Model.Filter.DepartmentId == x.Id)">@x.Name</option> }</select></div>
+    <div class="djj-field"><label for="Status">Estado</label><select id="Status" name="Status" class="djj-select"><option value="">Todos los estados</option>@foreach (var status in new[] { "Vigente", "Suspendido", "Archivado" }) { <option selected="@(Model.Filter.Status == status)">@status</option> }</select></div>
+    <div class="djj-field"><label for="Expiration">Vencimiento</label><select id="Expiration" name="Expiration" class="djj-select"><option value="">Todo vencimiento</option>@foreach (var expiration in new[] { "Vigente", "Por vencer", "Vencido", "No vence" }) { <option selected="@(Model.Filter.Expiration == expiration)">@expiration</option> }</select></div>
+    <div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--neutral">Filtrar</button><a asp-action="Index" class="djj-button djj-button--ghost">Limpiar</a></div>
+</form></section>
+<section class="djj-card djj-data-section" aria-labelledby="document-list-title"><header><div><h2 id="document-list-title">Repositorio documental</h2><p>@Model.Documents.Total resultado(s).</p></div></header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Documentos: tabla desplazable"><table class="djj-table djj-table--compact djj-document-table"><caption class="djj-sr-only">Documentos para los filtros seleccionados</caption><thead><tr><th scope="col">Documento</th><th scope="col">Tipo / departamento</th><th scope="col">Vigencia</th><th scope="col">Versión / actualización</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead><tbody>
+@if (!Model.Documents.Items.Any()) { <tr><td colspan="6"><div class="djj-empty-state"><h3>Sin documentos para estos filtros</h3><p>Probá otra búsqueda o limpiá los filtros.</p></div></td></tr> }
+@foreach (var item in Model.Documents.Items)
+{
+    <tr><td><strong class="djj-table__primary">@item.Title</strong><small class="djj-table__note">@(item.ReferenceNumber ?? "Sin referencia")</small></td><td>@item.TypeName<small class="djj-table__note">@(item.DepartmentName ?? "General")</small></td>
+    <td><small class="djj-table__note">Emisión: @(item.IssueDate?.ToString("dd/MM/yyyy") ?? "No indicada")</small><span>@(item.DoesNotExpire ? "No vence" : item.ExpirationDate?.ToString("dd/MM/yyyy") ?? "No indicado")</span><small class="djj-table__note"><span class="djj-badge djj-badge--@DocumentPresentation.ExpirationTone(item.ExpirationStatus)">@item.ExpirationStatus</span></small></td>
+    <td>v@(item.Version)<small class="djj-table__note">@item.UpdatedUtc.ToString("dd/MM/yyyy HH:mm") UTC</small></td><td><span class="djj-badge djj-badge--@DocumentPresentation.DocumentTone(item.Active, item.Status)">@(item.Active ? item.Status : "Inactivo")</span></td>
+    <td><div class="djj-row-actions"><a asp-action="Details" asp-route-id="@item.DocumentId" class="djj-button djj-button--ghost djj-button--sm" aria-label="Ver documento @item.Title">Ver</a></div></td></tr>
+}
+</tbody></table></div>
+<nav class="djj-document-pagination" aria-label="Paginación de documentos"><span>Página @Model.Documents.Page de @Model.Documents.TotalPages · @Model.Documents.Total resultado(s)</span><div class="djj-row-actions">
+@if (Model.Documents.Page > 1) { <a asp-action="Index" asp-route-Page="@(Model.Documents.Page-1)" asp-route-PageSize="@Model.Filter.PageSize" asp-route-Search="@Model.Filter.Search" asp-route-TypeId="@Model.Filter.TypeId" asp-route-DepartmentId="@Model.Filter.DepartmentId" asp-route-Status="@Model.Filter.Status" asp-route-Expiration="@Model.Filter.Expiration" class="djj-button djj-button--ghost djj-button--sm">Anterior</a> }
+@if (Model.Documents.Page < Model.Documents.TotalPages) { <a asp-action="Index" asp-route-Page="@(Model.Documents.Page+1)" asp-route-PageSize="@Model.Filter.PageSize" asp-route-Search="@Model.Filter.Search" asp-route-TypeId="@Model.Filter.TypeId" asp-route-DepartmentId="@Model.Filter.DepartmentId" asp-route-Status="@Model.Filter.Status" asp-route-Expiration="@Model.Filter.Expiration" class="djj-button djj-button--ghost djj-button--sm">Siguiente</a> }
+</div></nav></section>
+</div>

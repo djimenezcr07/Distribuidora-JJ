@@ -1,0 +1,31 @@
+@model Proyecto_Final.Models.Admin.ReclamoFormViewModel
+@using Microsoft.AspNetCore.Http
+@using Proyecto_Final.Models.Presentation
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Registrar reclamo";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "RECLAMOS_GESTIONAR");
+}
+<div class="djj-customer-service">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Servicio al cliente</span><h1>Registrar reclamo</h1><p>Documentá la inconformidad del cliente para darle seguimiento.</p></div><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a></header>
+<partial name="_CustomerServiceNavigation" />
+@if (canManage)
+{
+<section class="djj-card djj-form-card"><h2>Datos del reclamo</h2><form asp-action="Create" method="post" data-djj-service-form data-djj-invoices-url="@Url.Action("InvoicesByClient", "Reclamos")">
+@Html.AntiForgeryToken()<div asp-validation-summary="All" class="djj-validation-summary" data-djj-validation-summary tabindex="-1" role="alert"></div>
+@if (Model.PedidoId.HasValue) { <input asp-for="PedidoId" type="hidden" /> }
+<fieldset class="djj-service-fieldset"><legend>Cliente y factura</legend><div class="djj-form-grid">
+<div class="djj-field"><label asp-for="UsuarioId"></label><select asp-for="UsuarioId" id="UsuarioId" class="djj-select"><option value="">— Seleccione un cliente —</option>@foreach (var c in Model.Clientes) { <option value="@c.UsuarioId">@c.NombreCompleto (@c.Correo)</option> }</select><span asp-validation-for="UsuarioId" class="djj-field-error"></span><small>Clientes activos del sistema.</small></div>
+<div class="djj-field"><label asp-for="FacturaId"></label><select asp-for="FacturaId" id="FacturaId" class="djj-select" aria-describedby="invoice-help"><option value="">— Sin factura asociada —</option>@foreach (var f in Model.Facturas) { <option value="@f.FacturaId">@f.NumeroFactura · @f.FechaFactura.ToString("dd/MM/yyyy") · ₡@f.Total.ToString("N2")</option> }</select><span asp-validation-for="FacturaId" class="djj-field-error"></span><small id="invoice-help" aria-live="polite">Opcional: factura del cliente seleccionado.</small></div>
+</div></fieldset>
+<fieldset class="djj-service-fieldset"><legend>Inconformidad</legend><div class="djj-form-grid">
+<div class="djj-field"><label asp-for="Categoria"></label><select asp-for="Categoria" class="djj-select">@foreach (var category in new[] { "Producto", "Entrega", "Facturación", "Servicio", "Otro" }) { <option>@category</option> }</select><span asp-validation-for="Categoria" class="djj-field-error"></span></div>
+<div class="djj-field"><label asp-for="Prioridad"></label><select asp-for="Prioridad" class="djj-select">@foreach (var priority in new[] { "Baja", "Media", "Alta" }) { <option>@priority</option> }</select><span asp-validation-for="Prioridad" class="djj-field-error"></span></div>
+<div class="djj-field djj-form-grid__full"><label asp-for="Asunto"></label><input asp-for="Asunto" class="djj-input" maxlength="150" /><span asp-validation-for="Asunto" class="djj-field-error"></span></div>
+<div class="djj-field djj-form-grid__full"><label asp-for="Descripcion"></label><textarea asp-for="Descripcion" class="djj-textarea" rows="6" maxlength="1000"></textarea><span asp-validation-for="Descripcion" class="djj-field-error"></span></div>
+</div></fieldset><div class="djj-form-actions"><button type="submit" class="djj-button djj-button--primary">Registrar reclamo</button><a asp-action="Index" class="djj-button djj-button--ghost">Cancelar</a></div></form></section>
+}
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/stage2/customer-service.js" asp-append-version="true"></script> }

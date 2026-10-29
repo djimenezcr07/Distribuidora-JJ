@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Http
+@model Proyecto_Final.Models.Admin.EmployeeDetailViewModel
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Detalle de empleado";
+    var active = Model.Activo && Model.UsuarioActivo;
+    string StateTone(string state) => state switch { "Completada" or "Aprobada" => "success", "Cancelada" or "Rechazada" => "danger", "Pendiente" or "En proceso" => "warning", _ => "neutral" };
+    string PriorityTone(string priority) => priority switch { "Urgente" or "Alta" => "danger", "Media" => "warning", _ => "neutral" };
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var isAdmin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var permissions = isAdmin ? new HashSet<string>(StringComparer.OrdinalIgnoreCase) : await PermissionService.GetPermissionCodesAsync(role);
+    bool Can(string code) => isAdmin || permissions.Contains(code);
+}
+
+<header class="djj-page-header">
+    <div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Expediente laboral · #@Model.EmpleadoId</span><h1>@Model.NombreCompleto</h1><p>@Model.Puesto · @(string.IsNullOrWhiteSpace(Model.Departamento) ? "Sin departamento" : Model.Departamento) · @Model.Rol</p><div class="djj-cluster"><span class="djj-status-badge djj-status-badge--@(active ? "success" : "neutral")">@(active ? "Activo" : "Inactivo")</span></div></div>
+    <div class="djj-page-header__actions">@if (Can("EMPLEADOS_EDITAR")) { <a asp-action="Edit" asp-route-id="@Model.EmpleadoId" class="djj-button djj-button--primary">Editar expediente</a> }<a asp-action="Index" class="djj-button djj-button--ghost">Volver</a></div>
+</header>
+
+<div class="djj-detail-layout">
+    <section class="djj-card" aria-labelledby="employment-title"><div class="djj-card__header"><div><h2 id="employment-title">Relación laboral</h2><p>Información vigente del puesto y la contratación.</p></div></div><dl class="djj-detail-grid"><div><dt>Puesto</dt><dd>@Model.Puesto</dd></div><div><dt>Departamento</dt><dd>@(Model.Departamento ?? "No indicado")</dd></div><div><dt>Fecha de contratación</dt><dd>@(Model.FechaContratacion?.ToString("dd/MM/yyyy") ?? "No indicada")</dd></div><div><dt>Salario actual</dt><dd class="djj-money"><strong>₡@Model.Salario.ToString("N2")</strong></dd></div><div><dt>Responsabilidades</dt><dd>@(string.IsNullOrWhiteSpace(Model.Responsabilidades) ? "No registradas" : Model.Responsabilidades)</dd></div><div><dt>Observaciones internas</dt><dd>@(string.IsNullOrWhiteSpace(Model.ObservacionesInternas) ? "Sin observaciones" : Model.ObservacionesInternas)</dd></div></dl></section>
+    <aside class="djj-card" aria-labelledby="contact-title"><div class="djj-card__header"><div><h2 id="contact-title">Contacto</h2><p>Datos personales del expediente autorizado.</p></div></div><dl class="djj-detail-grid"><div><dt>Correo</dt><dd>@Model.Correo</dd></div><div><dt>Teléfono</dt><dd>@(Model.Telefono ?? "No indicado")</dd></div><div><dt>Dirección</dt><dd>@(Model.Direccion ?? "No indicada")</dd></div><div><dt>Registro</dt><dd>@Model.FechaRegistro.ToString("dd/MM/yyyy")</dd></div></dl></aside>
+</div>
+
+<div class="djj-hr-split">
+    <section class="djj-card" aria-labelledby="assign-task-title">
+        <div class="djj-card__header"><div><h2 id="assign-task-title">Asignar tarea</h2><p>Definí el trabajo, su prioridad y una fecha límite opcional.</p></div></div>
+        <form asp-action="CreateTask" method="post" class="djj-workspace-form">
+            @Html.AntiForgeryToken()<input type="hidden" name="EmpleadoId" value="@Model.EmpleadoId" />
+            <div class="djj-field"><label for="task-title">Título</label><input id="task-title" name="Titulo" class="djj-input" maxlength="150" required /></div>
+            <div class="djj-field"><label for="task-description">Descripción</label><textarea id="task-description" name="Descripcion" class="djj-textarea" maxlength="700" rows="3"></textarea></div>
+            <div class="djj-form-grid"><div class="djj-field"><label for="task-priority">Prioridad</label><select id="task-priority" name="Prioridad" class="djj-select"><option>Baja</option><option selected>Media</option><option>Alta</option><option>Urgente</option></select></div><div class="djj-field"><label for="task-due">Fecha límite</label><input id="task-due" name="FechaLimite" class="djj-input" type="date" /></div></div>
+            <button type="submit" class="djj-button djj-button--primary">Asignar tarea</button>
+        </form>
+    </section>
+    <section class="djj-card djj-data-section" aria-labelledby="task-list-title">
+        <header><div><h2 id="task-list-title">Tareas asignadas</h2><p>@Model.Tareas.Count tarea(s) en el expediente.</p></div></header>
+        @if (!Model.Tareas.Any()) { <div class="djj-empty-state"><h3>Sin tareas</h3><p>No hay tareas asignadas a este empleado.</p></div> }
+        else
+        {
+            <ul class="djj-hr-list">
+            @foreach (var tarea in Model.Tareas)
+            {
+                <li><div class="djj-hr-list__content"><div class="djj-cluster"><strong>@tarea.Titulo</strong><span class="djj-status-badge djj-status-badge--@PriorityTone(tarea.Prioridad)">Prioridad @tarea.Prioridad</span><span class="djj-status-badge djj-status-badge--@StateTone(tarea.Estado)">@tarea.Estado</span></div><p>@(string.IsNullOrWhiteSpace(tarea.Descripcion) ? "Sin descripción." : tarea.Descripcion)</p><small>Asignada @tarea.FechaAsignacion.ToString("dd/MM/yyyy")@(tarea.FechaLimite.HasValue ? $" · Límite {tarea.FechaLimite.Value:dd/MM/yyyy}" : string.Empty)</small></div><form asp-action="UpdateTaskStatus" method="post" class="djj-inline-action">@Html.AntiForgeryToken()<input type="hidden" name="TareaId" value="@tarea.TareaId" /><input type="hidden" name="EmpleadoId" value="@Model.EmpleadoId" /><label class="djj-sr-only" for="task-state-@tarea.TareaId">Estado de @tarea.Titulo</label><select id="task-state-@tarea.TareaId" name="Estado" class="djj-select"><option selected="@(tarea.Estado == "Pendiente")">Pendiente</option><option selected="@(tarea.Estado == "En proceso")">En proceso</option><option selected="@(tarea.Estado == "Completada")">Completada</option><option selected="@(tarea.Estado == "Cancelada")">Cancelada</option></select><button type="submit" class="djj-button djj-button--outline djj-button--sm">Actualizar</button></form></li>
+            }
+            </ul>
+        }
+    </section>
+</div>
+
+<div class="djj-hr-split djj-hr-split--balanced">
+    <section class="djj-card djj-data-section" aria-labelledby="employee-request-title"><header><div><h2 id="employee-request-title">Solicitudes</h2><p>Períodos y decisiones registradas para el empleado.</p></div><a asp-action="LeaveRequests" class="djj-button djj-button--ghost djj-button--sm">Gestionar todas</a></header><div class="djj-table-wrap"><table class="djj-table djj-table--compact"><thead><tr><th>Período</th><th>Tipo</th><th>Estado</th><th>Respuesta</th></tr></thead><tbody>@if (!Model.Solicitudes.Any()) { <tr><td colspan="4"><div class="djj-empty-state"><h3>Sin solicitudes</h3><p>No hay solicitudes registradas.</p></div></td></tr> }@foreach (var item in Model.Solicitudes) { <tr><td class="djj-table__nowrap">@item.FechaInicio.ToString("dd/MM/yyyy") – @item.FechaFin.ToString("dd/MM/yyyy")<small class="djj-table__note">@item.CantidadDias día(s)</small></td><td>@item.TipoSolicitud</td><td><span class="djj-status-badge djj-status-badge--@StateTone(item.Estado)">@item.Estado</span></td><td>@(string.IsNullOrWhiteSpace(item.RespuestaAdmin) ? "Pendiente de respuesta" : item.RespuestaAdmin)</td></tr> }</tbody></table></div></section>
+    <section class="djj-card djj-data-section" aria-labelledby="salary-history-title"><header><div><h2 id="salary-history-title">Historial salarial</h2><p>Datos sensibles: cambios registrados y su justificación.</p></div></header><div class="djj-table-wrap"><table class="djj-table djj-table--compact"><thead><tr><th>Fecha</th><th class="djj-align-right">Salario anterior</th><th class="djj-align-right">Salario nuevo</th><th>Motivo</th></tr></thead><tbody>@if (!Model.HistorialSalarios.Any()) { <tr><td colspan="4"><div class="djj-empty-state"><h3>Sin movimientos</h3><p>No hay cambios salariales registrados.</p></div></td></tr> }@foreach (var item in Model.HistorialSalarios) { <tr><td class="djj-table__nowrap">@item.FechaCambio.ToString("dd/MM/yyyy HH:mm")</td><td class="djj-align-right">@(item.SalarioAnterior.HasValue ? $"₡{item.SalarioAnterior.Value:N2}" : "—")</td><td class="djj-align-right"><strong>₡@item.SalarioNuevo.ToString("N2")</strong></td><td>@(string.IsNullOrWhiteSpace(item.Motivo) ? "Sin motivo indicado" : item.Motivo)<small class="djj-table__note">@(item.UsuarioCambioNombre ?? "Responsable no indicado")</small></td></tr> }</tbody></table></div></section>
+</div>

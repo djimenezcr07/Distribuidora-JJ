@@ -1,0 +1,20 @@
+@model Proyecto_Final.Models.Admin.RoleFormViewModel
+@using Microsoft.AspNetCore.Http
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Crear rol";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var admin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var canManage = admin || await PermissionService.HasCodePermissionAsync(role, "ROLES_CREAR_EDITAR");
+}
+<section class="djj-security"><partial name="_SecurityNavigation" />
+<header class="djj-page-header"><div class="djj-page-header__copy"><h1>Crear rol</h1><p>Los datos del rol y su asignación de permisos se administran por separado.</p></div><a asp-action="Index" class="djj-button djj-button--secondary">Volver a roles</a></header>
+@if (!canManage) { <p class="djj-alert djj-alert--info" role="status">Vista de consulta. Tu perfil no permite guardar cambios de roles.</p> }
+<form asp-controller="Roles" asp-action="Create" method="post" class="djj-form-card">@Html.AntiForgeryToken()
+<div asp-validation-summary="ModelOnly" class="djj-validation-summary" role="alert" tabindex="-1"></div>
+<fieldset class="djj-security-fieldset" disabled="@(!canManage)"><legend>Información general</legend><div class="djj-field"><label asp-for="Nombre">Nombre del rol</label><input asp-for="Nombre" class="djj-input" maxlength="50" aria-describedby="nombre-help nombre-error" /><small id="nombre-help" class="djj-field__hint">Máximo 50 caracteres. El nombre debe ser único.</small><span asp-validation-for="Nombre" id="nombre-error" class="djj-field__error"></span></div>
+<div class="djj-field"><label asp-for="Descripcion"></label><textarea asp-for="Descripcion" class="djj-textarea" rows="4" maxlength="255" aria-describedby="descripcion-error"></textarea><span asp-validation-for="Descripcion" id="descripcion-error" class="djj-field__error"></span></div>
+<label class="djj-choice"><input asp-for="Activo" class="djj-checkbox" /> Rol activo</label>
+</fieldset><div class="djj-row-actions">@if (canManage) { <button type="submit" class="djj-button djj-button--primary">Guardar rol</button> }<a asp-action="Index" class="djj-button djj-button--secondary">Cancelar</a></div></form><p class="djj-field__hint">La asignación de capacidades se revisa en Permisos. Esta pantalla no añade permisos automáticamente.</p></section>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

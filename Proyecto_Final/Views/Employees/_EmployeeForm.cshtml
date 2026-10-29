@@ -1,0 +1,30 @@
+@model Proyecto_Final.Models.Admin.EmployeeFormViewModel
+
+<div class="djj-hr-form-sections">
+    <fieldset>
+        <legend>Identidad y acceso</legend>
+        <div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="NombreCompleto"></label><input asp-for="NombreCompleto" class="djj-input" autocomplete="name" /><span asp-validation-for="NombreCompleto" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="Correo"></label><input asp-for="Correo" class="djj-input" autocomplete="email" /><span asp-validation-for="Correo" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="PerfilId"></label><select asp-for="PerfilId" asp-items="Model.RolesDisponibles" class="djj-select"><option value="">Seleccione un rol</option></select><span asp-validation-for="PerfilId" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="Contrasena"></label><input asp-for="Contrasena" class="djj-input" autocomplete="new-password" aria-describedby="employee-password-hint" /><p id="employee-password-hint" class="djj-field__hint">En edición, dejala vacía para conservar la contraseña actual.</p><span asp-validation-for="Contrasena" class="djj-field__error"></span></div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Contacto</legend>
+        <div class="djj-form-grid"><div class="djj-field"><label asp-for="Telefono"></label><input asp-for="Telefono" class="djj-input" autocomplete="tel" /><span asp-validation-for="Telefono" class="djj-field__error"></span></div><div class="djj-field"><label asp-for="Direccion"></label><input asp-for="Direccion" class="djj-input" autocomplete="street-address" /><span asp-validation-for="Direccion" class="djj-field__error"></span></div></div>
+    </fieldset>
+    <fieldset>
+        <legend>Relación laboral</legend>
+        <div class="djj-form-grid">
+            <div class="djj-field"><label asp-for="Puesto"></label><input asp-for="Puesto" class="djj-input" /><span asp-validation-for="Puesto" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="Departamento"></label><input asp-for="Departamento" class="djj-input" /><span asp-validation-for="Departamento" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="Salario"></label><input asp-for="Salario" class="djj-input djj-money" type="number" min="0" step="0.01" inputmode="decimal" /><span asp-validation-for="Salario" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="FechaContratacion"></label><input asp-for="FechaContratacion" class="djj-input" type="date" /><span asp-validation-for="FechaContratacion" class="djj-field__error"></span></div>
+            <div class="djj-field djj-form-grid__full"><label asp-for="MotivoCambioSalario"></label><input asp-for="MotivoCambioSalario" class="djj-input" placeholder="Ajuste anual, cambio de puesto u otra razón" /><span asp-validation-for="MotivoCambioSalario" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="Responsabilidades"></label><textarea asp-for="Responsabilidades" class="djj-textarea" rows="4"></textarea><span asp-validation-for="Responsabilidades" class="djj-field__error"></span></div>
+            <div class="djj-field"><label asp-for="ObservacionesInternas"></label><textarea asp-for="ObservacionesInternas" class="djj-textarea" rows="4" aria-describedby="employee-notes-hint"></textarea><p id="employee-notes-hint" class="djj-field__hint">Contenido interno visible para administración autorizada.</p><span asp-validation-for="ObservacionesInternas" class="djj-field__error"></span></div>
+        </div>
+    </fieldset>
+    <fieldset><legend>Estado</legend><label class="djj-check"><input asp-for="Activo" /> <span>Empleado activo</span></label></fieldset>
+</div>

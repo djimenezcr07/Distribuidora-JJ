@@ -1,0 +1,59 @@
+@using Microsoft.AspNetCore.Http
+@model Proyecto_Final.Models.Admin.EmployeeFilterViewModel
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Empleados";
+    string StateTone(bool active) => active ? "success" : "neutral";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var isAdmin = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase);
+    var permissions = isAdmin ? new HashSet<string>(StringComparer.OrdinalIgnoreCase) : await PermissionService.GetPermissionCodesAsync(role);
+    bool Can(string code) => isAdmin || permissions.Contains(code);
+}
+
+<header class="djj-page-header">
+    <div class="djj-page-header__copy">
+        <span class="djj-page-header__eyebrow">Personal · Expedientes</span>
+        <h1>Empleados</h1>
+        <p>Gestioná la relación laboral, el estado y el seguimiento del personal sin exponer datos sensibles en el listado.</p>
+    </div>
+    <div class="djj-page-header__actions">
+        @if (Can("EMPLEADOS_SOLICITUDES")) { <a asp-action="LeaveRequests" class="djj-button djj-button--outline">Ver solicitudes</a> }
+        @if (Can("EMPLEADOS_CREAR")) { <a asp-action="Create" class="djj-button djj-button--primary"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-users"></use></svg>Nuevo empleado</a> }
+    </div>
+</header>
+
+<section class="djj-card djj-filter-card" aria-labelledby="employee-filters">
+    <h2 id="employee-filters">Filtrar personal</h2>
+    <form asp-action="Index" method="get" class="djj-filter-bar">
+        <div class="djj-field"><label for="employee-search">Buscar</label><input id="employee-search" name="buscar" value="@Model.Buscar" class="djj-input" placeholder="Nombre, correo, puesto o departamento" /></div>
+        <div class="djj-field"><label for="employee-status">Estado</label><select id="employee-status" name="estado" class="djj-select"><option value="">Todos</option><option value="Activo" selected="@(Model.Estado == "Activo")">Activos</option><option value="Inactivo" selected="@(Model.Estado == "Inactivo")">Inactivos</option></select></div>
+        <div class="djj-filter-bar__actions"><button type="submit" class="djj-button djj-button--neutral"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-search"></use></svg>Buscar</button><a asp-action="Index" class="djj-button djj-button--ghost">Limpiar</a></div>
+    </form>
+</section>
+
+<section class="djj-card djj-data-section" aria-labelledby="employee-list-title">
+    <header><div><h2 id="employee-list-title">Personal registrado</h2><p>@Model.Empleados.Count resultado(s). El contacto y salario se consultan dentro del expediente.</p></div></header>
+    <div class="djj-table-wrap">
+        <table class="djj-table djj-table--compact">
+            <thead><tr><th>Empleado</th><th>Relación laboral</th><th>Seguimiento</th><th>Estado</th><th class="djj-align-right">Acciones</th></tr></thead>
+            <tbody>
+            @if (!Model.Empleados.Any())
+            {
+                <tr><td colspan="5"><div class="djj-empty-state"><h3>Sin empleados</h3><p>No hay personal para los filtros seleccionados.</p></div></td></tr>
+            }
+            @foreach (var item in Model.Empleados)
+            {
+                var active = item.Activo && item.UsuarioActivo;
+                <tr>
+                    <td><strong class="djj-table__primary">@item.NombreCompleto</strong><small class="djj-table__note">@item.Rol</small></td>
+                    <td><span class="djj-table__primary">@item.Puesto</span><small class="djj-table__note">@(string.IsNullOrWhiteSpace(item.Departamento) ? "Sin departamento" : item.Departamento)</small></td>
+                    <td><span class="djj-table__primary">@item.TareasPendientes tarea(s) pendiente(s)</span><small class="djj-table__note">@item.SolicitudesPendientes solicitud(es) pendiente(s)</small></td>
+                    <td><span class="djj-status-badge djj-status-badge--@StateTone(active)">@(active ? "Activo" : "Inactivo")</span></td>
+                    <td><div class="djj-row-actions"><a asp-action="Details" asp-route-id="@item.EmpleadoId" class="djj-button djj-button--outline djj-button--sm">Ver expediente</a>@if (Can("EMPLEADOS_EDITAR")) { <details class="djj-action-menu"><summary aria-label="Más acciones para @item.NombreCompleto"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-menu"></use></svg></summary><div class="djj-action-menu__panel"><a asp-action="Edit" asp-route-id="@item.EmpleadoId">Editar</a><form asp-action="ToggleStatus" method="post" data-djj-confirm="@(item.Activo ? $"Inactivar a {item.NombreCompleto}. Su expediente permanecerá disponible, pero el empleado quedará inactivo." : $"Reactivar a {item.NombreCompleto} para devolverle el estado activo.")">@Html.AntiForgeryToken()<input type="hidden" name="empleadoId" value="@item.EmpleadoId" /><input type="hidden" name="buscar" value="@Model.Buscar" /><input type="hidden" name="estado" value="@Model.Estado" /><button type="submit" class="@(item.Activo ? "djj-action-menu__danger" : null)">@(item.Activo ? "Inactivar" : "Reactivar")</button></form></div></details> }</div></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>

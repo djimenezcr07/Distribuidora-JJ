@@ -1,0 +1,31 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.AssetListItemViewModel>
+@using Proyecto_Final.Models.Presentation
+@{
+    Layout = "_WorkspaceLayout"; ViewData["Title"] = "Activos";
+    var buscar = ViewBag.Buscar as string; var estado = ViewBag.Estado as string;
+    var items = Model?.ToList() ?? new();
+}
+<div class="djj-assets djj-stack">
+    <partial name="_AssetsNavigation" />
+    <header class="djj-page-header"><div><h1>Activos de la empresa</h1><p>Neveras, exhibidores y equipos: identificación, estado y préstamo actual.</p></div><a asp-action="Create" class="djj-button djj-button--primary">Nuevo activo</a></header>
+    <form asp-action="Index" method="get" class="djj-card djj-padded djj-filter-bar">
+        <div class="djj-field"><label for="asset-search">Buscar activos</label><input id="asset-search" name="buscar" value="@buscar" class="djj-input" placeholder="Código, nombre, tipo o cliente" /></div>
+        <div class="djj-field"><label for="asset-state">Estado</label><select id="asset-state" name="estado" class="djj-select"><option value="">Todos los estados</option>
+        @foreach (var option in new[] { "Disponible", "Prestado", "Mantenimiento", "Baja" }) { <option value="@option" selected="@(estado == option)">@option</option> }
+        </select></div><div class="djj-filter-bar__actions"><button class="djj-button djj-button--primary" type="submit">Buscar</button><a asp-action="Index" class="djj-button djj-button--outline">Limpiar</a></div>
+    </form>
+    <section class="djj-card djj-data-section"><header><div><h2>Inventario de activos</h2><p>@items.Count registro(s) en este resultado.</p></div></header>
+        <div class="djj-table-wrap" tabindex="0" aria-label="Inventario de activos desplazable"><table class="djj-table djj-table--compact"><caption class="djj-sr-only">Identificación, préstamo y acciones de los activos</caption><thead><tr><th scope="col">Activo</th><th scope="col">Tipo</th><th scope="col">Estado</th><th scope="col">Prestado a</th><th scope="col">Registro</th><th scope="col">Acciones</th></tr></thead><tbody>
+        @if (!items.Any()) { <tr><td colspan="6">No hay activos para estos filtros.</td></tr> }
+        @foreach (var a in items) {
+            <tr><th scope="row">@a.CodigoActivo<small class="djj-table__note">@a.Nombre</small></th><td>@a.Tipo<small class="djj-table__note">@a.Descripcion</small></td><td><span class="djj-badge djj-badge--@AssetPresentation.AssetTone(a.Estado)">@a.Estado</span></td><td>@(string.IsNullOrWhiteSpace(a.ClientePrestamo) ? "Sin préstamo registrado" : a.ClientePrestamo)</td><td><time class="djj-table__nowrap" datetime="@a.FechaRegistro.ToString("O")">@a.FechaRegistro.ToString("dd/MM/yyyy")</time><small class="djj-table__note">Registro @(a.Activo ? "activo" : "inactivo")</small></td><td><div class="djj-row-actions" aria-label="Acciones del activo @a.CodigoActivo">
+                <a asp-action="Details" asp-route-id="@a.ActivoId" class="djj-button djj-button--outline" aria-label="Ver activo @a.CodigoActivo">Ver</a>
+                <a asp-action="Edit" asp-route-id="@a.ActivoId" class="djj-button djj-button--outline" aria-label="Editar activo @a.CodigoActivo">Editar</a>
+                <form asp-action="Delete" asp-route-id="@a.ActivoId" method="post" data-djj-confirm="¿Eliminar (dar de baja) el activo @a.CodigoActivo? No se podrá si está prestado.">
+                    @Html.AntiForgeryToken()<button type="submit" class="djj-button djj-button--danger-outline" aria-label="Dar de baja al activo @a.CodigoActivo">Dar de baja</button>
+                </form>
+            </div></td></tr>
+        }
+        </tbody></table></div>
+    </section>
+</div>

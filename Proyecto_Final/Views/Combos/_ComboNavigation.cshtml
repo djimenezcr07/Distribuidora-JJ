@@ -1,0 +1,12 @@
+@inject IRolePermissionService PermissionService
+@{
+    var permissions = await PermissionService.GetPermissionCodesAsync(Context.Session.GetString("UserRole") ?? "");
+    var isAdmin = Context.Session.GetString("UserRole") == "Administrador";
+}
+<nav class="djj-domain-nav" aria-label="Secciones de inventario">
+    @if (isAdmin || permissions.Contains("INVENTARIO_VER")) { <a asp-controller="Inventory" asp-action="Index">Productos</a> }
+    @if (isAdmin || permissions.Contains("INVENTARIO_MOVIMIENTOS")) { <a asp-controller="Inventory" asp-action="Movements">Movimientos</a> }
+    @if (isAdmin || permissions.Contains("INVENTARIO_INTELIGENCIA_VER")) { <a asp-controller="InventoryIntelligence" asp-action="Index">Inteligencia</a> }
+    <a aria-current="page" asp-controller="Combos" asp-action="Index">Combos</a>
+    @if (isAdmin || permissions.Contains("DEVOLUCIONES_GESTIONAR")) { <a asp-controller="Returns" asp-action="Index">Devoluciones</a> }
+</nav>

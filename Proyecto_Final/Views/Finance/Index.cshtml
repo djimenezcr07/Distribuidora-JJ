@@ -1,0 +1,23 @@
+@using Proyecto_Final.Models.Admin
+@model IEnumerable<CashSettlementListItemViewModel>
+@{
+    Layout = "_WorkspaceLayout";
+    ViewData["Title"] = "Liquidación de cobros";
+    var estado = ViewBag.Estado as string;
+    var rutas = ViewBag.Rutas as List<RouteListItemViewModel> ?? new();
+    var registradas = Model?.ToList() ?? new();
+    var liquidadasIds = registradas.Select(item => item.RutaId).ToHashSet();
+    var pendientes = rutas.Where(item => !liquidadasIds.Contains(item.RutaId)).ToList();
+    string Tone(string value) => value switch { "Cuadrada" => "success", "Sobrante" => "info", "Faltante" => "danger", _ => "neutral" };
+}
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Finanzas · Rutas</span><h1>Liquidación de cobros</h1><p>Cuadrá efectivo y comprobantes entregados contra los pedidos de cada ruta.</p></div></header>
+<nav class="djj-domain-nav" aria-label="Finanzas"><a asp-action="Index" aria-current="page">Liquidaciones</a><a asp-controller="Credits" asp-action="Index">Crédito y cobro</a><a asp-controller="Budgets" asp-action="Index">Presupuestos</a><a asp-controller="Expenses" asp-action="Index">Gastos</a></nav>
+<section class="djj-card djj-data-section" aria-labelledby="pending-routes"><header><div><h2 id="pending-routes">Rutas pendientes</h2><p>@pendientes.Count ruta(s) requieren liquidación financiera.</p></div></header><div class="djj-table-wrap"><table class="djj-table djj-table--compact"><thead><tr><th>Código</th><th>Zona</th><th>Estado</th><th class="djj-align-right">Entregados</th><th class="djj-align-right">Acción</th></tr></thead><tbody>
+@if (!pendientes.Any()) { <tr><td colspan="5"><div class="djj-empty-state"><h3>Todo está liquidado</h3><p>No hay rutas despachadas pendientes.</p></div></td></tr> }
+@foreach (var route in pendientes) { <tr><td><strong>@route.Codigo</strong></td><td>@route.Zona</td><td><span class="djj-badge djj-badge--info">@route.Estado</span></td><td class="djj-align-right">@route.Entregados / @route.TotalPedidos</td><td><div class="djj-row-actions"><a asp-action="Liquidate" asp-route-rutaId="@route.RutaId" class="djj-button djj-button--primary djj-button--sm">Liquidar</a></div></td></tr> }
+</tbody></table></div></section>
+<section class="djj-card djj-filter-card" aria-labelledby="settlement-filters"><h2 id="settlement-filters">Filtrar liquidaciones</h2><form asp-action="Index" method="get" class="djj-filter-bar"><div class="djj-field"><label for="settlement-status" class="djj-field__label">Resultado</label><select id="settlement-status" name="estado" class="djj-select"><option value="">Todos</option><option value="Cuadrada" selected="@(estado == "Cuadrada")">Cuadrada</option><option value="Faltante" selected="@(estado == "Faltante")">Faltante</option><option value="Sobrante" selected="@(estado == "Sobrante")">Sobrante</option></select></div><div class="djj-filter-bar__actions"><button class="djj-button djj-button--primary" type="submit">Aplicar filtro</button><a asp-action="Index" class="djj-button djj-button--ghost">Limpiar</a></div><span class="djj-filter-bar__results">@registradas.Count resultado(s)</span></form></section>
+<section class="djj-card djj-data-section" aria-labelledby="registered-settlements"><header><div><h2 id="registered-settlements">Liquidaciones registradas</h2><p>Diferencias y responsables del cierre de cada ruta.</p></div></header><div class="djj-table-wrap"><table class="djj-table djj-table--compact"><thead><tr><th>Ruta</th><th class="djj-align-right">Esperado</th><th class="djj-align-right">Efectivo</th><th class="djj-align-right">Comprobantes</th><th class="djj-align-right">Diferencia</th><th>Resultado</th><th>Responsable</th><th>Fecha</th></tr></thead><tbody>
+@if (!registradas.Any()) { <tr><td colspan="8"><div class="djj-empty-state"><h3>Sin liquidaciones</h3><p>No hay registros para el filtro seleccionado.</p></div></td></tr> }
+@foreach (var item in registradas) { <tr><td><strong>@item.RutaCodigo</strong></td><td class="djj-align-right">₡@((item.MontoEsperadoEfectivo + item.MontoEsperadoOtros).ToString("N2"))</td><td class="djj-align-right">₡@item.MontoEfectivoRecibido.ToString("N2")</td><td class="djj-align-right">₡@item.MontoComprobantes.ToString("N2")</td><td class="djj-align-right"><strong>@(item.Diferencia < 0 ? "−" : item.Diferencia > 0 ? "+" : string.Empty)₡@Math.Abs(item.Diferencia).ToString("N2")</strong></td><td><span class="djj-badge djj-badge--@Tone(item.Estado)">@item.Estado</span></td><td>@item.LiquidadoPorNombre</td><td class="djj-table__nowrap">@item.FechaLiquidacion.ToString("dd/MM/yyyy HH:mm")</td></tr> }
+</tbody></table></div></section>

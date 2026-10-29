@@ -1,0 +1,103 @@
+@model Proyecto_Final.Models.Admin.MetasIndexViewModel
+@using System.Globalization
+@inject IRolePermissionService PermissionService
+@{
+    Layout = "_WorkspaceLayout";
+    var role = Context.Session.GetString("UserRole") ?? string.Empty;
+    var canNavigate = string.Equals(role, "Administrador", StringComparison.OrdinalIgnoreCase) || await PermissionService.HasCodePermissionAsync(role, "REPORTE_KPI");
+    ViewData["Title"] = "Metas de ventas";
+    var culture = CultureInfo.GetCultureInfo("es-CR");
+    var period = new DateTime(Model.Anio, Model.Mes, 1).ToString("MMMM yyyy", culture);
+}
+
+<div class="djj-analytics">
+<header class="djj-page-header">
+<div>
+<h1>Metas de ventas</h1>
+<p>Definí los objetivos mensuales del equipo · @period.</p>
+</div>@if (canNavigate) { <a asp-controller="Kpis" asp-action="Report" asp-route-anio="@Model.Anio" asp-route-mes="@Model.Mes" class="djj-button djj-button--secondary">Ver reporte de KPIs</a> }</header>
+<form asp-controller="Kpis" asp-action="Index" method="get" class="djj-card djj-analytics-filter djj-filter-bar djj-filter-bar--analytics" data-djj-screen-only aria-label="Período de metas">
+<div class="djj-field">
+<label for="kpi-anio">Año</label>
+<input id="kpi-anio" type="number" name="anio" value="@Model.Anio" min="2000" max="2100" class="djj-input" />
+</div>
+<div class="djj-field">
+<label for="kpi-mes">Mes</label>
+<select id="kpi-mes" name="mes" class="djj-select">@for (int i = 1; i <= 12; i++) { <option value="@i" selected="@(Model.Mes == i)">@culture.DateTimeFormat.GetMonthName(i)</option> }</select>
+</div>
+<div>
+<button type="submit" class="djj-button djj-button--primary">Ver período</button>
+</div>
+</form>
+
+<div class="djj-analytics-panels">
+<section class="djj-card djj-data-section" aria-labelledby="goals-title">
+<header>
+<div>
+<h2 id="goals-title">Metas de @period</h2>
+<p>@Model.Metas.Count vendedor(es) con meta definida</p>
+</div>
+</header>
+<div class="djj-table-wrap" tabindex="0" role="region" aria-label="Metas y ventas del equipo">
+<table class="djj-table djj-table--compact">
+<caption>Objetivos mensuales, ventas reales y cumplimiento completo.</caption>
+<thead>
+<tr>
+<th scope="col">Vendedor</th>
+<th scope="col">Meta</th>
+<th scope="col">Ventas reales</th>
+<th scope="col">Cumplimiento</th>
+<th scope="col">Restante</th>
+</tr>
+</thead>
+<tbody>
+@if (!Model.Metas.Any()) { <tr>
+<td colspan="5">
+<div class="djj-empty-state">
+<p>No hay metas definidas para este período.</p>
+</div>
+</td>
+</tr> }
+@foreach (var item in Model.Metas) {
+var status = item.PorcentajeCumplimiento >= 100 ? "success" : item.PorcentajeCumplimiento >= 70 ? "warning" : "danger";
+<tr>
+<th scope="row">@item.VendedorNombre @if (!string.IsNullOrWhiteSpace(item.Observaciones)) { <span class="djj-table__note">@item.Observaciones</span> }</th>
+<td class="djj-number">₡@item.MontoMeta.ToString("N2")</td>
+<td class="djj-number">₡@item.VentasReales.ToString("N2")</td>
+<td>
+<span class="djj-badge djj-badge--@status">@item.PorcentajeCumplimiento.ToString("N1")%</span>
+<progress class="djj-progress" max="100" value="@Math.Clamp(item.PorcentajeCumplimiento, 0m, 100m).ToString(CultureInfo.InvariantCulture)" aria-label="Cumplimiento de @item.VendedorNombre">@item.PorcentajeCumplimiento.ToString("N1")%</progress>
+</td>
+<td class="djj-number">₡@Math.Max(0m, item.MontoMeta - item.VentasReales).ToString("N2")</td>
+</tr>
+}
+</tbody>
+</table>
+</div>
+</section>
+<section class="djj-card djj-goal-summary" aria-labelledby="define-goal">
+<h2 id="define-goal">Definir o actualizar meta</h2>
+<form asp-controller="Kpis" asp-action="Save" method="post" class="djj-workspace-form">
+@Html.AntiForgeryToken()
+<input type="hidden" name="Anio" value="@Model.Anio" />
+<input type="hidden" name="Mes" value="@Model.Mes" />
+<div class="djj-field">
+<label for="goal-seller">Vendedor</label>
+<select id="goal-seller" name="VendedorUsuarioId" class="djj-select" required>
+<option value="">Seleccione un vendedor</option>@foreach (var seller in Model.Vendedores) { <option value="@seller.UsuarioId">@seller.NombreCompleto</option> }</select>
+@if (!Model.Vendedores.Any()) { <small>No hay usuarios con perfil Vendedor registrados.</small> }</div>
+<div class="djj-field">
+<label for="goal-amount">Meta de ingresos (₡)</label>
+<input id="goal-amount" type="number" name="MontoMeta" step="0.01" min="0.01" class="djj-input" required />
+</div>
+<div class="djj-field">
+<label for="goal-notes">Observaciones (opcional)</label>
+<textarea id="goal-notes" name="Observaciones" class="djj-textarea" rows="3" maxlength="300">
+</textarea>
+</div>
+<p>Período: <strong>@period</strong>. Si la meta ya existe, se actualizará para el vendedor seleccionado.</p>
+<button type="submit" class="djj-button djj-button--primary">Guardar meta</button>
+</form>
+</section>
+</div>
+</div>

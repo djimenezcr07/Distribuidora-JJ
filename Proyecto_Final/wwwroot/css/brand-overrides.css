@@ -1,0 +1,2264 @@
+/* =========================================================
+   Brand overrides - shared layout and branded views
+   Loaded after legacy visual layers to avoid rewriting them.
+   ========================================================= */
+
+.text-primary {
+    color: var(--brand-gold-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--brand-gold-primary) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--brand-red-primary), var(--brand-red-secondary)) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: linear-gradient(135deg, var(--brand-red-secondary), var(--brand-red-primary)) !important;
+    border-color: var(--brand-red-secondary) !important;
+    color: var(--brand-white) !important;
+}
+
+.btn:focus,
+.btn:active:focus,
+.nav-link:focus,
+.form-control:focus {
+    box-shadow: var(--brand-focus-ring) !important;
+}
+
+.topbar,
+.modern-nav-shell {
+    background:
+        radial-gradient(circle at 16% 0%, rgba(var(--brand-gold-primary-rgb), .18), transparent 30%),
+        linear-gradient(135deg, #151515 0%, var(--brand-red-primary) 52%, #1F1F1F 100%) !important;
+}
+
+.topbar {
+    border-bottom-color: rgba(var(--brand-gold-primary-rgb), .24) !important;
+}
+
+.modern-nav-shell {
+    border-bottom-color: rgba(var(--brand-gold-primary-rgb), .22) !important;
+}
+
+.header-categories-button {
+    background: linear-gradient(135deg, var(--brand-gold-primary), var(--brand-gold-light)) !important;
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .38);
+}
+
+.header-categories-button h6,
+.header-categories-button i {
+    color: var(--brand-black) !important;
+}
+
+.brand-navbar-shell {
+    gap: .85rem;
+}
+
+.brand-navbar {
+    display: inline-flex;
+    align-items: center;
+    gap: .7rem;
+    min-width: 0;
+    max-width: 300px;
+    color: var(--brand-white);
+    padding: .52rem .7rem .52rem 0;
+}
+
+.brand-navbar:hover,
+.brand-navbar:focus {
+    color: var(--brand-white);
+    text-decoration: none;
+}
+
+.brand-navbar__mark {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    overflow: hidden;
+    border: 2px solid rgba(var(--brand-gold-primary-rgb), .72);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 32% 22%, rgba(255, 255, 255, .22), transparent 35%),
+        linear-gradient(135deg, var(--brand-red-secondary), var(--brand-red-primary));
+    box-shadow: 0 10px 24px rgba(var(--brand-black-rgb), .24);
+}
+
+.brand-navbar__icon {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+}
+
+.brand-navbar__initials {
+    color: var(--brand-gold-light);
+    font-size: .82rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.brand-navbar__copy,
+.brand-footer__copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    line-height: 1.05;
+}
+
+.brand-navbar__name {
+    color: var(--brand-white);
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+.brand-navbar__subtitle {
+    color: var(--brand-gold-light);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus,
+.navbar-dark .navbar-nav .nav-link.active {
+    background: rgba(var(--brand-gold-primary-rgb), .14) !important;
+    color: var(--brand-gold-light) !important;
+}
+
+.nav-highlight {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34) !important;
+    background: rgba(var(--brand-red-secondary-rgb), .2) !important;
+    color: var(--brand-gold-light) !important;
+}
+
+.admin-dropdown-menu {
+    border-color: rgba(var(--brand-gold-primary-rgb), .24) !important;
+    background: rgba(31, 31, 31, .98) !important;
+}
+
+.admin-dropdown-menu .dropdown-item i {
+    color: var(--brand-gold-light) !important;
+}
+
+.admin-dropdown-menu .dropdown-item:hover,
+.admin-dropdown-menu .dropdown-item:focus {
+    background: linear-gradient(135deg, var(--brand-gold-primary), var(--brand-gold-light)) !important;
+    color: var(--brand-black) !important;
+}
+
+.admin-dropdown-menu .dropdown-item:hover i,
+.admin-dropdown-menu .dropdown-item:focus i {
+    color: var(--brand-black) !important;
+}
+
+.s3-footer {
+    background:
+        radial-gradient(circle at 14% 0%, rgba(var(--brand-gold-primary-rgb), .18), transparent 30%),
+        linear-gradient(135deg, #151515 0%, var(--brand-red-primary) 54%, #1F1F1F 100%) !important;
+    border-top-color: rgba(var(--brand-gold-primary-rgb), .24) !important;
+}
+
+.brand-footer {
+    align-items: center;
+    gap: .75rem;
+    letter-spacing: 0;
+}
+
+.brand-footer__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .42);
+    border-radius: 50%;
+    background: rgba(var(--brand-black-rgb), .24);
+}
+
+.brand-footer__name {
+    color: var(--brand-white);
+    font-size: 1.12rem;
+    font-weight: 900;
+}
+
+.brand-footer small {
+    color: var(--brand-gold-light);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.back-to-top {
+    border-color: var(--brand-gold-primary) !important;
+}
+
+/* =========================================================
+   Login and registration
+   ========================================================= */
+
+.s4-auth-page--clean {
+    background:
+        linear-gradient(180deg, rgba(var(--brand-red-primary-rgb), .05), transparent 220px),
+        var(--brand-surface);
+}
+
+.s4-auth-page--clean .s4-auth-breadcrumb a {
+    color: var(--brand-red-primary);
+    font-weight: 800;
+}
+
+.s4-auth-page--clean .s4-auth-breadcrumb a:hover,
+.s4-auth-page--clean .s4-auth-breadcrumb a:focus {
+    color: var(--brand-red-secondary);
+}
+
+.s4-auth-page--clean .s4-auth-panel {
+    border-color: rgba(var(--brand-red-primary-rgb), .2);
+    box-shadow: 0 22px 52px rgba(var(--brand-black-rgb), .14);
+}
+
+.s4-auth-page--clean .s4-auth-brand-strip {
+    background:
+        linear-gradient(135deg, var(--brand-black) 0%, var(--brand-red-primary) 72%, var(--brand-red-secondary) 100%);
+    border-bottom-color: var(--brand-gold-primary);
+    gap: 1.15rem;
+    min-height: 126px;
+    padding: 1.4rem 1.65rem;
+}
+
+.s4-auth-page--clean .s4-auth-brand-strip::before {
+    background: var(--brand-gold-primary);
+    width: 6px;
+}
+
+.s4-auth-page--clean .s4-auth-brand-mark {
+    background: var(--brand-white);
+    border: 2px solid var(--brand-gold-primary);
+    border-radius: 50%;
+    box-shadow: 0 12px 28px rgba(var(--brand-black-rgb), .28);
+    flex: 0 0 72px;
+    height: 72px;
+    overflow: hidden;
+    padding: 3px;
+    width: 72px;
+}
+
+.s4-auth-page--clean .s4-auth-brand-logo {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.s4-auth-page--clean .s4-auth-brand-copy {
+    min-width: 0;
+}
+
+.s4-auth-page--clean .s4-auth-brand-strip .s4-auth-brand-name {
+    color: var(--brand-gold-light);
+    font-size: .8rem;
+    letter-spacing: .08em;
+    margin: 0 0 .15rem;
+}
+
+.s4-auth-page--clean .s4-auth-brand-subtitle {
+    color: rgba(255, 255, 255, .78);
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    margin-bottom: .45rem;
+    text-transform: uppercase;
+}
+
+.s4-auth-page--clean .s4-auth-brand-strip h1 {
+    color: var(--brand-white);
+}
+
+.s4-auth-page--clean .s4-auth-brand-strip p {
+    color: rgba(255, 255, 255, .78);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-card-title span {
+    color: var(--brand-red-primary);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-card-title h2 {
+    color: var(--brand-black);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-field .form-control {
+    background: var(--brand-white);
+    border-color: rgba(var(--brand-black-rgb), .2);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-field .form-control:focus {
+    background: var(--brand-white);
+    border-color: var(--brand-red-primary);
+    box-shadow: var(--brand-focus-ring);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-check,
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-switch {
+    background: rgba(var(--brand-red-primary-rgb), .045);
+    border-color: rgba(var(--brand-red-primary-rgb), .14);
+}
+
+.s4-auth-page--clean .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--brand-red-primary);
+    border-color: var(--brand-red-primary);
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-primary {
+    background: linear-gradient(135deg, var(--brand-red-primary), var(--brand-red-secondary)) !important;
+    border-color: var(--brand-red-primary) !important;
+    box-shadow: 0 14px 28px rgba(var(--brand-red-primary-rgb), .22);
+    color: var(--brand-white) !important;
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-primary:hover,
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-primary:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+    box-shadow: 0 14px 28px rgba(var(--brand-red-primary-rgb), .28);
+    color: var(--brand-white) !important;
+}
+
+.s4-auth-page--clean .s4-auth-link {
+    color: var(--brand-red-primary) !important;
+}
+
+.s4-auth-page--clean .s4-auth-link:hover,
+.s4-auth-page--clean .s4-auth-link:focus {
+    color: var(--brand-red-secondary) !important;
+}
+
+.s4-auth-page--clean .s4-auth-card--clean .s4-auth-demo-note {
+    border-top-color: rgba(var(--brand-red-primary-rgb), .14);
+}
+
+.s4-auth-page--clean .s4-auth-meta-row {
+    background: var(--brand-black);
+    border-top: 3px solid var(--brand-gold-primary);
+    color: var(--brand-white);
+}
+
+.s4-auth-page--clean .s4-auth-meta-row i {
+    color: var(--brand-gold-light);
+}
+
+/* =========================================================
+   Storefront: home, shop and product detail
+   ========================================================= */
+
+.s3-storefront-page {
+    color: var(--brand-black);
+}
+
+.s3-storefront-page .s3-home-eyebrow {
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    border: 1px solid rgba(var(--brand-red-primary-rgb), .15);
+    border-radius: 999px;
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s3-storefront-page .s3-home-hero,
+.s3-storefront-page .s3-shop-hero {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .3);
+    border-radius: 8px;
+    background:
+        linear-gradient(90deg, rgba(31, 31, 31, .98) 0%, rgba(139, 14, 22, .94) 58%, rgba(31, 31, 31, .78) 100%),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+    box-shadow: 0 20px 44px rgba(var(--brand-black-rgb), .2);
+}
+
+.s3-storefront-page .s3-home-hero h1,
+.s3-storefront-page .s3-shop-hero h1,
+.s3-storefront-page .s3-home-section__head h2,
+.s3-storefront-page .s3-product-card h3,
+.s3-storefront-page .s3-category-card span {
+    letter-spacing: 0;
+}
+
+.s3-storefront-page .s3-home-hero .s3-home-eyebrow,
+.s3-storefront-page .s3-shop-hero .s3-home-eyebrow {
+    background: rgba(var(--brand-gold-primary-rgb), .14);
+    border-color: rgba(var(--brand-gold-primary-rgb), .34);
+    color: var(--brand-gold-light);
+}
+
+.s3-storefront-page .s3-home-hero__metrics div,
+.s3-storefront-page .s3-shop-hero__stats div {
+    border-color: rgba(var(--brand-gold-primary-rgb), .25);
+    border-radius: 6px;
+    background: rgba(var(--brand-black-rgb), .25);
+}
+
+.s3-storefront-page .s3-home-hero__metrics strong,
+.s3-storefront-page .s3-shop-hero__stats strong {
+    color: var(--brand-gold-light);
+}
+
+.s3-storefront-page .s3-home-hero__actions .btn,
+.s3-storefront-page .s3-home-section__head .btn,
+.s3-storefront-page .s3-shop-search-card .btn {
+    border-radius: 6px !important;
+}
+
+.s3-storefront-page .btn-primary {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-storefront-page .btn-primary:hover,
+.s3-storefront-page .btn-primary:focus {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-gold-light) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-storefront-page .btn-outline-dark {
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-red-primary) !important;
+}
+
+.s3-storefront-page .btn-outline-dark:hover,
+.s3-storefront-page .btn-outline-dark:focus {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-storefront-page .s3-hero-product-card,
+.s3-storefront-page .s3-hero-mini-card {
+    border-color: rgba(var(--brand-gold-primary-rgb), .35);
+    border-radius: 8px;
+}
+
+.s3-storefront-page .s3-hero-product-card--main div {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .2);
+    border-radius: 6px;
+    background: rgba(var(--brand-black-rgb), .72);
+}
+
+.s3-storefront-page .s3-hero-product-card span,
+.s3-storefront-page .s3-hero-mini-card span,
+.s3-storefront-page .s3-hero-product-card a {
+    color: var(--brand-gold-light);
+    letter-spacing: 0;
+}
+
+.s3-storefront-page .s3-benefit-card,
+.s3-storefront-page .s3-category-card,
+.s3-storefront-page .s3-product-card,
+.s3-storefront-page .s3-shop-sidebar,
+.s3-storefront-page .s3-shop-toolbar,
+.s3-storefront-page .s3-empty-state {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    background: var(--brand-white);
+    box-shadow: 0 12px 28px rgba(var(--brand-black-rgb), .07);
+}
+
+.s3-storefront-page .s3-benefit-card {
+    border-top: 3px solid var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-benefit-card i,
+.s3-storefront-page .s3-shop-sidebar__head > i,
+.s3-storefront-page .s3-empty-state i {
+    border-radius: 6px;
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-category-card:hover,
+.s3-storefront-page .s3-product-card:hover {
+    border-color: rgba(var(--brand-red-primary-rgb), .38);
+    box-shadow: 0 18px 36px rgba(var(--brand-black-rgb), .12);
+}
+
+.s3-storefront-page .s3-category-card__image {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .3);
+    border-radius: 6px;
+    background: #FAFAFA;
+}
+
+.s3-storefront-page .s3-category-card span i {
+    color: var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-category-card__arrow {
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s3-storefront-page .s3-shop-search-card {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34);
+    border-radius: 8px;
+    background: rgba(var(--brand-black-rgb), .32);
+}
+
+.s3-storefront-page .s3-shop-search-card .form-control {
+    border: 1px solid transparent;
+    border-radius: 6px;
+}
+
+.s3-storefront-page .s3-shop-search-card .form-control:focus {
+    border-color: var(--brand-gold-primary);
+    box-shadow: var(--brand-focus-ring) !important;
+}
+
+.s3-storefront-page .s3-clear-filter:hover,
+.s3-storefront-page .s3-clear-filter:focus {
+    color: var(--brand-gold-light);
+}
+
+.s3-storefront-page .s3-shop-filter {
+    border-radius: 6px;
+}
+
+.s3-storefront-page .s3-shop-filter span i {
+    color: var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-shop-filter:hover,
+.s3-storefront-page .s3-shop-filter.active {
+    border-color: var(--brand-red-primary);
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s3-storefront-page .s3-shop-filter:hover span i,
+.s3-storefront-page .s3-shop-filter.active span i {
+    color: var(--brand-gold-light);
+}
+
+.s3-storefront-page .s3-active-pill {
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-product-card__image {
+    border-bottom: 1px solid rgba(var(--brand-black-rgb), .08);
+    background: #FAFAFA;
+}
+
+.s3-storefront-page .s3-product-card__category {
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s3-storefront-page .s3-product-card__footer {
+    border-top-color: rgba(var(--brand-black-rgb), .1);
+}
+
+.s3-storefront-page .s3-product-card__footer strong {
+    color: var(--brand-red-primary);
+}
+
+.s3-storefront-page .s3-stock-badge.ok {
+    color: #18723A;
+}
+
+.s3-storefront-page .s3-stock-badge.low {
+    color: #9A5A00;
+}
+
+.s3-storefront-page .s3-stock-badge.out {
+    color: var(--brand-red-secondary);
+}
+
+.s3-storefront-page .s3-product-card__actions .btn {
+    border-radius: 6px !important;
+}
+
+.s4-product-detail-page {
+    background: #F7F7F7;
+}
+
+.s4-product-detail-page .s4-product-detail-hero {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(var(--brand-black-rgb), .1);
+}
+
+.s4-product-detail-page .s4-product-detail-back {
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s4-product-detail-page .s4-product-detail-back:hover,
+.s4-product-detail-page .s4-product-detail-back:focus {
+    background: var(--brand-red-secondary);
+    color: var(--brand-gold-light);
+}
+
+.s4-product-detail-page .s4-product-detail-media {
+    background: #FAFAFA;
+}
+
+.s4-product-detail-page .s4-product-detail-panel {
+    border-left-color: rgba(var(--brand-black-rgb), .1);
+}
+
+.s4-product-detail-page .s4-product-detail-eyebrow {
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s4-product-detail-page .s4-product-detail-eyebrow i {
+    color: var(--brand-gold-primary);
+}
+
+.s4-product-detail-page .s4-product-detail-title {
+    color: var(--brand-black);
+    letter-spacing: 0;
+}
+
+.s4-product-detail-page .s4-product-detail-price {
+    border-radius: 6px;
+    background: var(--brand-red-primary);
+}
+
+.s4-product-detail-page .s4-product-detail-price span {
+    color: var(--brand-gold-light);
+}
+
+.s4-product-detail-page .s4-product-detail-stock {
+    border-color: rgba(var(--brand-red-primary-rgb), .12);
+    border-radius: 6px;
+    background: rgba(var(--brand-red-primary-rgb), .035);
+}
+
+.s4-product-detail-page .s4-product-detail-primary,
+.s4-product-detail-page .s4-product-detail-secondary {
+    border-radius: 6px;
+}
+
+.s4-product-detail-page .s4-product-detail-primary {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s4-product-detail-page .s4-product-detail-primary:hover,
+.s4-product-detail-page .s4-product-detail-primary:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s4-product-detail-page .s4-product-detail-secondary {
+    border-color: var(--brand-black);
+    color: var(--brand-black);
+}
+
+.s4-product-detail-page .s4-product-detail-secondary:hover,
+.s4-product-detail-page .s4-product-detail-secondary:focus {
+    background: var(--brand-black);
+    border-color: var(--brand-black);
+    color: var(--brand-white);
+}
+
+/* =========================================================
+   Purchase flow: cart, checkout and confirmation
+   ========================================================= */
+
+.s3-cart-page .s3-cart-hero {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .3);
+    border-radius: 8px;
+    background:
+        linear-gradient(110deg, rgba(31, 31, 31, .98), rgba(139, 14, 22, .94)),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+    box-shadow: 0 18px 40px rgba(var(--brand-black-rgb), .18);
+}
+
+.s3-cart-page .s3-cart-hero h1,
+.s3-cart-page .s3-cart-item__name,
+.s3-cart-page .s3-cart-summary__head h3,
+.s3-confirmation-card__head h1 {
+    letter-spacing: 0;
+}
+
+.s3-cart-page .s3-eyebrow {
+    background: rgba(var(--brand-gold-primary-rgb), .14);
+    color: var(--brand-gold-light);
+}
+
+.s3-cart-page .s3-cart-hero__icon {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .5);
+    border-radius: 8px;
+    background: var(--brand-gold-primary);
+    color: var(--brand-black);
+    box-shadow: 0 14px 28px rgba(var(--brand-black-rgb), .2);
+}
+
+.s3-cart-page .s3-cart-item,
+.s3-cart-page .s3-cart-summary,
+.s3-cart-page .s3-cart-empty {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    background: var(--brand-white);
+    box-shadow: 0 12px 28px rgba(var(--brand-black-rgb), .08);
+}
+
+.s3-cart-page .s3-cart-item {
+    border-left: 4px solid var(--brand-red-primary);
+}
+
+.s3-cart-page .s3-cart-item__image {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .25);
+    border-radius: 6px;
+    background: #FAFAFA;
+}
+
+.s3-cart-page .s3-cart-item__category {
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s3-cart-page .s3-cart-item__price,
+.s3-cart-page .s3-cart-item__subtotal strong,
+.s3-cart-page .s3-cart-summary__total strong {
+    color: var(--brand-red-primary);
+}
+
+.s3-cart-page .s3-cart-qty__input {
+    border-color: rgba(var(--brand-black-rgb), .2);
+    border-radius: 6px !important;
+}
+
+.s3-cart-page .s3-cart-qty__input:focus {
+    border-color: var(--brand-red-primary);
+    box-shadow: var(--brand-focus-ring);
+}
+
+.s3-cart-page .s3-cart-qty__form .btn,
+.s3-cart-page .s3-cart-qty__input-form .btn,
+.s3-cart-page .s3-cart-remove-form .btn,
+.s3-cart-page .s3-cart-summary__actions .btn,
+.s3-cart-page .s3-cart-empty .btn {
+    border-radius: 6px !important;
+}
+
+.s3-cart-page .s3-cart-qty__form .btn-outline-secondary {
+    border-color: rgba(var(--brand-black-rgb), .28);
+    color: var(--brand-black);
+}
+
+.s3-cart-page .s3-cart-qty__form .btn-outline-secondary:hover,
+.s3-cart-page .s3-cart-qty__form .btn-outline-secondary:focus {
+    background: var(--brand-black);
+    border-color: var(--brand-black);
+    color: var(--brand-white);
+}
+
+.s3-cart-page .btn-primary {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-cart-page .btn-primary:hover,
+.s3-cart-page .btn-primary:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-cart-page .btn-outline-dark {
+    border-color: var(--brand-black) !important;
+    color: var(--brand-black) !important;
+}
+
+.s3-cart-page .btn-outline-dark:hover,
+.s3-cart-page .btn-outline-dark:focus {
+    background: var(--brand-black) !important;
+    border-color: var(--brand-black) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-cart-page .btn-outline-danger {
+    border-color: var(--brand-red-secondary);
+    color: var(--brand-red-secondary);
+}
+
+.s3-cart-page .btn-outline-danger:hover,
+.s3-cart-page .btn-outline-danger:focus {
+    background: var(--brand-red-secondary);
+    border-color: var(--brand-red-secondary);
+    color: var(--brand-white);
+}
+
+.s3-cart-page .s3-cart-item__subtotal {
+    border-left-color: rgba(var(--brand-red-primary-rgb), .14);
+}
+
+.s3-cart-page .s3-cart-summary {
+    border-top: 4px solid var(--brand-gold-primary);
+}
+
+.s3-cart-page .s3-cart-summary__head {
+    background: var(--brand-black);
+}
+
+.s3-cart-page .s3-cart-summary__head .text-primary {
+    color: var(--brand-gold-light) !important;
+}
+
+.s3-cart-page .s3-cart-summary__total {
+    border-top-color: rgba(var(--brand-red-primary-rgb), .18);
+}
+
+.s3-cart-page .s3-cart-note {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .3);
+    border-radius: 6px;
+    background: rgba(var(--brand-gold-primary-rgb), .08);
+    color: var(--brand-black);
+}
+
+.s3-cart-page .s3-cart-empty {
+    border-top: 4px solid var(--brand-red-primary);
+}
+
+.s3-cart-page .s3-cart-empty__icon {
+    border-radius: 8px;
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+}
+
+.s4-checkout-page {
+    background: #F7F7F7;
+}
+
+.s4-checkout-page .s4-checkout-hero {
+    border-color: rgba(var(--brand-gold-primary-rgb), .36);
+    background:
+        linear-gradient(110deg, rgba(31, 31, 31, .98), rgba(139, 14, 22, .94)),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+    box-shadow: 0 18px 42px rgba(var(--brand-black-rgb), .18);
+}
+
+.s4-checkout-page .s4-checkout-hero::before {
+    background: var(--brand-gold-primary);
+}
+
+.s4-checkout-page .s4-checkout-hero__eyebrow,
+.s4-checkout-page .s4-checkout-hero__badge i {
+    color: var(--brand-gold-light);
+}
+
+.s4-checkout-page .s4-checkout-hero__badge {
+    border-color: rgba(var(--brand-gold-primary-rgb), .36);
+    background: rgba(var(--brand-black-rgb), .26);
+}
+
+.s4-checkout-page .s4-checkout-card,
+.s4-checkout-page .s4-checkout-summary {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    box-shadow: 0 14px 32px rgba(var(--brand-black-rgb), .08);
+}
+
+.s4-checkout-page .s4-checkout-card {
+    border-top: 4px solid var(--brand-red-primary);
+}
+
+.s4-checkout-page .s4-checkout-section {
+    border-top-color: rgba(var(--brand-red-primary-rgb), .12);
+}
+
+.s4-checkout-page .s4-checkout-section-title i {
+    background: var(--brand-red-primary);
+    color: var(--brand-gold-light);
+}
+
+.s4-checkout-page .s4-checkout-section-title span,
+.s4-checkout-page .s4-checkout-summary__header span {
+    color: var(--brand-red-primary);
+}
+
+.s4-checkout-page .s4-checkout-section-title h2,
+.s4-checkout-page .s4-checkout-summary__header h2 {
+    color: var(--brand-black);
+}
+
+.s4-checkout-page .form-control {
+    border-color: rgba(var(--brand-black-rgb), .2);
+    border-radius: 6px;
+}
+
+.s4-checkout-page .form-control:focus {
+    border-color: var(--brand-red-primary);
+    box-shadow: var(--brand-focus-ring);
+}
+
+.s4-checkout-page .form-control[readonly] {
+    background: rgba(var(--brand-black-rgb), .035);
+}
+
+.s4-checkout-page .s4-checkout-option {
+    border-color: rgba(var(--brand-black-rgb), .2);
+    border-radius: 6px;
+    background: var(--brand-white);
+    color: var(--brand-black);
+}
+
+.s4-checkout-page .s4-checkout-option:hover,
+.s4-checkout-page .s4-checkout-option.active {
+    border-color: var(--brand-red-primary);
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s4-checkout-page .s4-checkout-note {
+    border-color: rgba(var(--brand-gold-primary-rgb), .32);
+    border-left: 4px solid var(--brand-gold-primary);
+    border-radius: 6px;
+    background: rgba(var(--brand-gold-primary-rgb), .08);
+    color: var(--brand-black);
+}
+
+.s4-checkout-page .form-check-input:checked {
+    accent-color: var(--brand-red-primary);
+}
+
+.s4-checkout-page .s4-checkout-validation {
+    border-color: rgba(var(--brand-red-secondary-rgb), .3);
+    background: rgba(var(--brand-red-secondary-rgb), .06);
+}
+
+.s4-checkout-page .s4-checkout-actions {
+    border-top-color: rgba(var(--brand-red-primary-rgb), .14);
+}
+
+.s4-checkout-page .s4-checkout-submit,
+.s4-checkout-page .s4-checkout-secondary {
+    border-radius: 6px;
+}
+
+.s4-checkout-page .s4-checkout-submit {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s4-checkout-page .s4-checkout-submit:hover,
+.s4-checkout-page .s4-checkout-submit:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s4-checkout-page .s4-checkout-secondary {
+    border-color: var(--brand-black);
+    color: var(--brand-black);
+}
+
+.s4-checkout-page .s4-checkout-secondary:hover,
+.s4-checkout-page .s4-checkout-secondary:focus {
+    background: var(--brand-black);
+    border-color: var(--brand-black);
+    color: var(--brand-white);
+}
+
+.s4-checkout-page .s4-checkout-summary {
+    border-top: 4px solid var(--brand-gold-primary);
+}
+
+.s4-checkout-page .s4-checkout-summary__header {
+    background: var(--brand-black);
+}
+
+.s4-checkout-page .s4-checkout-summary__header span,
+.s4-checkout-page .s4-checkout-summary__header h2 {
+    color: var(--brand-white);
+}
+
+.s4-checkout-page .s4-checkout-summary__header i {
+    color: var(--brand-gold-light);
+}
+
+.s4-checkout-page .s4-checkout-summary-row + .s4-checkout-summary-row,
+.s4-checkout-page .s4-checkout-summary-total {
+    border-top-color: rgba(var(--brand-black-rgb), .1);
+}
+
+.s4-checkout-page .s4-checkout-summary-row strong {
+    color: var(--brand-red-primary);
+}
+
+.s4-checkout-page .s4-checkout-summary-total {
+    background: rgba(var(--brand-red-primary-rgb), .045);
+}
+
+.s3-confirmation-card {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    box-shadow: 0 18px 40px rgba(var(--brand-black-rgb), .1);
+}
+
+.s3-confirmation-card .s3-confirmation-card__head {
+    border-bottom: 4px solid var(--brand-gold-primary);
+    background:
+        linear-gradient(110deg, rgba(31, 31, 31, .98), rgba(139, 14, 22, .94)),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+}
+
+.s3-confirmation-card .s3-confirmation-icon {
+    border: 2px solid var(--brand-gold-light);
+    border-radius: 50%;
+    background: var(--brand-white);
+    color: var(--brand-red-primary);
+}
+
+.s3-confirmation-card .s3-confirmation-fact {
+    border-color: rgba(var(--brand-red-primary-rgb), .12);
+    border-radius: 6px;
+    background: rgba(var(--brand-red-primary-rgb), .035);
+}
+
+.s3-confirmation-card .s3-confirmation-fact span,
+.s3-confirmation-card .s3-section-title__eyebrow {
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s3-confirmation-card .s3-confirmation-fact strong {
+    color: var(--brand-black);
+}
+
+.s3-confirmation-card .s3-confirmation-product {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 6px;
+}
+
+.s3-confirmation-card .s3-confirmation-product > strong {
+    color: var(--brand-red-primary);
+}
+
+.s3-confirmation-card .alert-light {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34) !important;
+    background: rgba(var(--brand-gold-primary-rgb), .07);
+}
+
+.s3-confirmation-card .s3-confirmation-actions .btn {
+    border-radius: 6px !important;
+}
+
+.s3-confirmation-card .btn-primary {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.s3-confirmation-card .btn-primary:hover,
+.s3-confirmation-card .btn-primary:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+}
+
+.s3-confirmation-card .btn-outline-primary {
+    border-color: var(--brand-red-primary);
+    color: var(--brand-red-primary);
+}
+
+.s3-confirmation-card .btn-outline-primary:hover,
+.s3-confirmation-card .btn-outline-primary:focus {
+    background: var(--brand-red-primary);
+    border-color: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s3-confirmation-card .btn-outline-dark {
+    border-color: var(--brand-black);
+    color: var(--brand-black);
+}
+
+.s3-confirmation-card .btn-outline-dark:hover,
+.s3-confirmation-card .btn-outline-dark:focus {
+    background: var(--brand-black);
+    border-color: var(--brand-black);
+    color: var(--brand-white);
+}
+
+/* =========================================================
+   Post-purchase: client portal, invoices and billing
+   ========================================================= */
+
+.s4-client-portal-page,
+.s4-client-invoice-page {
+    background: #F7F7F7;
+}
+
+.s4-client-portal-page .s4-client-portal-hero,
+.s4-client-invoice-page .s4-client-invoice-toolbar {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34);
+    background:
+        linear-gradient(110deg, rgba(31, 31, 31, .98), rgba(139, 14, 22, .94)),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+    box-shadow: 0 18px 42px rgba(var(--brand-black-rgb), .18);
+}
+
+.s4-client-portal-page .s4-client-portal-hero::before {
+    background: var(--brand-gold-primary);
+}
+
+.s4-client-portal-page .s4-client-portal-eyebrow,
+.s4-client-portal-page .s4-client-portal-hero__stats strong {
+    color: var(--brand-gold-light);
+}
+
+.s4-client-portal-page .s4-client-portal-hero__stats div {
+    border-color: rgba(var(--brand-gold-primary-rgb), .28);
+    background: rgba(var(--brand-black-rgb), .24);
+}
+
+.s4-client-portal-page .s4-client-summary-card,
+.s4-client-portal-page .s4-client-orders-panel,
+.s4-client-portal-page .s4-client-detail-card,
+.s4-client-portal-page .s4-client-action-panel {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    box-shadow: 0 14px 32px rgba(var(--brand-black-rgb), .08);
+}
+
+.s4-client-portal-page .s4-client-summary-card {
+    border-top: 4px solid var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-summary-card--dark {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34);
+    border-top-color: var(--brand-gold-primary);
+    background: linear-gradient(145deg, var(--brand-black), var(--brand-red-primary));
+}
+
+.s4-client-portal-page .s4-client-summary-card__icon {
+    background: rgba(var(--brand-red-primary-rgb), .08);
+    color: var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-summary-card--dark .s4-client-summary-card__icon {
+    background: rgba(var(--brand-gold-primary-rgb), .16);
+    color: var(--brand-gold-light);
+}
+
+.s4-client-portal-page .s4-client-summary-card span,
+.s4-client-portal-page .s4-client-orders-panel__head span,
+.s4-client-portal-page .s4-client-detail-card__head > div > span,
+.s4-client-portal-page .s4-client-detail-facts span,
+.s4-client-portal-page .s4-client-detail-note span,
+.s4-client-portal-page .s4-client-action-panel > div > span {
+    color: var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-summary-card--dark span {
+    color: var(--brand-gold-light);
+}
+
+.s4-client-portal-page .s4-client-summary-list,
+.s4-client-portal-page .s4-client-detail-card__head {
+    border-color: rgba(var(--brand-red-primary-rgb), .12);
+}
+
+.s4-client-portal-page .s4-client-credit-amount.success {
+    color: #18723A;
+}
+
+.s4-client-portal-page .s4-client-credit-amount.danger {
+    color: var(--brand-red-secondary);
+}
+
+.s4-client-portal-page .s4-client-status-pill {
+    border: 1px solid transparent;
+}
+
+.s4-client-portal-page .s4-client-status-pill.warning {
+    border-color: rgba(var(--brand-gold-primary-rgb), .4);
+    background: rgba(var(--brand-gold-primary-rgb), .14);
+    color: #805A00;
+}
+
+.s4-client-portal-page .s4-client-status-pill.success {
+    border-color: rgba(24, 114, 58, .24);
+    background: rgba(24, 114, 58, .1);
+    color: #176A37;
+}
+
+.s4-client-portal-page .s4-client-status-pill.danger {
+    border-color: rgba(var(--brand-red-secondary-rgb), .25);
+    background: rgba(var(--brand-red-secondary-rgb), .08);
+    color: var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-status-pill.dark {
+    border-color: rgba(var(--brand-black-rgb), .2);
+    background: rgba(var(--brand-black-rgb), .07);
+    color: var(--brand-black);
+}
+
+.s4-client-portal-page .s4-client-orders-panel {
+    border-top: 4px solid var(--brand-gold-primary);
+}
+
+.s4-client-portal-page .s4-client-orders-panel__head {
+    border-bottom-color: rgba(var(--brand-black-rgb), .1);
+    background: var(--brand-white);
+}
+
+.s4-client-portal-page .s4-client-orders-panel__head strong {
+    border-color: rgba(var(--brand-red-primary-rgb), .16);
+    background: rgba(var(--brand-red-primary-rgb), .05);
+    color: var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-orders-table thead th {
+    border-bottom-color: rgba(var(--brand-red-primary-rgb), .18);
+    background: rgba(var(--brand-red-primary-rgb), .06);
+    color: var(--brand-black);
+}
+
+.s4-client-portal-page .s4-client-orders-table tbody tr:hover {
+    background: rgba(var(--brand-gold-primary-rgb), .06);
+}
+
+.s4-client-portal-page .s4-client-table-action,
+.s4-client-portal-page .s4-client-primary-action,
+.s4-client-portal-page .s4-client-secondary-action,
+.s4-client-portal-page .s4-client-danger-action,
+.s4-client-portal-page .s4-client-hero-action {
+    border-radius: 6px;
+}
+
+.s4-client-portal-page .s4-client-table-action,
+.s4-client-portal-page .s4-client-secondary-action {
+    border-color: var(--brand-black);
+    background: var(--brand-white);
+    color: var(--brand-black);
+}
+
+.s4-client-portal-page .s4-client-table-action:hover,
+.s4-client-portal-page .s4-client-table-action:focus,
+.s4-client-portal-page .s4-client-secondary-action:hover,
+.s4-client-portal-page .s4-client-secondary-action:focus {
+    background: var(--brand-black);
+    border-color: var(--brand-black);
+    color: var(--brand-white);
+}
+
+.s4-client-portal-page .s4-client-primary-action,
+.s4-client-portal-page .s4-client-hero-action {
+    border-color: var(--brand-gold-primary);
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s4-client-portal-page .s4-client-primary-action:hover,
+.s4-client-portal-page .s4-client-primary-action:focus,
+.s4-client-portal-page .s4-client-hero-action:hover,
+.s4-client-portal-page .s4-client-hero-action:focus {
+    border-color: var(--brand-gold-light);
+    background: var(--brand-red-secondary);
+    color: var(--brand-white);
+}
+
+.s4-client-portal-page .s4-client-danger-action {
+    border-color: var(--brand-red-secondary);
+    background: var(--brand-red-secondary);
+    color: var(--brand-white);
+}
+
+.s4-client-portal-page .s4-client-detail-facts div,
+.s4-client-portal-page .s4-client-detail-note {
+    border-color: rgba(var(--brand-red-primary-rgb), .12);
+    border-radius: 6px;
+    background: rgba(var(--brand-red-primary-rgb), .035);
+}
+
+.s4-client-portal-page .s4-client-action-panel {
+    border-top: 4px solid var(--brand-gold-primary);
+}
+
+.s4-client-portal-page .s4-client-order-total {
+    border-radius: 6px;
+    background: var(--brand-red-primary);
+}
+
+.s4-client-portal-page .s4-client-order-total span {
+    color: var(--brand-gold-light);
+}
+
+.s4-client-invoice-page .s4-client-invoice-toolbar span {
+    color: var(--brand-gold-light);
+}
+
+.s4-client-invoice-page .s4-client-invoice-primary,
+.s4-client-invoice-page .s4-client-invoice-secondary {
+    border-radius: 6px;
+}
+
+.s4-client-invoice-page .s4-client-invoice-primary {
+    border-color: var(--brand-gold-primary);
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.s4-client-invoice-page .s4-client-invoice-primary:hover,
+.s4-client-invoice-page .s4-client-invoice-primary:focus {
+    border-color: var(--brand-gold-light);
+    background: var(--brand-red-secondary);
+    color: var(--brand-white);
+}
+
+.s4-client-invoice-page .s4-client-invoice-document {
+    border-color: rgba(var(--brand-black-rgb), .14);
+    box-shadow: 0 18px 42px rgba(var(--brand-black-rgb), .1);
+}
+
+.s4-client-invoice-page .s4-client-invoice-header {
+    border-bottom-color: rgba(var(--brand-red-primary-rgb), .15);
+}
+
+.s4-client-invoice-page .s4-client-invoice-brand {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .35);
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--brand-black), var(--brand-red-primary));
+}
+
+.s4-client-invoice-page .s4-client-invoice-brand-heading {
+    align-items: center;
+    display: flex;
+    gap: .8rem;
+}
+
+.s4-client-invoice-page .s4-client-invoice-logo {
+    background: var(--brand-white);
+    border: 2px solid var(--brand-gold-primary);
+    border-radius: 50%;
+    flex: 0 0 54px;
+    height: 54px;
+    object-fit: cover;
+    padding: 2px;
+    width: 54px;
+}
+
+.s4-client-invoice-page .s4-client-invoice-brand-heading small {
+    color: rgba(255, 255, 255, .76);
+    display: block;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.s4-client-invoice-page .s4-client-invoice-meta div,
+.s4-client-invoice-page .s4-client-invoice-card,
+.s4-client-invoice-page .s4-client-invoice-totals,
+.s4-client-invoice-page .s4-client-invoice-products {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 6px;
+    background: #FAFAFA;
+}
+
+.s4-client-invoice-page .s4-client-invoice-meta span,
+.s4-client-invoice-page .s4-client-invoice-card-title span:first-child,
+.s4-client-invoice-page .s4-client-invoice-totals span,
+.s4-client-invoice-page .s4-client-invoice-products-head span,
+.s4-client-invoice-page .s4-client-invoice-facts dt {
+    color: var(--brand-red-primary);
+    letter-spacing: 0;
+}
+
+.s4-client-invoice-page .s4-client-invoice-card-title,
+.s4-client-invoice-page .s4-client-invoice-totals div,
+.s4-client-invoice-page .s4-client-invoice-products-head {
+    border-color: rgba(var(--brand-red-primary-rgb), .12);
+}
+
+.s4-client-invoice-page .s4-client-invoice-total-row {
+    border-radius: 6px;
+    background: var(--brand-red-primary);
+}
+
+.s4-client-invoice-page .s4-client-invoice-total-row span {
+    color: var(--brand-gold-light);
+}
+
+.s4-client-invoice-page .s4-client-invoice-table th {
+    border-bottom-color: rgba(var(--brand-red-primary-rgb), .16);
+    background: rgba(var(--brand-red-primary-rgb), .07);
+    color: var(--brand-black);
+    letter-spacing: 0;
+}
+
+.s4-client-invoice-page .s4-client-invoice-table tbody tr:hover {
+    background: rgba(var(--brand-gold-primary-rgb), .06);
+}
+
+.s4-client-invoice-page .s4-client-invoice-table tfoot tr:last-child th {
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.billing-page .admin-page-header,
+.billing-detail-page .admin-page-header {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .32);
+    border-radius: 8px;
+    background:
+        linear-gradient(110deg, rgba(31, 31, 31, .98), rgba(139, 14, 22, .94)),
+        url("../img/CervesayLicores.webp") center / cover no-repeat;
+    box-shadow: 0 18px 40px rgba(var(--brand-black-rgb), .16);
+}
+
+.billing-page .admin-card,
+.billing-page .admin-table-wrapper,
+.billing-detail-page .admin-card,
+.billing-detail-page .admin-table-wrapper {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    box-shadow: 0 12px 28px rgba(var(--brand-black-rgb), .07);
+}
+
+.billing-page .admin-card {
+    border-top: 4px solid var(--brand-red-primary);
+}
+
+.billing-page .admin-card .text-primary {
+    color: var(--brand-red-primary) !important;
+}
+
+.billing-page .admin-card h3 {
+    color: var(--brand-red-primary);
+}
+
+.billing-page .billing-table-wrapper,
+.billing-detail-page .admin-table-wrapper {
+    border-top: 4px solid var(--brand-gold-primary);
+}
+
+.billing-page .billing-table-wrapper > .border-bottom,
+.billing-detail-page .admin-table-wrapper > .border-bottom {
+    border-bottom-color: rgba(var(--brand-red-primary-rgb), .12) !important;
+}
+
+.billing-page .billing-invoices-table thead th,
+.billing-detail-page .admin-table-wrapper thead th {
+    border-bottom-color: rgba(var(--brand-red-primary-rgb), .18);
+    background: rgba(var(--brand-red-primary-rgb), .07);
+    color: var(--brand-black);
+}
+
+.billing-page .billing-invoices-table tbody tr:hover,
+.billing-detail-page .admin-table-wrapper tbody tr:hover {
+    background: rgba(var(--brand-gold-primary-rgb), .06);
+}
+
+.billing-page .billing-invoices-table td:nth-child(8),
+.billing-detail-page .admin-table-wrapper tbody td:last-child,
+.billing-detail-page .admin-table-wrapper tfoot tr:last-child th {
+    color: var(--brand-red-primary);
+    font-weight: 900;
+}
+
+.billing-page .billing-action-link {
+    border-color: var(--brand-red-primary);
+    border-radius: 6px;
+    color: var(--brand-red-primary);
+}
+
+.billing-page .billing-action-link:hover,
+.billing-page .billing-action-link:focus {
+    background: var(--brand-red-primary);
+    border-color: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+.billing-page .list-group-item {
+    border-color: rgba(var(--brand-black-rgb), .1);
+}
+
+.billing-page .admin-badge-soft.success,
+.billing-detail-page .admin-badge-soft.success {
+    background: rgba(24, 114, 58, .1);
+    color: #176A37;
+}
+
+.billing-page .admin-badge-soft.dark,
+.billing-detail-page .admin-badge-soft.dark {
+    background: rgba(var(--brand-black-rgb), .08);
+    color: var(--brand-black);
+}
+
+.billing-detail-page .billing-detail-brand {
+    align-items: center;
+    display: flex;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.billing-detail-page .billing-detail-brand img {
+    background: var(--brand-white);
+    border: 2px solid var(--brand-gold-primary);
+    border-radius: 50%;
+    height: 54px;
+    object-fit: cover;
+    padding: 2px;
+    width: 54px;
+}
+
+.billing-detail-page .billing-detail-brand span,
+.billing-detail-page .billing-detail-brand small {
+    display: block;
+}
+
+.billing-detail-page .billing-detail-brand span {
+    color: var(--brand-gold-light);
+    font-size: .82rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.billing-detail-page .billing-detail-brand small {
+    color: rgba(255, 255, 255, .74);
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.billing-detail-page .admin-card h5,
+.billing-detail-page .admin-table-wrapper h5 {
+    color: var(--brand-black);
+}
+
+.billing-detail-page .admin-card label {
+    color: var(--brand-red-primary);
+}
+
+.billing-detail-page .billing-detail-actions .btn {
+    border-radius: 6px !important;
+}
+
+.billing-detail-page .billing-detail-actions .btn-primary {
+    background: var(--brand-red-primary) !important;
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.billing-detail-page .billing-detail-actions .btn-primary:hover,
+.billing-detail-page .billing-detail-actions .btn-primary:focus {
+    background: var(--brand-red-secondary) !important;
+    border-color: var(--brand-gold-primary) !important;
+}
+
+@media print {
+    .s4-client-invoice-page {
+        background: var(--brand-white) !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .s4-client-invoice-page .s4-client-invoice-logo,
+    .billing-detail-page .billing-detail-brand img {
+        height: 46px;
+        width: 46px;
+    }
+
+    .s4-client-invoice-page .s4-client-invoice-document,
+    .billing-detail-page .admin-page-header,
+    .billing-detail-page .admin-card,
+    .billing-detail-page .admin-table-wrapper {
+        box-shadow: none !important;
+    }
+
+    .billing-detail-page {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    .brand-navbar {
+        max-width: 240px;
+    }
+
+    .brand-navbar__name {
+        font-size: .92rem;
+    }
+
+    .brand-navbar__subtitle {
+        font-size: .66rem;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .brand-navbar-shell {
+        gap: .6rem;
+    }
+
+    .brand-navbar {
+        max-width: calc(100% - 72px);
+        padding-right: .35rem;
+    }
+
+    .main-nav-clean,
+    .main-nav-2027 {
+        min-height: 0;
+        padding-top: .75rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .s4-auth-page--clean .s4-auth-brand-strip {
+        align-items: center;
+        min-height: 112px;
+        padding: 1.15rem;
+    }
+
+    .s4-auth-page--clean .s4-auth-brand-mark {
+        flex-basis: 58px;
+        height: 58px;
+        width: 58px;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand-navbar__mark {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+
+    .brand-navbar__name {
+        font-size: .84rem;
+        white-space: normal;
+    }
+
+    .brand-navbar__subtitle {
+        font-size: .6rem;
+        white-space: normal;
+    }
+
+    .s4-auth-page--clean .s4-auth-brand-strip {
+        align-items: flex-start;
+        gap: .8rem;
+        padding: 1rem;
+    }
+
+    .s4-auth-page--clean .s4-auth-brand-mark {
+        flex-basis: 52px;
+        height: 52px;
+        width: 52px;
+    }
+
+    .s4-auth-page--clean .s4-auth-brand-strip .s4-auth-brand-name {
+        font-size: .7rem;
+        letter-spacing: .05em;
+    }
+
+    .s4-auth-page--clean .s4-auth-brand-subtitle {
+        font-size: .62rem;
+        letter-spacing: .03em;
+    }
+}
+
+/* =========================================================
+   Backoffice - dashboard, inventory, orders and access
+   ========================================================= */
+
+.backoffice-page {
+    color: var(--brand-black);
+}
+
+.backoffice-page .admin-page-header {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .42) !important;
+    border-left: 6px solid var(--brand-gold-primary) !important;
+    border-radius: 8px !important;
+    background: linear-gradient(115deg, var(--brand-black) 0%, #321719 56%, var(--brand-red-primary) 100%) !important;
+    box-shadow: 0 14px 30px rgba(var(--brand-black-rgb), .16) !important;
+}
+
+.backoffice-page .admin-page-header::after {
+    display: none;
+}
+
+.backoffice-page .admin-page-header h1,
+.backoffice-page .admin-page-header h2,
+.backoffice-page .admin-page-header h3,
+.backoffice-page .admin-page-header h4 {
+    color: var(--brand-white);
+    letter-spacing: 0;
+}
+
+.backoffice-page .admin-page-header p,
+.backoffice-page .admin-page-header .text-muted {
+    color: rgba(255, 255, 255, .78) !important;
+}
+
+.backoffice-page .admin-card,
+.backoffice-page .admin-table-wrapper,
+.backoffice-page .admin-filter-bar,
+.backoffice-page .admin-filter-grid {
+    border: 1px solid rgba(var(--brand-black-rgb), .12) !important;
+    border-radius: 8px !important;
+    background: var(--brand-white) !important;
+    box-shadow: 0 9px 24px rgba(var(--brand-black-rgb), .08) !important;
+}
+
+.backoffice-page .admin-card h3,
+.backoffice-page .admin-card h4,
+.backoffice-page .admin-card h5,
+.backoffice-page .admin-table-wrapper h5,
+.backoffice-page .admin-filter-bar h5 {
+    color: var(--brand-black);
+    letter-spacing: 0;
+}
+
+.backoffice-page .admin-card .text-primary,
+.backoffice-page .admin-table-wrapper .text-primary {
+    color: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .admin-card label,
+.backoffice-page .admin-filter-bar label {
+    color: var(--brand-black);
+}
+
+.backoffice-page .form-control,
+.backoffice-page .custom-select,
+.backoffice-page select.form-control,
+.backoffice-page textarea.form-control {
+    border: 1px solid rgba(var(--brand-black-rgb), .2) !important;
+    border-radius: 6px !important;
+    background: var(--brand-white) !important;
+    color: var(--brand-black) !important;
+}
+
+.backoffice-page .form-control:focus,
+.backoffice-page .custom-select:focus,
+.backoffice-page select.form-control:focus,
+.backoffice-page textarea.form-control:focus {
+    border-color: var(--brand-gold-primary) !important;
+    box-shadow: var(--brand-focus-ring) !important;
+}
+
+.backoffice-page .btn {
+    border-radius: 6px !important;
+    letter-spacing: 0;
+}
+
+.backoffice-page .btn-primary,
+.backoffice-page .btn-modern-primary {
+    border-color: var(--brand-red-primary) !important;
+    background: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-primary:hover,
+.backoffice-page .btn-primary:focus,
+.backoffice-page .btn-modern-primary:hover,
+.backoffice-page .btn-modern-primary:focus {
+    border-color: var(--brand-red-secondary) !important;
+    background: var(--brand-red-secondary) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-dark {
+    border-color: var(--brand-black) !important;
+    background: var(--brand-black) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-dark:hover,
+.backoffice-page .btn-dark:focus {
+    border-color: var(--brand-red-primary) !important;
+    background: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .btn-outline-primary {
+    border-color: var(--brand-red-primary) !important;
+    color: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .btn-outline-primary:hover,
+.backoffice-page .btn-outline-primary:focus {
+    background: var(--brand-red-primary) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-outline-secondary {
+    border-color: rgba(var(--brand-black-rgb), .34) !important;
+    color: var(--brand-black) !important;
+}
+
+.backoffice-page .btn-outline-secondary:hover,
+.backoffice-page .btn-outline-secondary:focus {
+    border-color: var(--brand-black) !important;
+    background: var(--brand-black) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-warning {
+    border-color: var(--brand-gold-primary) !important;
+    background: var(--brand-gold-light) !important;
+    color: var(--brand-black) !important;
+}
+
+.backoffice-page .btn-success {
+    border-color: #247145 !important;
+    background: #247145 !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-danger,
+.backoffice-page .btn-outline-danger:hover,
+.backoffice-page .btn-outline-danger:focus {
+    border-color: var(--brand-red-secondary) !important;
+    background: var(--brand-red-secondary) !important;
+    color: var(--brand-white) !important;
+}
+
+.backoffice-page .btn-outline-danger {
+    border-color: var(--brand-red-secondary) !important;
+    color: var(--brand-red-secondary) !important;
+}
+
+.backoffice-page .admin-table-wrapper {
+    overflow: hidden;
+}
+
+.backoffice-page .admin-table-wrapper thead th,
+.backoffice-page .admin-table-wrapper .thead-light th {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34) !important;
+    background: var(--brand-black) !important;
+    color: var(--brand-white) !important;
+    font-weight: 700 !important;
+    letter-spacing: 0;
+}
+
+.backoffice-page .admin-table-wrapper tbody td {
+    border-top-color: rgba(var(--brand-black-rgb), .09) !important;
+}
+
+.backoffice-page .admin-table-wrapper tbody tr:hover {
+    background: rgba(var(--brand-gold-primary-rgb), .08) !important;
+}
+
+.backoffice-page .admin-table-wrapper > .border-bottom,
+.backoffice-page .admin-table-wrapper .p-4.border-bottom {
+    border-bottom-color: rgba(var(--brand-gold-primary-rgb), .32) !important;
+    background: #fffdf7;
+}
+
+.backoffice-page .admin-badge-soft,
+.backoffice-page .badge {
+    letter-spacing: 0 !important;
+}
+
+.backoffice-page .admin-badge-soft.success,
+.backoffice-page .badge-success {
+    background: rgba(36, 113, 69, .12) !important;
+    color: #1d6039 !important;
+}
+
+.backoffice-page .admin-badge-soft.warning,
+.backoffice-page .badge-warning {
+    background: rgba(var(--brand-gold-primary-rgb), .2) !important;
+    color: #715405 !important;
+}
+
+.backoffice-page .admin-badge-soft.danger,
+.backoffice-page .badge-danger {
+    background: rgba(var(--brand-red-secondary-rgb), .12) !important;
+    color: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .admin-badge-soft.dark,
+.backoffice-page .badge-secondary {
+    background: rgba(var(--brand-black-rgb), .1) !important;
+    color: var(--brand-black) !important;
+}
+
+.backoffice-page .badge-info {
+    background: rgba(var(--brand-red-primary-rgb), .11) !important;
+    color: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .badge-light {
+    background: #f3f1ec !important;
+    color: #4b4b4b !important;
+}
+
+.backoffice-page .alert {
+    border-radius: 8px !important;
+    box-shadow: none;
+}
+
+.backoffice-page .alert-warning {
+    border-color: rgba(var(--brand-gold-primary-rgb), .46);
+    background: #fff9df;
+    color: #5e4708;
+}
+
+.backoffice-page .alert-info {
+    border-color: rgba(var(--brand-red-primary-rgb), .22);
+    background: rgba(var(--brand-red-primary-rgb), .06);
+    color: #5f1117;
+}
+
+.backoffice-page .form-check-input:checked,
+.backoffice-page .custom-control-input:checked ~ .custom-control-label::before {
+    border-color: var(--brand-red-primary) !important;
+    background-color: var(--brand-red-primary) !important;
+}
+
+.backoffice-page .admin-actions {
+    gap: .45rem;
+}
+
+.backoffice-page .admin-actions .btn {
+    min-width: 104px;
+    border-radius: 6px !important;
+}
+
+/* Dashboard */
+
+.admin-dashboard-page .admin-card.text-center {
+    position: relative;
+    overflow: hidden;
+    border-top: 3px solid var(--brand-gold-primary) !important;
+}
+
+.admin-dashboard-page .admin-card.text-center::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 46px;
+    height: 3px;
+    background: var(--brand-red-primary);
+}
+
+.admin-dashboard-page .admin-card.text-center .fa-2x {
+    display: inline-grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(var(--brand-red-primary-rgb), .09);
+    color: var(--brand-red-primary) !important;
+    font-size: 1.35rem;
+}
+
+.admin-dashboard-page .admin-card.text-center h3 {
+    color: var(--brand-red-primary);
+    font-weight: 800;
+}
+
+.admin-dashboard-page .admin-card:not(.text-center) > h5 {
+    padding-bottom: .8rem;
+    border-bottom: 2px solid rgba(var(--brand-gold-primary-rgb), .36);
+}
+
+.admin-dashboard-page .admin-card:not(.text-center) .btn-primary {
+    min-height: 48px;
+    border-left: 4px solid var(--brand-gold-primary) !important;
+    text-align: left;
+}
+
+/* Inventory and order management */
+
+.inventory-admin-page .table-product-thumb {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .38);
+    border-radius: 6px;
+    box-shadow: 0 6px 14px rgba(var(--brand-black-rgb), .1);
+}
+
+.inventory-admin-page .admin-filter-grid,
+.orders-admin-page .admin-filter-bar,
+.access-admin-page .admin-filter-grid {
+    border-top: 3px solid var(--brand-gold-primary) !important;
+}
+
+.inventory-admin-page .admin-card > h5,
+.orders-admin-page .admin-card > h5,
+.access-admin-page .admin-card > h5 {
+    padding-bottom: .7rem;
+    border-bottom: 2px solid rgba(var(--brand-gold-primary-rgb), .3);
+}
+
+.orders-admin-page .admin-card hr {
+    border-top-color: rgba(var(--brand-gold-primary-rgb), .34);
+}
+
+.orders-admin-page .admin-card .col-md-6 > label,
+.orders-admin-page .admin-card .col-md-12 > label {
+    color: #696969;
+    font-size: .78rem;
+    text-transform: uppercase;
+}
+
+.orders-admin-page .admin-card .col-md-6 > span,
+.orders-admin-page .admin-card .col-md-12 > span {
+    color: var(--brand-black);
+    font-weight: 600;
+}
+
+/* Roles and permissions */
+
+.access-admin-page .admin-card.text-center {
+    border-top: 3px solid var(--brand-gold-primary) !important;
+}
+
+.access-admin-page .admin-card.text-center h3 {
+    color: var(--brand-red-primary);
+    font-weight: 800;
+}
+
+.permissions-admin-page .admin-card .border.rounded {
+    border-color: rgba(var(--brand-black-rgb), .12) !important;
+    border-radius: 6px !important;
+    background: #fbfaf7;
+}
+
+.permissions-admin-page .admin-card .border.rounded:hover {
+    border-color: rgba(var(--brand-gold-primary-rgb), .6) !important;
+    background: #fffdf5;
+}
+
+.permissions-admin-page .admin-card .fa-folder-open {
+    color: var(--brand-red-primary) !important;
+}
+
+/* Seller orders and offline workflow */
+
+.seller-orders-page .offline-status-card {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .44);
+    border-left: 6px solid var(--brand-gold-primary);
+    border-radius: 8px;
+    background: linear-gradient(120deg, var(--brand-black) 0%, #361719 60%, var(--brand-red-primary) 100%);
+    box-shadow: 0 14px 30px rgba(var(--brand-black-rgb), .16);
+}
+
+.seller-orders-page .offline-status-pill {
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .1);
+}
+
+.seller-orders-page .seller-product-card,
+.seller-orders-page .offline-order-card {
+    border-color: rgba(var(--brand-black-rgb), .13);
+    border-radius: 8px !important;
+    background: var(--brand-white);
+    box-shadow: 0 7px 18px rgba(var(--brand-black-rgb), .07);
+}
+
+.seller-orders-page .seller-product-card:hover {
+    border-color: rgba(var(--brand-gold-primary-rgb), .68) !important;
+    box-shadow: 0 10px 24px rgba(var(--brand-black-rgb), .11) !important;
+}
+
+.seller-orders-page .seller-product-card__title {
+    color: var(--brand-black);
+}
+
+.seller-orders-page .seller-mobile-summary {
+    border-radius: 8px 8px 0 0;
+}
+
+.seller-orders-page .seller-mobile-summary .admin-card {
+    border-top: 3px solid var(--brand-gold-primary) !important;
+}
+
+/* Employee portal uses its existing isolated page root. */
+
+body .employee-page .employee-profile-hero {
+    border: 1px solid rgba(var(--brand-gold-primary-rgb), .42);
+    border-left: 6px solid var(--brand-gold-primary);
+    border-radius: 8px;
+    background: linear-gradient(115deg, var(--brand-black) 0%, #321719 56%, var(--brand-red-primary) 100%);
+    box-shadow: 0 14px 30px rgba(var(--brand-black-rgb), .16);
+}
+
+body .employee-page .employee-profile-hero::after {
+    display: none;
+}
+
+body .employee-page .employee-avatar--lg {
+    border-radius: 50%;
+    background: var(--brand-gold-primary);
+    color: var(--brand-black);
+    box-shadow: 0 10px 24px rgba(var(--brand-gold-primary-rgb), .2);
+}
+
+body .employee-page .employee-card {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 8px;
+    box-shadow: 0 9px 24px rgba(var(--brand-black-rgb), .08);
+}
+
+body .employee-page .employee-card-title {
+    padding-bottom: .7rem;
+    border-bottom: 2px solid rgba(var(--brand-gold-primary-rgb), .3);
+    color: var(--brand-black);
+    letter-spacing: 0;
+}
+
+body .employee-page .employee-card-title i {
+    color: var(--brand-red-primary);
+}
+
+body .employee-page .employee-task-item {
+    border-color: rgba(var(--brand-black-rgb), .12);
+    border-radius: 6px;
+    background: #fbfaf7;
+}
+
+body .employee-page .employee-salary {
+    color: var(--brand-red-primary) !important;
+}
+
+body .employee-page .btn-primary {
+    border-color: var(--brand-red-primary);
+    background: var(--brand-red-primary);
+    color: var(--brand-white);
+}
+
+body .employee-page .btn-primary:hover,
+body .employee-page .btn-primary:focus {
+    border-color: var(--brand-red-secondary);
+    background: var(--brand-red-secondary);
+}
+
+body .employee-page .btn-outline-dark {
+    border-color: var(--brand-black);
+    color: var(--brand-black);
+}
+
+body .employee-page .btn-outline-dark:hover,
+body .employee-page .btn-outline-dark:focus {
+    background: var(--brand-black);
+    color: var(--brand-white);
+}
+
+body .employee-page .form-control:focus,
+body .employee-page .custom-select:focus {
+    border-color: var(--brand-gold-primary);
+    box-shadow: var(--brand-focus-ring);
+}
+
+body .employee-page .table thead th {
+    border-color: rgba(var(--brand-gold-primary-rgb), .34);
+    background: var(--brand-black);
+    color: var(--brand-white);
+    letter-spacing: 0;
+}
+
+body .employee-page .table tbody tr:hover {
+    background: rgba(var(--brand-gold-primary-rgb), .08);
+}
+
+@media (max-width: 991.98px) {
+    .backoffice-page .admin-page-header {
+        padding: 24px !important;
+    }
+
+    .backoffice-page .admin-filter-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .backoffice-page .admin-filter-grid .btn,
+    .backoffice-page .admin-page-header .btn {
+        width: 100%;
+    }
+
+    .backoffice-page .admin-actions,
+    .backoffice-page .admin-actions--products,
+    .backoffice-page .admin-actions--roles {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .backoffice-page {
+        padding-top: 1rem !important;
+    }
+
+    .backoffice-page > .row.px-xl-5 {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+    .backoffice-page .admin-page-header {
+        align-items: stretch !important;
+        padding: 20px !important;
+    }
+
+    .backoffice-page .admin-page-header h2 {
+        font-size: 1.55rem;
+    }
+
+    .backoffice-page .admin-card {
+        padding: 1rem !important;
+    }
+
+    .backoffice-page .admin-table-wrapper td,
+    .backoffice-page .admin-table-wrapper th {
+        padding: .75rem !important;
+    }
+
+    .backoffice-page .admin-actions {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        width: 100% !important;
+    }
+
+    .backoffice-page .admin-actions form,
+    .backoffice-page .admin-actions .btn {
+        width: 100% !important;
+    }
+
+    .permissions-admin-page .admin-card.d-flex {
+        align-items: stretch !important;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .permissions-admin-page .admin-card.d-flex > .d-flex {
+        flex-direction: column;
+    }
+
+    .permissions-admin-page .admin-card.d-flex .btn {
+        width: 100%;
+    }
+
+    .seller-orders-page .offline-status-card {
+        padding: 14px;
+    }
+
+    body .employee-page .employee-profile-hero__main {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

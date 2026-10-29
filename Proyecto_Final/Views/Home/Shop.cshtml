@@ -1,0 +1,134 @@
+@model Proyecto_Final.Models.Store.ShopViewModel
+@{
+    Layout = "_StorefrontLayout";
+    ViewData["Title"] = Model.Titulo;
+    var productos = Model.Productos ?? new List<Proyecto_Final.Models.Store.StoreProductViewModel>();
+    var combos = Model.Combos ?? new List<Proyecto_Final.Models.Admin.StoreComboViewModel>();
+    var categorias = Model.Categorias ?? new List<string>();
+    var totalResultados = productos.Count + (string.IsNullOrWhiteSpace(Model.Categoria) ? combos.Count : 0);
+    var returnUrl = Url.Action("Shop", "Home", new { categoria = Model.Categoria, buscar = Model.Buscar });
+}
+
+<div class="djj-container djj-store-page">
+    <nav class="djj-store-page__breadcrumb" aria-label="Migas de pan">
+        <ol class="djj-breadcrumb"><li><a asp-controller="Home" asp-action="Index">Inicio</a></li><li aria-hidden="true"><svg class="djj-icon djj-icon--sm"><use href="#djj-icon-caret-right"></use></svg></li><li aria-current="page">Catálogo</li></ol>
+    </nav>
+
+    <header class="djj-store-heading">
+        <div class="djj-store-heading__copy"><span class="djj-page-header__eyebrow">Catálogo disponible</span><h1>@Model.Titulo</h1><p>Buscá productos y combos usando la información disponible del inventario.</p></div>
+        <span class="djj-store-heading__meta" aria-live="polite">@totalResultados resultado(s)</span>
+    </header>
+
+    <form class="djj-catalog-search" asp-controller="Home" asp-action="Shop" method="get" role="search">
+        <input type="hidden" name="categoria" value="@Model.Categoria" />
+        <div class="djj-field"><label class="djj-field__label" for="buscar">Buscar en el catálogo</label><input class="djj-input" id="buscar" type="search" name="buscar" value="@Model.Buscar" placeholder="Nombre o descripción" autocomplete="off" /></div>
+        <button class="djj-button djj-button--primary" type="submit"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-search"></use></svg>Buscar</button>
+    </form>
+
+    <div class="djj-catalog-layout">
+        <aside class="djj-card djj-catalog-sidebar" aria-labelledby="djj-filter-title">
+            <div class="djj-card__header"><div><h2 id="djj-filter-title">Categorías</h2><p>Filtrá el catálogo.</p></div></div>
+            <ul class="djj-catalog-filter-list">
+                <li><a asp-controller="Home" asp-action="Shop" asp-route-buscar="@Model.Buscar" aria-current="@(string.IsNullOrWhiteSpace(Model.Categoria) ? "true" : null)"><span>Todos</span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a></li>
+                @foreach (var categoria in categorias)
+                {
+                    <li><a asp-controller="Home" asp-action="Shop" asp-route-categoria="@categoria" asp-route-buscar="@Model.Buscar" aria-current="@(string.Equals(Model.Categoria, categoria, StringComparison.OrdinalIgnoreCase) ? "true" : null)"><span>@categoria</span><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-caret-right"></use></svg></a></li>
+                }
+            </ul>
+        </aside>
+
+        <main>
+            <div class="djj-catalog-toolbar">
+                <div class="djj-filter-chips" aria-label="Filtros activos">
+                    @if (!string.IsNullOrWhiteSpace(Model.Categoria))
+                    {
+                        <span class="djj-filter-chip" aria-label="Categoría activa: @Model.Categoria"><svg class="djj-icon djj-icon--sm" aria-hidden="true"><use href="#djj-icon-tag"></use></svg>@Model.Categoria</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Buscar))
+                    {
+                        <span class="djj-filter-chip" aria-label="Búsqueda activa: @Model.Buscar"><svg class="djj-icon djj-icon--sm" aria-hidden="true"><use href="#djj-icon-search"></use></svg>@Model.Buscar</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.Categoria) || !string.IsNullOrWhiteSpace(Model.Buscar))
+                    {
+                        <a class="djj-button djj-button--ghost djj-button--sm djj-button--inline-mobile" asp-controller="Home" asp-action="Shop">Limpiar filtros</a>
+                    }
+                </div>
+                <button class="djj-button djj-button--outline djj-button--sm djj-button--inline-mobile djj-catalog-mobile-filter" type="button" aria-controls="djj-catalog-drawer" aria-expanded="false" data-djj-drawer-open="djj-catalog-drawer">Categorías</button>
+            </div>
+
+            @if (string.IsNullOrWhiteSpace(Model.Categoria) && combos.Count > 0)
+            {
+                <section class="djj-catalog-section" aria-labelledby="djj-combos-title">
+                    <div class="djj-catalog-section__header"><h2 id="djj-combos-title">Combos disponibles</h2><p>Ofertas armadas con componentes registrados por el comercio.</p></div>
+                    <div class="djj-catalog-grid">
+                        @foreach (var combo in combos)
+                        {
+                            var comboStatus = combo.Disponible ? (combo.StockDisponible <= 3 ? "warning" : "success") : "danger";
+                            <article class="djj-product-card djj-product-card--combo">
+                                <a class="djj-product-card__media" asp-controller="Home" asp-action="ComboDetail" asp-route-id="@combo.ComboId" asp-route-returnUrl="@returnUrl"><img data-djj-product-image src="@Url.Content(combo.ImagenUrl)" alt="@combo.Nombre" loading="lazy" width="360" height="360" /></a>
+                                <div class="djj-product-card__body">
+                                    <span class="djj-product-card__category">Combo · @combo.CantidadProductos componentes</span><h3>@combo.Nombre</h3>
+                                    <p class="djj-product-card__description">@(string.IsNullOrWhiteSpace(combo.ComponentesResumen) ? combo.Descripcion : combo.ComponentesResumen)</p>
+                                    <div><strong class="djj-product-card__price">₡@combo.Precio.ToString("N0")</strong><span class="djj-status-badge djj-status-badge--@comboStatus djj-product-card__stock">@(combo.Disponible ? $"Disponibles: {combo.StockDisponible}" : "Agotado")</span></div>
+                                    <div class="djj-product-card__actions">
+                                        <a class="djj-button djj-button--outline djj-button--sm" asp-controller="Home" asp-action="ComboDetail" asp-route-id="@combo.ComboId" asp-route-returnUrl="@returnUrl">Ver detalle</a>
+                                        @if (combo.Disponible)
+                                        {
+                                            <form asp-controller="Cart" asp-action="AddCombo" method="post">@Html.AntiForgeryToken()<input type="hidden" name="comboId" value="@combo.ComboId" /><input type="hidden" name="cantidad" value="1" /><button class="djj-button djj-button--primary djj-button--sm" type="submit">Agregar</button></form>
+                                        }
+                                        else
+                                        {
+                                            <button class="djj-button djj-button--neutral djj-button--sm" type="button" disabled>Agotado</button>
+                                        }
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </section>
+            }
+
+            <section class="djj-catalog-section" aria-labelledby="djj-products-title">
+                <div class="djj-catalog-section__header"><h2 id="djj-products-title">Productos</h2><p>@productos.Count producto(s) coinciden con la selección.</p></div>
+                @if (productos.Count == 0)
+                {
+                    <div class="djj-card djj-state"><span class="djj-state__icon"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-search"></use></svg></span><h3>No se encontraron productos</h3><p>Probá con otro texto o categoría.</p><a class="djj-button djj-button--primary djj-button--inline-mobile" asp-controller="Home" asp-action="Shop">Ver todo el catálogo</a></div>
+                }
+                else
+                {
+                    <div class="djj-catalog-grid">
+                        @foreach (var producto in productos)
+                        {
+                            var status = producto.Stock <= 0 ? "danger" : producto.Stock <= 5 ? "warning" : "success";
+                            var imagen = string.IsNullOrWhiteSpace(producto.ImagenUrl) ? Url.Content("~/img/product-placeholder.svg") : Url.Content(producto.ImagenUrl);
+                            <article class="djj-product-card">
+                                <a class="djj-product-card__media" asp-controller="Home" asp-action="Detail" asp-route-id="@producto.ProductoId" asp-route-returnUrl="@returnUrl"><img data-djj-product-image src="@imagen" alt="@producto.Nombre" loading="lazy" width="360" height="360" /></a>
+                                <div class="djj-product-card__body">
+                                    <span class="djj-product-card__category">@producto.Categoria</span><h3>@producto.Nombre</h3><p class="djj-product-card__description">@(string.IsNullOrWhiteSpace(producto.Descripcion) ? "Producto disponible en el catálogo activo." : producto.Descripcion)</p>
+                                    <div><strong class="djj-product-card__price">₡@producto.Precio.ToString("N0")</strong><span class="djj-status-badge djj-status-badge--@status djj-product-card__stock">@producto.EstadoStock · @producto.Stock unidad(es)</span></div>
+                                    <div class="djj-product-card__actions">
+                                        <a class="djj-button djj-button--outline djj-button--sm" asp-controller="Home" asp-action="Detail" asp-route-id="@producto.ProductoId" asp-route-returnUrl="@returnUrl">Ver detalle</a>
+                                        @if (producto.Stock > 0)
+                                        {
+                                            <form asp-controller="Cart" asp-action="Add" method="post">@Html.AntiForgeryToken()<input type="hidden" name="productoId" value="@producto.ProductoId" /><input type="hidden" name="cantidad" value="1" /><button class="djj-button djj-button--primary djj-button--sm" type="submit">Agregar</button></form>
+                                        }
+                                        else
+                                        {
+                                            <button class="djj-button djj-button--neutral djj-button--sm" type="button" disabled>Agotado</button>
+                                        }
+                                    </div>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+        </main>
+    </div>
+</div>
+
+<aside id="djj-catalog-drawer" class="djj-drawer djj-drawer--left" aria-label="Filtros de categoría" aria-hidden="true" data-djj-drawer>
+    <div class="djj-drawer__header"><strong>Categorías</strong><button class="djj-icon-button" type="button" aria-label="Cerrar filtros" data-djj-drawer-close><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-close"></use></svg></button></div>
+    <div class="djj-drawer__body"><ul class="djj-catalog-filter-list"><li><a asp-controller="Home" asp-action="Shop" asp-route-buscar="@Model.Buscar" aria-current="@(string.IsNullOrWhiteSpace(Model.Categoria) ? "true" : null)">Todos</a></li>@foreach (var categoria in categorias){<li><a asp-controller="Home" asp-action="Shop" asp-route-categoria="@categoria" asp-route-buscar="@Model.Buscar" aria-current="@(string.Equals(Model.Categoria, categoria, StringComparison.OrdinalIgnoreCase) ? "true" : null)">@categoria</a></li>}</ul></div>
+</aside>
+<button class="djj-scrim" type="button" aria-label="Cerrar filtros" aria-controls="djj-catalog-drawer" data-djj-drawer-scrim hidden></button>

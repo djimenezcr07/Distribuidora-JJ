@@ -1,0 +1,50 @@
+@model Proyecto_Final.Models.Admin.DocumentFormViewModel
+@using Proyecto_Final.Models.Admin
+@{
+    var types = ViewBag.Types as IReadOnlyList<SelectOptionViewModel> ?? Array.Empty<SelectOptionViewModel>();
+    var departments = ViewBag.Departments as IReadOnlyList<SelectOptionViewModel> ?? Array.Empty<SelectOptionViewModel>();
+}
+<input asp-for="DocumentId" type="hidden" />
+<div asp-validation-summary="All" class="djj-validation-summary" data-djj-validation-summary tabindex="-1" role="alert"></div>
+<fieldset class="djj-document-fieldset">
+    <legend>Identificación</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field djj-form-grid__full"><label asp-for="Title">Título</label><input asp-for="Title" class="djj-input" /><span asp-validation-for="Title" class="djj-field-error"></span></div>
+        <div class="djj-field djj-form-grid__full"><label asp-for="ReferenceNumber">Referencia</label><input asp-for="ReferenceNumber" class="djj-input" /><span asp-validation-for="ReferenceNumber" class="djj-field-error"></span></div>
+    </div>
+</fieldset>
+<fieldset class="djj-document-fieldset">
+    <legend>Clasificación y departamento</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field"><label asp-for="TypeId">Tipo</label><select asp-for="TypeId" class="djj-select"><option value="">Seleccione</option>@foreach (var item in types) { <option value="@item.Id">@item.Name</option> }</select><span asp-validation-for="TypeId" class="djj-field-error"></span></div>
+        <div class="djj-field"><span>Departamento responsable</span><input asp-for="DepartmentId" type="hidden" /><p class="djj-muted">@(Model.DepartmentId.HasValue ? departments.FirstOrDefault(item => item.Id == Model.DepartmentId)?.Name ?? "Departamento registrado" : "Documento personal")</p><small>El cambio de departamento requiere una fuente de autorización acreditada y permanece bloqueado.</small><span asp-validation-for="DepartmentId" class="djj-field-error"></span></div>
+    </div>
+</fieldset>
+<fieldset class="djj-document-fieldset">
+    <legend>Vigencia</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field"><label asp-for="IssueDate">Emisión</label><input asp-for="IssueDate" class="djj-input" /><span asp-validation-for="IssueDate" class="djj-field-error"></span></div>
+        <div class="djj-field"><label asp-for="ExpirationDate">Vencimiento</label><input asp-for="ExpirationDate" class="djj-input" aria-describedby="document-expiration-help" /><small id="document-expiration-help">Indicá la fecha de vencimiento o seleccioná «No vence».</small><span asp-validation-for="ExpirationDate" class="djj-field-error"></span></div>
+        <div class="djj-checkbox-field djj-form-grid__full"><input asp-for="DoesNotExpire" /><label asp-for="DoesNotExpire">No vence</label></div>
+    </div>
+</fieldset>
+@if (Model.DocumentId == 0)
+{
+    <fieldset class="djj-document-fieldset">
+        <legend>Archivo</legend>
+        <div class="djj-field djj-document-upload">
+            <label asp-for="File">Archivo privado</label>
+            <input asp-for="File" type="file" class="djj-input" accept=".pdf,.jpg,.jpeg,.png" required data-file-label="document-file-name" aria-describedby="document-file-help document-file-name" />
+            <span id="document-file-name" class="djj-table__note" aria-live="polite">Ningún archivo seleccionado</span>
+            <small id="document-file-help">PDF, JPG, JPEG o PNG. Máximo 10 MB. La descarga requiere autorización.</small>
+            <span asp-validation-for="File" class="djj-field-error"></span>
+        </div>
+    </fieldset>
+}
+<fieldset class="djj-document-fieldset">
+    <legend>Descripción y estado</legend>
+    <div class="djj-form-grid">
+        <div class="djj-field djj-form-grid__full"><label asp-for="Description">Descripción</label><textarea asp-for="Description" class="djj-textarea" rows="3"></textarea><span asp-validation-for="Description" class="djj-field-error"></span></div>
+        <div class="djj-field"><label asp-for="Status">Estado del documento</label><select asp-for="Status" class="djj-select"><option>Vigente</option><option>Suspendido</option><option>Archivado</option></select><span asp-validation-for="Status" class="djj-field-error"></span></div>
+    </div>
+</fieldset>

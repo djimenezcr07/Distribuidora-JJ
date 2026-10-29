@@ -1,0 +1,59 @@
+ M Proyecto_Final.Tests/OfflineStoragePrivacyTests.cs
+ M Proyecto_Final/Controllers/ChatController.cs
+ M Proyecto_Final/Views/Cart/Index.cshtml
+ M Proyecto_Final/Views/Chat/Index.cshtml
+ M Proyecto_Final/Views/DriverDeliveries/Route.cshtml
+ M Proyecto_Final/Views/Fleet/Mileage.cshtml
+ M Proyecto_Final/Views/Home/ComboDetail.cshtml
+ M Proyecto_Final/Views/Home/Detail.cshtml
+ M Proyecto_Final/Views/Home/Index.cshtml
+ M Proyecto_Final/Views/Home/Shop.cshtml
+ M Proyecto_Final/Views/Inventory/Edit.cshtml
+ M Proyecto_Final/Views/Inventory/Index.cshtml
+ M Proyecto_Final/Views/Shared/_FieldLayout.cshtml
+ M Proyecto_Final/Views/Shared/_Layout.cshtml
+ M Proyecto_Final/Views/Shared/_StorefrontLayout.cshtml
+ M Proyecto_Final/Views/Shared/_ValidationScriptsPartial.cshtml
+ M Proyecto_Final/Views/Shared/_WorkspaceLayout.cshtml
+ M Proyecto_Final/Views/Vehicles/Create.cshtml
+ M Proyecto_Final/Views/Vehicles/Edit.cshtml
+ M Proyecto_Final/Views/Vehicles/Index.cshtml
+ M Proyecto_Final/Views/_ViewImports.cshtml
+ M Proyecto_Final/wwwroot/brand/stage2/logo_stage2-identity_compact_20260821_color.svg
+ M Proyecto_Final/wwwroot/css/stage2/base.css
+ M Proyecto_Final/wwwroot/css/stage2/components.css
+ M Proyecto_Final/wwwroot/css/stage2/field.css
+ M Proyecto_Final/wwwroot/css/stage2/storefront.css
+ M Proyecto_Final/wwwroot/css/stage2/tokens.css
+ M Proyecto_Final/wwwroot/css/stage2/workspace.css
+ M Proyecto_Final/wwwroot/js/driver-deliveries.js
+ M Proyecto_Final/wwwroot/js/secure-offline-storage.js
+ M Proyecto_Final/wwwroot/js/stage2/layouts.js
+ M Proyecto_Final/wwwroot/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js
+ M Proyecto_Final/wwwroot/lib/jquery-validation/dist/jquery.validate.min.js
+?? ../.cache/
+?? "../Grupo 7 Proyecto - Marco Te\303\263rico y Metodolog\303\255a.docx"
+?? ../REPORTE_AZURE_2026-09-30.md
+?? ../REPORTE_AZURE_2026-10-01.md
+?? ../Supermercado_Mayoreo_Presentacion_Ejecutiva.pptx
+?? ../Supermercado_Mayoreo_Presentacion_Ejecutiva.pptx.inspect.ndjson
+?? ../Supermercado_Mayoreo_Presentacion_Ejecutiva/
+?? .agents/
+?? Proyecto_Final.Tests/ChatPresentationStateTests.cs
+?? Proyecto_Final.Tests/ProductImagePresentationTests.cs
+?? Proyecto_Final/TagHelpers/
+?? Proyecto_Final/wwwroot/img/product-placeholder.svg
+?? Proyecto_Final/wwwroot/js/driver-route-map.js
+?? Proyecto_Final/wwwroot/js/driver-signature.js
+?? Proyecto_Final/wwwroot/lib/THIRD-PARTY-NOTICES.md
+?? Proyecto_Final/wwwroot/lib/jquery/
+?? docs/MANUAL_USUARIO_SISTEMA.docx
+?? docs/MANUAL_USUARIO_SISTEMA.md
+?? docs/MANUAL_USUARIO_SISTEMA.pdf
+?? docs/PRESENTACION_EJECUTIVA_HOY.md
+?? docs/qa/
+?? scripts/ui/
+?? ../_codex_docx_work/
+?? ../_pptx_build/
+?? ../azure-reactivacion-bloqueada.png
+?? ../azure-recursos-vigentes.png

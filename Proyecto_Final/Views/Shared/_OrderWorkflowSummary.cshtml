@@ -1,0 +1,28 @@
+@model Proyecto_Final.Models.Admin.OrderDetailViewModel
+@using Proyecto_Final.Models.Presentation
+@{
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("es-CR");
+}
+<section class="djj-card djj-form-card" aria-labelledby="order-context-title">
+    <h2 id="order-context-title">Información del pedido</h2>
+    <dl class="djj-detail-grid">
+        <div><dt>Pedido</dt><dd>#@Model.PedidoId</dd></div>
+        <div><dt>Estado actual</dt><dd><span class="djj-badge djj-badge--@OrderStatusPresentation.Tone(Model.Estado)">@Model.Estado</span></dd></div>
+        <div><dt>Cliente</dt><dd>@Model.Cliente<small class="djj-table__note">@Model.Correo</small></dd></div>
+        <div><dt>Fecha</dt><dd>@Model.FechaPedido.ToString("dd/MM/yyyy HH:mm")</dd></div>
+        <div><dt>Entrega</dt><dd>@(Model.TipoEntrega ?? "—")</dd></div>
+        <div><dt>Total del pedido</dt><dd><strong class="djj-order-money djj-money--dominant">₡@Model.Total.ToString("N2", culture)</strong></dd></div>
+        @if (!string.IsNullOrWhiteSpace(Model.DireccionEntrega))
+        {
+            <div class="djj-form-grid__full"><dt>Dirección de entrega</dt><dd>@Model.DireccionEntrega</dd></div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+        {
+            <div class="djj-form-grid__full"><dt>Observaciones</dt><dd class="djj-order-notes">@Model.Observaciones</dd></div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.MotivoRechazo))
+        {
+            <div class="djj-form-grid__full"><dt>Motivo de rechazo</dt><dd class="djj-order-notes">@Model.MotivoRechazo</dd></div>
+        }
+    </dl>
+</section>

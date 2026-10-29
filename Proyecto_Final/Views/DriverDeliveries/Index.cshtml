@@ -1,0 +1,10 @@
+@model IEnumerable<Proyecto_Final.Models.Admin.DriverRouteItemViewModel>
+@{
+    Layout = "_FieldLayout";
+    ViewData["Title"] = "Mis entregas";
+    string BadgeEstado(string e) => e switch { "Planificada" => "warning", "Despachada" => "info", "Completada" => "success", _ => "neutral" };
+}
+
+<header class="djj-page-header djj-field-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Ruta y entregas</span><h1>Mis entregas</h1><p>Abre una ruta despachada para actualizar cada entrega.</p></div></header>
+@if (Model == null || !Model.Any()) { <section class="djj-empty-state djj-card"><svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-truck"></use></svg><h2>Sin rutas asignadas</h2><p>Cuando logística te asigne una ruta, aparecerá aquí.</p></section> }
+else { <section class="djj-field-route-list" aria-label="Rutas asignadas">@foreach (var r in Model) { var progress = r.TotalPedidos == 0 ? 0 : (r.Entregados * 100 / r.TotalPedidos); <article class="djj-field-route-card"><div class="djj-field-card__head"><div><span class="djj-field-card__eyebrow">@r.Zona</span><h2>@r.Codigo</h2></div><span class="djj-status-badge djj-status-badge--@BadgeEstado(r.Estado)">@r.Estado</span></div><dl class="djj-field-meta"><div><dt>Vehículo</dt><dd>@r.VehiculoPlaca</dd></div>@if (r.FechaDespacho.HasValue) { <div><dt>Despachada</dt><dd>@r.FechaDespacho.Value.ToString("dd/MM/yyyy HH:mm")</dd></div> }</dl><div class="djj-field-progress" aria-label="@r.Entregados de @r.TotalPedidos entregas completadas"><div class="djj-field-progress__label"><span>@r.Entregados entregadas</span><span>@r.Pendientes pendientes de @r.TotalPedidos</span></div><div class="djj-field-progress__track"><span style="--djj-progress-value:@progress%"></span></div></div><a asp-action="Route" asp-route-id="@r.RutaId" class="djj-button djj-button--primary djj-button--block">Ver entregas <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-arrow-right"></use></svg></a></article> }</section> }

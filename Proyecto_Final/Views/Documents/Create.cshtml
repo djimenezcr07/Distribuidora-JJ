@@ -1,0 +1,15 @@
+@model Proyecto_Final.Models.Admin.DocumentFormViewModel
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = "Nuevo documento"; }
+<div class="djj-documents">
+<header class="djj-page-header"><div class="djj-page-header__copy"><span class="djj-page-header__eyebrow">Gestión documental</span><h1>Nuevo documento</h1><p>Registrá sus metadatos y un archivo privado.</p></div></header>
+<partial name="_DocumentsNavigation" />
+<section class="djj-card djj-form-card" aria-labelledby="document-create-title">
+    <h2 id="document-create-title">Datos del documento</h2>
+    <form asp-action="Create" method="post" enctype="multipart/form-data" data-djj-document-form>
+        @Html.AntiForgeryToken()
+        <partial name="_Form" model="Model" />
+        <div class="djj-form-actions"><button type="submit" class="djj-button djj-button--primary">Guardar documento</button></div>
+    </form>
+</section>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /><script src="~/js/stage2/documents.js" asp-append-version="true"></script> }

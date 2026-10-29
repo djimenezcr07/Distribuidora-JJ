@@ -1,0 +1,173 @@
+﻿@using Microsoft.AspNetCore.Http
+@{
+    ViewData["Stage2Layout"] = true;
+    var brandName = Company.Value.BrandName;
+    var brandSubtitle = Company.Value.BrandSubtitle;
+    var pageTitle = ViewData["Title"]?.ToString();
+    var documentTitle = string.IsNullOrWhiteSpace(pageTitle) ? brandName : $"{pageTitle} - {brandName}";
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    var isLoggedIn = Context.Session.GetInt32("UserId") is > 0;
+    var userName = Context.Session.GetString("UserFullName") ?? "Mi cuenta";
+    var userRole = Context.Session.GetString("UserRole") ?? string.Empty;
+    var bodyClass = ViewData["BodyClass"]?.ToString() ?? string.Empty;
+    var isClient = string.Equals(userRole, "Cliente", StringComparison.OrdinalIgnoreCase);
+    bool IsCurrent(string expectedController, string? expectedAction = null) =>
+        string.Equals(controller, expectedController, StringComparison.OrdinalIgnoreCase)
+        && (expectedAction is null || string.Equals(action, expectedAction, StringComparison.OrdinalIgnoreCase));
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@brandName - @brandSubtitle" />
+    <title>@documentTitle</title>
+    <link rel="icon" type="image/svg+xml" href="~/brand/stage2/icon_stage2-identity_favicon_20260821_32.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/stage2/tokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/storefront.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/stage2/utilities.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="djj-stage2 djj-storefront @bodyClass" data-djj-layout="storefront" data-authenticated-user-id="@(Context.Session.GetInt32("UserId")?.ToString() ?? string.Empty)">
+    <a class="djj-skip-link" href="#djj-main-content">Saltar al contenido principal</a>
+    <partial name="_DjjIconSprite" />
+
+    <header class="djj-storefront__header">
+        <div class="djj-container djj-storefront__bar">
+            <button class="djj-icon-button djj-storefront__mobile-toggle" type="button"
+                    aria-label="Abrir navegación" aria-controls="djj-storefront-drawer" aria-expanded="false"
+                    data-djj-drawer-open="djj-storefront-drawer">
+                <svg class="djj-icon djj-icon--lg" aria-hidden="true"><use href="#djj-icon-menu"></use></svg>
+            </button>
+
+            <a class="djj-storefront__brand" asp-controller="Home" asp-action="Index" aria-label="@brandName — Inicio">
+                <picture>
+                    <source media="(max-width: 63.99rem)" srcset="@Url.Content("~/brand/stage2/logo_stage2-identity_compact_20260821_color.svg")" />
+                    <img src="~/brand/stage2/logo_stage2-identity_horizontal_20260821_color.svg"
+                         width="640" height="160" alt="@brandName" />
+                </picture>
+            </a>
+
+            <form class="djj-search-box djj-storefront__search" asp-controller="Home" asp-action="Shop" method="get" role="search">
+                <label class="djj-sr-only" for="djj-store-search">Buscar productos</label>
+                <input id="djj-store-search" name="buscar" type="search" placeholder="Buscar en el catálogo" autocomplete="off" />
+                <button class="djj-icon-button" type="submit" aria-label="Buscar">
+                    <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-search"></use></svg>
+                </button>
+            </form>
+
+            <div class="djj-storefront__actions">
+                @if (isLoggedIn)
+                {
+                    <a class="djj-storefront__action djj-storefront__account" asp-controller="Profile" asp-action="Edit">
+                        <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-user"></use></svg>
+                        <span class="djj-storefront__action-label">@userName</span>
+                    </a>
+                }
+                else
+                {
+                    <a class="djj-storefront__action djj-storefront__account" asp-controller="Account" asp-action="Login">
+                        <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-user"></use></svg>
+                        <span class="djj-storefront__action-label">Ingresar</span>
+                    </a>
+                }
+                <a class="djj-storefront__action" asp-controller="Cart" asp-action="Index">
+                    <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-cart"></use></svg>
+                    <span class="djj-storefront__action-label">Carrito</span>
+                    <span class="djj-sr-only">Abrir carrito</span>
+                </a>
+            </div>
+        </div>
+
+        <nav class="djj-storefront__nav" aria-label="Navegación comercial">
+            <ul class="djj-container djj-storefront__nav-list">
+                <li><a asp-controller="Home" asp-action="Index" aria-current="@(IsCurrent("Home", "Index") ? "page" : null)">Inicio</a></li>
+                <li><a asp-controller="Home" asp-action="Shop" aria-current="@(IsCurrent("Home", "Shop") || IsCurrent("Home", "Detail") ? "page" : null)">Tienda</a></li>
+                <li><a asp-controller="Home" asp-action="Contact" aria-current="@(IsCurrent("Home", "Contact") ? "page" : null)">Contacto</a></li>
+                @if (isLoggedIn)
+                {
+                    @if (isClient)
+                    {
+                        <li><a asp-controller="ClientPortal" asp-action="Index" aria-current="@(IsCurrent("ClientPortal") ? "page" : null)">Mi cuenta</a></li>
+                        <li><a asp-controller="Documents" asp-action="Index">Mis documentos</a></li>
+                        <li><a asp-controller="ChatV2" asp-action="Index">Chat V2 · disponibilidad</a></li>
+                    }
+                    <li><a asp-controller="Assistant" asp-action="Index" aria-current="@(IsCurrent("Assistant") ? "page" : null)">Asistente</a></li>
+                }
+            </ul>
+        </nav>
+    </header>
+
+    <aside id="djj-storefront-drawer" class="djj-drawer djj-drawer--left" role="dialog" aria-modal="true" aria-label="Navegación móvil" aria-hidden="true" data-djj-drawer>
+        <div class="djj-drawer__header">
+            <img src="~/brand/stage2/logo_stage2-identity_compact_20260821_color.svg" width="420" height="120" alt="@brandName" />
+            <button class="djj-icon-button" type="button" aria-label="Cerrar navegación" data-djj-drawer-close>
+                <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-close"></use></svg>
+            </button>
+        </div>
+        <div class="djj-drawer__body">
+            <nav aria-label="Navegación móvil principal">
+                <ul class="djj-mobile-nav">
+                    <li><a asp-controller="Home" asp-action="Index" aria-current="@(IsCurrent("Home", "Index") ? "page" : null)"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-house"></use></svg>Inicio</a></li>
+                    <li><a asp-controller="Home" asp-action="Shop" aria-current="@(IsCurrent("Home", "Shop") ? "page" : null)"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-store"></use></svg>Tienda</a></li>
+                    <li><a asp-controller="Cart" asp-action="Index"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-cart"></use></svg>Carrito</a></li>
+                    <li class="djj-mobile-nav__divider" aria-hidden="true"></li>
+                    @if (isLoggedIn)
+                    {
+                        @if (isClient)
+                        {
+                            <li><a asp-controller="ClientPortal" asp-action="Index" aria-current="@(IsCurrent("ClientPortal") ? "page" : null)"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-orders"></use></svg>Mi cuenta</a></li>
+                        }
+                        <li><a asp-controller="Profile" asp-action="Edit"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-user"></use></svg>@userName <span class="djj-sr-only">(@userRole)</span></a></li>
+                        <li><a asp-controller="Assistant" asp-action="Index"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-robot"></use></svg>Asistente</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-controller="Account" asp-action="Login"><svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-user"></use></svg>Iniciar sesión</a></li>
+                    }
+                </ul>
+            </nav>
+            @if (isLoggedIn)
+            {
+                <form class="djj-mobile-nav__logout" asp-controller="Account" asp-action="Logout" method="post" data-clear-private-storage="true">
+                    @Html.AntiForgeryToken()
+                    <button class="djj-button djj-button--outline djj-full-width" type="submit">
+                        <svg class="djj-icon" aria-hidden="true"><use href="#djj-icon-sign-out"></use></svg>Cerrar sesión
+                    </button>
+                </form>
+            }
+        </div>
+    </aside>
+    <button class="djj-scrim" type="button" aria-label="Cerrar navegación" aria-controls="djj-storefront-drawer" data-djj-drawer-scrim hidden></button>
+
+    <main id="djj-main-content" class="djj-storefront__main" tabindex="-1">
+        <div class="djj-container djj-storefront__messages"><partial name="_Stage2Messages" /></div>
+        @RenderBody()
+    </main>
+
+    <footer class="djj-storefront__footer">
+        <div class="djj-container djj-storefront__footer-grid">
+            <div class="djj-storefront__footer-brand">
+                <img src="~/brand/stage2/logo_stage2-identity_horizontal_20260821_reversed.svg" width="640" height="160" alt="@brandName" />
+                <p>@brandSubtitle. Catálogo, pedidos y operación conectados en una experiencia clara.</p>
+            </div>
+            <nav class="djj-storefront__footer-links" aria-label="Enlaces del pie">
+                <a asp-controller="Home" asp-action="Shop">Tienda</a>
+                <a asp-controller="Home" asp-action="Contact">Contacto</a>
+                <a asp-controller="Home" asp-action="Privacy">Privacidad</a>
+            </nav>
+        </div>
+        <div class="djj-container djj-storefront__footer-bottom">&copy; @DateTime.UtcNow.Year @brandName</div>
+    </footer>
+
+    <script src="~/js/secure-offline-storage.js" asp-append-version="true"></script>
+    <script src="~/js/stage2/layouts.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

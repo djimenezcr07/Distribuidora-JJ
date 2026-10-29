@@ -1,0 +1,31 @@
+@model Proyecto_Final.Models.Admin.RouteEvidencesViewModel
+@using Proyecto_Final.Models.Presentation
+@{ Layout = "_WorkspaceLayout"; ViewData["Title"] = $"Evidencias de {Model.Cabecera.Codigo}"; var c = Model.Cabecera; }
+<div class="djj-logistics djj-stack">
+    <partial name="_LogisticsNavigation" />
+    <header class="djj-page-header"><div><h1>Evidencias de la ruta @c.Codigo</h1><p>@c.Zona · @c.Chofer · @c.VehiculoPlaca</p></div><a asp-action="Detail" asp-route-id="@c.RutaId" class="djj-button djj-button--outline">Volver a la ruta</a></header>
+    <section class="djj-card djj-data-section"><header><h2>Resumen por pedido</h2><p>Las evidencias se consultan mediante acceso autorizado.</p></header>
+        <div class="djj-table-wrap" tabindex="0" aria-label="Resumen de evidencias desplazable"><table class="djj-table"><caption class="djj-sr-only">Entregas y cantidad de evidencias por pedido</caption><thead><tr><th scope="col">Pedido</th><th scope="col">Cliente</th><th scope="col">Entrega</th><th scope="col">Evidencias</th></tr></thead><tbody>
+        @if (!Model.Resumen.Any()) { <tr><td colspan="4">No hay pedidos con resumen de evidencias.</td></tr> }
+        @foreach (var s in Model.Resumen) { <tr><th scope="row">#@s.PedidoId</th><td>@s.Cliente</td><td><span class="djj-badge djj-badge--@LogisticsStatusPresentation.DeliveryTone(s.EstadoEntrega)">@s.EstadoEntrega</span></td><td>@if (s.SinEvidencia) { <span class="djj-badge djj-badge--warning">Sin evidencia</span> } else { <span>@s.TotalEvidencias registro(s)</span> }</td></tr> }
+        </tbody></table></div>
+    </section>
+    <section class="djj-card djj-logistics-pad"><h2>Archivos de evidencia</h2>
+    @if (!Model.Evidencias.Any()) { <p class="djj-text-secondary">Aún no se han registrado evidencias disponibles para esta ruta.</p> }
+    else { <div class="djj-logistics-evidence-grid">
+        @foreach (var e in Model.Evidencias) {
+            <article class="djj-logistics-evidence">
+                <h3>Pedido #@e.PedidoId · @e.TipoEvidencia</h3>
+                @if (e.MimeType is "image/jpeg" or "image/png" or "image/webp") {
+                    <figure data-djj-evidence><img src="@Url.Action("View", "DeliveryEvidence", new { id = e.EvidenciaId })" alt="@e.TipoEvidencia del pedido @e.PedidoId" width="320" height="200" loading="lazy" /><figcaption hidden>Vista previa no disponible. Usá el enlace autorizado para consultar el archivo.</figcaption></figure>
+                }
+                <p><time datetime="@e.FechaRegistro.ToString("O")">@e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</time></p>
+                <p class="djj-text-secondary">Registrada por @e.RegistradoPorNombre</p>
+                @if (!string.IsNullOrWhiteSpace(e.Observaciones)) { <p>@e.Observaciones</p> }
+                @if (e.HasPrivateFile) { <a asp-controller="DeliveryEvidence" asp-action="View" asp-route-id="@e.EvidenciaId" target="_blank" rel="noopener" class="djj-button djj-button--outline">Ver archivo autorizado<span class="djj-sr-only"> del pedido @e.PedidoId, nueva pestaña</span></a> } else { <p class="djj-table__note">Referencia histórica; archivo pendiente de reconciliación privada.</p> }
+            </article>
+        }
+    </div> }
+    </section>
+</div>
+@section Scripts { <script src="~/js/stage2/logistics-ui.js" asp-append-version="true"></script> }

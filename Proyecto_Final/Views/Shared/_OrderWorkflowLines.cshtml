@@ -1,0 +1,35 @@
+@model Proyecto_Final.Models.Admin.OrderDetailViewModel
+@{
+    var showStock = ViewData["OrderWorkflowShowStock"] is true;
+    var culture = System.Globalization.CultureInfo.GetCultureInfo("es-CR");
+}
+<section class="djj-card djj-data-section" aria-labelledby="order-lines-title">
+    <header><div><h2 id="order-lines-title">Productos del pedido</h2><p>@Model.Detalles.Count línea(s) registradas.</p></div></header>
+    <div class="djj-table-wrap" tabindex="0" role="region" aria-label="Productos del pedido; desplazamiento horizontal">
+        <table class="djj-table djj-table--compact">
+            <caption class="djj-sr-only">Detalle e importes del pedido #@Model.PedidoId</caption>
+            <thead><tr><th scope="col">Producto</th><th scope="col" class="djj-align-right">Cantidad</th><th scope="col" class="djj-align-right">Precio unitario</th><th scope="col" class="djj-align-right">Subtotal de línea</th>@if (showStock) { <th scope="col">Disponibilidad actual</th> }</tr></thead>
+            <tbody>
+                @if (!Model.Detalles.Any())
+                {
+                    <tr><td colspan="@(showStock ? 5 : 4)"><div class="djj-empty-state"><h3>Sin líneas disponibles</h3><p>No se recibió detalle de productos para este pedido.</p></div></td></tr>
+                }
+                @foreach (var item in Model.Detalles)
+                {
+                    <tr>
+                        <th scope="row"><span class="djj-table__primary">@item.Producto</span>@if (item.IsCombo) { <small class="djj-table__note">Combo</small> }</th>
+                        <td class="djj-align-right">@item.Cantidad</td>
+                        <td class="djj-align-right djj-order-money">₡@item.PrecioUnitario.ToString("N2", culture)</td>
+                        <td class="djj-align-right djj-order-money">₡@item.Subtotal.ToString("N2", culture)</td>
+                        @if (showStock)
+                        {
+                            var stockOk = item.StockActual >= item.Cantidad;
+                            <td><span class="djj-badge djj-badge--@(stockOk ? "success" : "warning")">@item.StockActual · @(stockOk ? "Suficiente" : "Insuficiente")</span></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tfoot><tr><th scope="row" colspan="3" class="djj-align-right">Total del pedido</th><td class="djj-align-right djj-order-money"><strong>₡@Model.Total.ToString("N2", culture)</strong></td>@if (showStock) { <td></td> }</tr></tfoot>
+        </table>
+    </div>
+</section>
